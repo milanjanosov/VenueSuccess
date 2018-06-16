@@ -190,4 +190,3 @@ def plot_final_results(city, outfolder):
 
 
 
-

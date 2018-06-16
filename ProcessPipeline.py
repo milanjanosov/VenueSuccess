@@ -6,15 +6,13 @@ import GetHomeLocations as Home
 import MachineLearningHomeFeatures as MLFeat
 import WhereIsHomeClassification as Class
 import CompareHomingMethods as Compare
-
-
+import CallOldPython as Call 
+import SumNetworks as SNW
 
 
 ''' TODO '''
 
 '''
-- distance -> 1/weight a network reszen
-- user id is not a feature either
 - classification confidence range! rank
 - network of regions?
 
@@ -44,6 +42,7 @@ outroot = '../ProcessedData/' + city + '/'
 ParseJsons.create_folder(outroot + 'user_info') 
 ParseJsons.create_folder(outroot + 'venues_info')
 ParseJsons.create_folder(outroot + 'user_homes')
+ParseJsons.create_folder(outroot + 'networks')
 ParseJsons.create_folder(outroot + 'user_homes/figures')
 ParseJsons.create_folder(outroot + 'user_homes/comparison')
 ParseJsons.create_folder(outroot + 'user_homes/centroids')
@@ -60,20 +59,22 @@ if sys.argv[2] == 'preproc':
 
 
     users_homes   = {}
-    users_likes   = ParseJsons.get_users_like_location(city, bbox, inroot, outroot, users_homes)  
-    num_users     = len(users_likes.keys())
-    users_friends = ParseJsons.get_users_friends(city, inroot, outroot)
-    users_photos  = ParseJsons.get_photos_locations_and_users(city, bbox, inroot, outroot, users_homes)
+  #  users_likes   = ParseJsons.get_users_like_location(city, bbox, inroot, outroot, users_homes)  
+ #   num_users     = len(users_likes.keys())
+   # users_friends = ParseJsons.get_users_friends(city, inroot, outroot)
+ #   users_photos  = ParseJsons.get_photos_locations_and_users(city, bbox, inroot, outroot, users_homes)
 
 
-    ParseJsons.write_home_locations(users_homes, city, outroot, num_users)#10)
-    ParseJsons.get_users_coordinates(users_likes, users_friends, users_photos, city, outroot)
-    ParseJsons.get_users_distance_distr_from_home(city, outroot)
+  #  ParseJsons.write_home_locations(users_homes, city, outroot, num_users)#10)
+  #  ParseJsons.get_users_coordinates(users_likes, users_friends, users_photos, city, outroot)
+  #  ParseJsons.get_users_distance_distr_from_home(city, outroot)
 
     ParseJsons.get_users_venues(users_photos, users_likes, city, outroot)
 
     ParseJsons.get_venues_information(city, bbox, inroot, outroot)
-    ParseJsons.venues_distance_mtx(city, outroot)
+ #   ParseJsons.venues_distance_mtx(city, outroot)
+
+ #   ParseJsons.get_venues_users(city, outroot)
 
 
 
@@ -115,6 +116,35 @@ elif sys.argv[2] == 'home_full':
  #       Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     
     Compare.plot_final_results(city, outroot)
+
+
+elif sys.argv[2] == 'networks':
+
+    eps       = 0.02
+    mins      = 3
+    LIMIT_num = 5
+    infile    = outroot + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat'
+   
+
+    Call.call_python_version('2.7', 'BuildNetworks', 'do_all_the_networks', [city, outroot, infile])
+
+
+
+
+''' 
+
+    MERGELES: 
+    - venue -> zipcode map
+    - full_locationt atmappelni
+    - networkos reszt atparameterezni ugyh venue, zipcode, ...
+
+'''
+
+
+
+
+
+
 
 
 

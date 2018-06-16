@@ -1,9 +1,3 @@
-
-
-'''   this script parses the jsons obtained from the mongodb        '''
-'''   and gets the coordinate list and home addresses of the users  '''
-
-
 # https://developer.foursquare.com/docs/api/photos/details 
 import os, sys
 import json
@@ -417,6 +411,60 @@ def get_users_distance_distr_from_home(city, outfolder):
     plt.savefig(outfolder + 'user_info/' + city + '_distances_from_home_locations.png')
     plt.close()
    
+
+
+
+'''  ---------------------------------------------------------  '''
+'''             get users similarity matrix                     '''
+'''  ---------------------------------------------------------  '''
+
+def jaccard(a, b):
+    c = a.intersection(b)
+    return float(len(c)) / (len(a) + len(b) - len(c))
+
+
+def get_users_similarity_mtx(city, outfolder):
+
+    users_venues = {} 
+    fout         = open(outfolder + '/user_info/' + city + '_users_jaccard_sim_mtx.dat', 'w')
+
+    for line in open( outfolder + '/user_info/' + city + '_user_venues_full.dat'):
+        fields                  = (line.strip().split('\t'))
+        users_venues[fields[0]] = set([ vv.split(',')[0] for vv in fields[1:]])
+
+
+    for u1, venues1 in users_venues.items():
+        for u2, venues2 in users_venues.items():
+            fout.write( u1 + '\t' + u2 + '\t' + str( jaccard(venues1, venues2)) + '\n')
+
+    fout.close()
+
+
+
+
+'''  ---------------------------------------------------------  '''
+'''                get venuesusers                              '''
+'''  ---------------------------------------------------------  '''
+
+def get_venues_users(city, outfolder):
+
+    venues_users = {}
+
+    for line in open( outfolder + '/user_info/' + city + '_user_venues_full.dat'):
+        fields  = (line.strip().split('\t'))
+        user    = fields[0]
+        venues  = [ vv.split(',')[0] for vv in fields[1:]]
+
+        for v in venues:
+            if v not in venues_users:
+                venues_users[v] = [user]
+            else:
+                venues_users[v].append(user)
+
+    fout = open(outfolder + '/venues_info/' + city + '_venues_users.dat', 'w')
+    for v, users in venues_users.items():
+        fout.write(v + '\t' + '\t'.join(users) + '\n')
+    fout.close()
 
 
 
