@@ -7,7 +7,8 @@ import MachineLearningHomeFeatures as MLFeat
 import WhereIsHomeClassification as Class
 import CompareHomingMethods as Compare
 import CallOldPython as Call 
-import SumNetworks as SNW
+import time
+#import SumNetworks as SNW
 
 
 ''' TODO '''
@@ -57,26 +58,54 @@ if sys.argv[2] == 'preproc':
     ''' ===================   ParseJsons.py   ===================== '''
     ''' =========================================================== '''
 
-
     users_homes   = {}
-  #  users_likes   = ParseJsons.get_users_like_location(city, bbox, inroot, outroot, users_homes)  
- #   num_users     = len(users_likes.keys())
-   # users_friends = ParseJsons.get_users_friends(city, inroot, outroot)
- #   users_photos  = ParseJsons.get_photos_locations_and_users(city, bbox, inroot, outroot, users_homes)
+
+    unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
+
+    ''' three types of users:
+            - live in bristol
+            - dont live in bristol
+            - we dont know
+    '''
+
+    t1 = time.time()
+ 
+    users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
+    users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
+    users_tips    = ParseJsons.get_tips_locations_and_users(    unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
 
 
-  #  ParseJsons.write_home_locations(users_homes, city, outroot, num_users)#10)
-  #  ParseJsons.get_users_coordinates(users_likes, users_friends, users_photos, city, outroot)
-  #  ParseJsons.get_users_distance_distr_from_home(city, outroot)
+    print(len(users_likes), len(users_photos), len(users_tips))
 
-    ParseJsons.get_users_venues(users_photos, users_likes, city, outroot)
+    uuu = list(users_likes.keys()) + list(users_photos.keys()) + list(users_tips.keys())
 
-    ParseJsons.get_venues_information(city, bbox, inroot, outroot)
- #   ParseJsons.venues_distance_mtx(city, outroot)
+    print(len(set(uuu).intersection(set(nonlocal_users))))
 
- #   ParseJsons.get_venues_users(city, outroot)
+    ParseJsons.get_users_coordinates(nonlocal_users, users_likes, users_tips,  users_photos, city, outroot)
+    ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_likes.keys()))#10)
+        
+ 
+    
+    t2 = time.time()
+
+    print (t2 - t1)   
 
 
+    ''' out_test:
+        - local users shouldn't have venues outside of the bbox
+        - nonlocal users shouldn't be present in the data
+        - unknown users should have locations both within and outside of the bbox
+    '''
+
+
+    '''
+
+    ParseJsons.get_users_distance_distr_from_home(city, outroot)           -->  csak amiknek van groundtruth home location, make sure fig is saved
+    ParseJsons.get_users_venues(users_photos, users_likes, city, outroot)  -->  for local+unknown users , not sure why would i need this
+    ParseJsons.get_venues_information(city, bbox, inroot, outroot)         -->  for all the venues we have here -- COMPARE venues.json AND FULL-VENUES FROM USERS
+    ParseJsons.venues_distance_mtx(city, outroot)                          -->  ONLY VENUES WITHIN BBOX
+    ParseJsons.get_venues_users(city, outroot)                             -->  ONLY venues within bbox and local_unknown users
+    '''
 
 elif sys.argv[2] == 'home_sample':
 
@@ -95,11 +124,11 @@ elif sys.argv[2] == 'home_full':
 
     LIMIT = 10
 
-    for LIMIT in range(20):
+    for LIMIT in range(1):
 
 
         ''' these are the centroid based things '''
- #       users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
+        users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
  #       Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
  #       Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
  #       Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
@@ -131,14 +160,17 @@ elif sys.argv[2] == 'networks':
 
 
 
-''' 
+
+    ''' 
+    1. FINISH SUMNETWORKS WHEN I HAVE THE NW MEASURES
+
 
     MERGELES: 
     - venue -> zipcode map
     - full_locationt atmappelni
     - networkos reszt atparameterezni ugyh venue, zipcode, ...
 
-'''
+    '''
 
 
 

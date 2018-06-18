@@ -69,7 +69,7 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
     # read the full friendshipnw
     filename  = outfolder + '/user_info/' + city  + '_users_friends.lgl' 
-    filename  = outfolder + '/user_info/' + city  + '_users_friends_sample.lgl' 
+    '''filename  = outfolder + '/user_info/' + city  + '_users_friends_sample.lgl' '''
     G_topol   = Graph.Read_Lgl(filename, names = True, weights = False, directed = False)
     all_users = set([line.strip().split('\t')[0] for line in open(infile)])
 
@@ -172,7 +172,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
                 edges.append((user1, user2))
                 weights.append(w)
 
-        if ind == 50: break
+    '''        if ind == 50: break '''
     
 
     G.add_vertices(list(all_users))
@@ -221,7 +221,7 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
     
         vv += venues
 
-        if ind == 100: break
+        '''if ind == 100: break '''
 
 
 
@@ -257,7 +257,7 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
                 edges.append((venue1, venue2))
                 weights.append(w)
 
-        if ind == 100: break
+        '''if ind == 100: break '''
 
 
     all_venues = list(all_venues)
@@ -491,24 +491,17 @@ def do_all_the_networks(city, outroot, infile):
 
 
     print city, infile
-  #  city = 'bristol'
-  #  outroot = '../ProcessedData/' + city + '/'
-
-    eps       = 0.02
-    mins      = 3
-    LIMIT_num = 5
-  #  infile    = outroot + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat'
 
 
     G_friends_topol, G_friends_geo = get_user_user_friendship_network_igraph(city, outroot, infile)
-    G_users       = get_user_user_similarity_network_igraph(city, outroot, infile)
-    G_venues      = get_venue_venue_similarity_network_igraph(city, outroot, infile)
+#    G_users       = get_user_user_similarity_network_igraph(city, outroot, infile)
+#    G_venues      = get_venue_venue_similarity_network_igraph(city, outroot, infile)
 
 
     calc_network_centralities(G_friends_geo,   outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
-    calc_network_centralities(G_friends_topol, outroot, city, infile, 'users_topo',      geo = False, weighted = False, venue = False)
-    calc_network_centralities(G_users,         outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
-    calc_network_centralities(G_venues,        outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
+ #   calc_network_centralities(G_friends_topol, outroot, city, infile, 'users_topo',      geo = False, weighted = False, venue = False)
+ #   calc_network_centralities(G_users,         outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+#    calc_network_centralities(G_venues,        outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
 
 
 

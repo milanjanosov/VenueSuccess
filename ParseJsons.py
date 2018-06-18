@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 
 
+
 '''  ---------------------------------------------------------  '''
 '''  make sure that the coordinates are within the bounding box '''
 '''  ---------------------------------------------------------  '''
@@ -31,54 +32,64 @@ def check_box(boundingbox, city, lat, lng):
 '''  harness the locations of places which the users liked      '''
 '''  ---------------------------------------------------------  '''
 
-def get_users_like_location(city, boundingbox, infolder, outfolder, users_homes):
+def get_users_like_location(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
 
     users_likes_locations = {}
     categories = {}
 
 
-    for line in open(infolder + city + '_likes.json', 'r'):
+    print(city + ' --  start parsing likes.json...')
+
+    for ind, line in enumerate(open(infolder + city + '_likes.json', 'r')):
     
+
+        #if ind == 5: break
+
         jsono = json.loads(line)
         user  = jsono['list']['user']['id']
 
-
-        for item in  jsono['list']['listItems']['items']:
-
-            location = item['venue']['location']
-            categ    = 'na'
-
-            try:
-                categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
-            except:
-                pass
-
-            if categ not in categories:
-                categories[categ] = 1
-            else:
-                categories[categ] += 1
-
-            lng = location['lng']
-            lat = location['lat']
-
-            venue = (item['venue']['id'], lng, lat, categ)
+        if str(user) in set(unknown_users + local_users):
+    
 
 
-            if check_box(boundingbox, city, item['venue']['location']['lat'], item['venue']['location']['lng']):
+            for item in  jsono['list']['listItems']['items']:
 
+                location = item['venue']['location']
+                categ    = 'na'
 
-                if 'Residential' in str((item['venue'])):
+                try:
+                    categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
+                except:
+                    pass
 
-                    if user not in users_homes:
-                        users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
-                    else:
-                        users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']))
-
-
-                if user not in users_likes_locations:
-                    users_likes_locations[user] = [venue]
+                if categ not in categories:
+                    categories[categ] = 1
                 else:
-                    users_likes_locations[user].append(venue)
+                    categories[categ] += 1
+
+                lng = location['lng']
+                lat = location['lat']
+
+                venue = (item['venue']['id'], lng, lat, categ)
+
+
+                if check_box(boundingbox, city, lat, lng):
+                    if 'Residential' in str((item['venue'])):
+
+                        if user not in users_homes:
+                            users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
+                        else:
+                            users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']))
+
+
+                if (str(user) in local_users and check_box(boundingbox, city, lat, lng)) or (str(user) in unknown_users):
+                
+                    if user not in users_likes_locations:
+                        users_likes_locations[user] = [venue]
+                    else:
+                        users_likes_locations[user].append(venue)
+      
+
 
 
     return users_likes_locations
@@ -87,29 +98,179 @@ def get_users_like_location(city, boundingbox, infolder, outfolder, users_homes)
 
 
 '''  ---------------------------------------------------------  '''
+'''  harness the locations of places which suggested as tips    '''
+'''  ---------------------------------------------------------  '''
+
+def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
+
+
+    users_tips = {}
+
+    print(city + ' --  start parsing tips.json...')
+
+    for ind, line in enumerate(open(infolder + city + '_tips.json', 'r')):
+
+
+        #if ind == 5: break
+
+
+        jsono = json.loads(line)
+        user  = jsono['id']
+
+        if str(user) in set(unknown_users + local_users):
+
+            for item in jsono['list']['listItems']['items']:
+
+                lng = item['venue']['location']['lng']
+                lat = item['venue']['location']['lat']
+
+                try:
+                    if 'Residential' in item['venue']['categories'][0]['shortName']:
+                    
+                        if check_box(boundingbox, city, lat, lng):
+                            
+                            if user not in users_homes:
+                                users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
+                            else:
+                                users_homes[user].add((str(lng)   + '\t' + str(lat) + '\t' + item['venue']['id']))
+
+                except: 
+                    pass
+
+
+                categ = 'na'
+                try:
+                    categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
+                except:
+                    pass
+
+
+                tip = (item['venue']['id'], lng, lat, categ )  
+
+
+                if (str(user) in local_users and check_box(boundingbox, city, lat, lng)) or (str(user) in unknown_users):
+                
+                    if user not in users_tips:
+                        users_tips[user] = [tip]
+                    else:
+                        users_tips[user].append(tip)
+
+
+
+    return users_tips
+
+
+
+
+'''  ---------------------------------------------------------  '''
+'''  harness the locations of places which from the users piced '''
+'''  ---------------------------------------------------------  '''
+
+def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
+
+
+    users_photos = {}
+
+    print(city + ' --  start parsing photos.json...')
+
+    for ind, line in enumerate(open(infolder + city + '_photos.json', 'r')):
+
+        #if ind == 5: break
+
+        jsono = json.loads(line)
+
+        count = jsono['totalCount']
+        user  = jsono['id']
+
+       # print(str(user), user in set(unknown_users + local_users))
+        if str(user) in set(unknown_users + local_users) and count > 0:
+
+
+
+            for index, item in enumerate(jsono['photos']['items']):
+
+                if 'venue' in item:
+
+                    location = item['venue']['location']
+
+
+                    categ = 'na'
+                    try:
+                        categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
+                    except:
+                        pass
+
+
+                    lng = item['venue']['location']['lng']
+                    lat = item['venue']['location']['lat']
+
+
+                    try:
+
+                        if check_box(boundingbox, city, lat, lng):
+                            if 'Residential' in item['venue']['categories'][0]['shortName']:
+                            
+                               if check_box(boundingbox, city, lat, lng):        
+                                
+                                   if user not in users_homes:
+                                        users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
+                                   else:
+                                        users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']))
+
+                    except: 
+                        pass
+
+                    #if check_box(boundingbox, city, lat, lng):
+
+                    photo = (item['venue']['id'], lng, lat, categ )  
+
+                    if (str(user) in local_users and check_box(boundingbox, city, lat, lng)) or (str(user) in unknown_users):
+                
+                        if user not in users_photos:
+                            users_photos[user] = [photo]
+                        else:
+                            users_photos[user].append(photo)
+
+
+
+
+    return users_photos
+
+
+
+
+
+'''  ---------------------------------------------------------  '''
 '''   list the friends of all the users for the friendship nw   '''
 '''  ---------------------------------------------------------  '''
 
-def get_users_friends(city, infolder, outfolder):
+def get_users_friends(local_users, city, infolder, outfolder):
 
     users_friends = {}
 
-    for line in open(infolder + city + '_friends.json', 'r'):
+    print(city + ' --  start parsing friends.json...')
+
+    for ind, line in enumerate(open(infolder + city + '_friends.json', 'r')):
+
+        #if ind == 5: break
 
         jsono   = json.loads(line)      
         user    = jsono['id']
-        friends = jsono['friends']['items']
 
-        if len(friends) > 0:
+        if user in local_users:
 
-            for friend in friends:
+            friends = jsono['friends']['items']    
 
-                friendid = friend['id']
-     
-                if user not in users_friends:
-                    users_friends[user] = [friendid]
-                else:
-                    users_friends[user].append(friendid)
+            if len(friends) > 0:
+
+                for friend in friends:
+
+                    friendid = friend['id']
+         
+                    if user not in users_friends:
+                        users_friends[user] = [friendid]
+                    else:
+                        users_friends[user].append(friendid)
 
     fout = open(outfolder + '/user_info/' + city + '_users_friends.dat', 'w')
     fout.write('user\tall_the_friends\n')
@@ -131,64 +292,58 @@ def get_users_friends(city, infolder, outfolder):
 
 
 '''  ---------------------------------------------------------  '''
-'''  harness the locations of places which from the users piced '''
+'''                     get users home cities                   '''
 '''  ---------------------------------------------------------  '''
 
-def get_photos_locations_and_users(city, boundingbox, infolder, outfolder, users_homes):
+
+def get_local_users(city, infolder, outfolder):
 
 
-    users_photos = {}
+    print(city + ' --  get the users homeCities...')
 
-    for line in open(infolder + city + '_photos.json', 'r'):
+    users_tips = {}
+    hres       = open(outfolder + 'user_info/'  + city + '_users_locals_homeCities.dat',    'w')
+    gres       = open(outfolder + 'user_info/'  + city + '_users_nonlocals_homeCities.dat', 'w')
+    qres       = open(outfolder + 'user_info/'  + city + '_users_all_users.dat', 'w')
+
+    for ind, line in enumerate(open(infolder + city + '_users.json', 'r')):
+
+        #if ind == 5: break
 
         jsono = json.loads(line)
-
-        count = jsono['totalCount']
         user  = jsono['id']
 
-        if count > 0:
+        qres.write(user + '\n')
 
-            for index, item in enumerate(jsono['photos']['items']):
+        if 'homeCity' in jsono:
 
-                if 'venue' in item:
+            hcity = jsono['homeCity']
 
-                    location = item['venue']['location']
+            if len(hcity) > 0:
+                if city in hcity.lower():
+                    hres.write(user + '\t' + hcity + '\n')
+                else:        
+                    gres.write(user + '\t' + hcity + '\n')
 
-
-                    categ = 'na'
-                    try:
-                        categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
-                    except:
-                        pass
-
-
-                    lng = item['venue']['location']['lng']
-                    lat = item['venue']['location']['lat']
+    hres.close()
+    gres.close()
+    qres.close()
 
 
-                    try:
-                        if 'Residential' in item['venue']['categories'][0]['shortName']:
-                        
-                            if check_box(boundingbox, city, lat, lng):        
-                                
-                               if user not in users_homes:
-                                    users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
-                               else:
-                                    users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']))
+    localss   = set([line.strip().split('\t')[0] for line in open(outfolder + 'user_info/'  + city + '_users_locals_homeCities.dat')])
+    nonlocals = set([line.strip().split('\t')[0] for line in open(outfolder + 'user_info/'  + city + '_users_nonlocals_homeCities.dat')])
+    everyone  = set([line.strip().split('\t')[0] for line in open(outfolder + 'user_info/'  + city + '_users_all_users.dat')])
 
-                    except: 
-                        pass
+    unknown   = list((everyone.difference(localss)).difference(nonlocals))
+    pres      = open(outfolder + 'user_info/'  + city + '_users_unknown_homeCities.dat',    'w')
 
-                    if check_box(boundingbox, city, lat, lng):
 
-                        photo = (item['venue']['id'], lng, lat, categ )  
+    for u in unknown:
+        pres.write(u + '\n')
+    pres.close()
 
-                        if user not in users_photos:
-                            users_photos[user] = [photo]
-                        else:
-                            users_photos[user].append(photo)
 
-    return users_photos
+    return list(unknown), list(localss), list(nonlocals)
 
 
 
@@ -202,6 +357,8 @@ def write_home_locations(users_homes, city, outfolder, users):
     fres = open(outfolder + 'user_info/'  + city + '_groundtruth_home_locations_all.dat',    'w')
     gres = open(outfolder + 'user_info/'  + city + '_groundtruth_home_locations_unique.dat', 'w')
 
+    print(city + ' --  write home locations...')
+
     num_of_home = []
 
     for user, home in users_homes.items():
@@ -212,7 +369,10 @@ def write_home_locations(users_homes, city, outfolder, users):
             gres.write(str(user) + '\t' + '\t'.join(list(home)) + '\n')
     
         num_of_home.append(len(home))
-    
+        
+
+
+
     plt.hist(num_of_home)
     plt.title(str(len(users_homes)) + '/' + str(users) + '  have home locations') 
     plt.savefig(outfolder + 'user_info/' + city + '_home_locations_freq.png')
@@ -229,6 +389,9 @@ def write_home_locations(users_homes, city, outfolder, users):
 '''  ---------------------------------------------------------  '''
 
 def get_users_venues(users_photos, users_likes, city, outfolder):
+
+
+    print(city + ' --  get a users venues...')
 
     users_venues = {}
 
@@ -263,6 +426,8 @@ def get_venues_information(city, boundingbox, infolder, outfolder):
     venues_stats = {}
     venues_coord = {}       
 
+    print(city + ' --  start parsing venues.json...')
+
     for line in open(infolder + city + '_venues.json', 'r'):
 
         jsono = json.loads(line)
@@ -295,6 +460,9 @@ def get_venues_information(city, boundingbox, infolder, outfolder):
 
 def venues_distance_mtx(city, outfolder):
 
+
+    print(city + ' --  get venues distance matrix...')
+
     fout = open(outfolder + '/venues_info/' + city + '_venues_distance_matrix.dat', 'w')
 
     for line in open(outfolder + '/user_info/' + city + '_user_venues_full.dat'):
@@ -326,52 +494,74 @@ def venues_distance_mtx(city, outfolder):
 '''  merge and write out all the locations of the users         '''
 '''  ---------------------------------------------------------  '''
 
-def get_users_coordinates(users_likes, users_friends, users_photos, city, outfolder):
 
 
-    users = list( list(users_likes.keys()) + list(users_friends.keys()) + list(users_photos.keys()))
+def get_users_coordinates(nonlocal_users, users_likes, users_tips, users_photos, city, outfolder):
 
-
-    ''' save the outputs '''
-    for user in users:
-        if user in users_likes:
-            liked_locations  = [v[0] for v in users_likes[user]]
-
+    print(city + ' --  get users coordinates...')
 
     # merge users' locations
-    users = list(set( list(users_likes.keys()) + list(users_photos.keys())))
-    users_locations = {}
-    for user in users:
-        if user in users_likes and user in users_photos:
-            users_locations[user] = users_likes[user] + users_photos[user]
-        elif user in users_likes:
-            users_locations[user] = users_likes[user]
-        elif user in users_photos:
-            users_locations[user] = users_photos[user]
 
-        
+
+    likes_tips_photos = {}
+
+    for u, v in users_likes.items():
+        u = str(u)
+        if u not in likes_tips_photos:
+            likes_tips_photos[u] = v
+        else:
+            likes_tips_photos[u] += v
+
+
+    for u, v in users_tips.items():
+        u = str(u)
+        if u not in likes_tips_photos:
+            likes_tips_photos[u] = v
+        else:
+            likes_tips_photos[u] += v
+
+
+    for u, v in users_photos.items():
+        u = str(u)
+        if u not in likes_tips_photos:
+            likes_tips_photos[u] = v
+        else:
+            likes_tips_photos[u] += v
+
+
+    
+
+
+
     ''' save coordinates '''
     f = open(outfolder + '/user_info/' + city + '_user_coordinates_raw.dat', 'w')
     g = open(outfolder + '/user_info/' + city + '_user_venues_full.dat',     'w')
     f.write('userid\tcoordinates\n')
 
-    for user, venues in users_locations.items():
+    ii = 0
+    for user, venues in likes_tips_photos.items():
+
+        ii += 1
 
         f.write(str(user) + '\t')            
         g.write(str(user) + '\t')
 
         venues = list(set(venues))
 
+        g.write('\t'.join([v[0] + ',' + str(v[1]) + ', ' + str(v[2]) +  ',' + v[3] for v in venues] )  + '\n')
+
         for venue in venues:
+
             f.write( str( venue[1] ) + ', ' + str( venue[2] ) + '\t' )
-            g.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
+            #g.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
 
         f.write('\n')
-        g.write('\n')
+        #g.write('\n')
 
+    print (ii)
     f.close()
     g.close()
-
+    
 
 
 
@@ -380,6 +570,8 @@ def get_users_coordinates(users_likes, users_friends, users_photos, city, outfol
 '''  ---------------------------------------------------------  '''
 
 def get_users_distance_distr_from_home(city, outfolder):
+
+    print(city + ' --  distance of users locations and home...')
 
     users_home   = {}
     users_venues = {}
@@ -425,6 +617,8 @@ def jaccard(a, b):
 
 def get_users_similarity_mtx(city, outfolder):
 
+    print(city + ' --  get users similarity matrix...')
+
     users_venues = {} 
     fout         = open(outfolder + '/user_info/' + city + '_users_jaccard_sim_mtx.dat', 'w')
 
@@ -447,6 +641,8 @@ def get_users_similarity_mtx(city, outfolder):
 '''  ---------------------------------------------------------  '''
 
 def get_venues_users(city, outfolder):
+
+    print(city + ' --  get venues of users...')
 
     venues_users = {}
 
