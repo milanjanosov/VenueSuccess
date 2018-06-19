@@ -35,8 +35,7 @@ def check_box(boundingbox, city, lat, lng):
 def get_users_like_location(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
 
     users_likes_locations = {}
-    categories = {}
-
+    venues_stats          = {}
 
     print(city + ' --  start parsing likes.json...')
 
@@ -57,15 +56,14 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
                 location = item['venue']['location']
                 categ    = 'na'
 
+                if item['venue']['id'] not in venues_stats:
+                    venues_stats[item['venue']['id']] = str(item['venue']['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
+
                 try:
                     categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
                 except:
                     pass
 
-                if categ not in categories:
-                    categories[categ] = 1
-                else:
-                    categories[categ] += 1
 
                 lng = location['lng']
                 lat = location['lat']
@@ -90,7 +88,10 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
                         users_likes_locations[user].append(venue)
       
 
-
+    f = open(outfolder + '/venues_info/' + city + '_liked_venues_stats.dat', 'w')
+    for v, stat in venues_stats.items():
+        f.write(v + '\t' + stat + '\n')
+    f.close()
 
     return users_likes_locations
 
@@ -104,7 +105,8 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
 def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
 
 
-    users_tips = {}
+    users_tips    = {}
+    venues_stats  = {}
 
     print(city + ' --  start parsing tips.json...')
 
@@ -138,6 +140,10 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
                     pass
 
 
+                if item['venue']['id'] not in venues_stats:
+                    venues_stats[item['venue']['id']] = str(item['venue']['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
+
+
                 categ = 'na'
                 try:
                     categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
@@ -156,6 +162,11 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
                         users_tips[user].append(tip)
 
 
+    f = open(outfolder + '/venues_info/' + city + '_tipped_venues_stats.dat', 'w')
+    for v, stat in venues_stats.items():
+        f.write(v + '\t' + stat + '\n')
+    f.close()
+
 
     return users_tips
 
@@ -169,7 +180,8 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
 def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
 
 
-    users_photos = {}
+    users_photos  = {}
+    venues_stats  = {}
 
     print(city + ' --  start parsing photos.json...')
 
@@ -192,6 +204,11 @@ def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox
                 if 'venue' in item:
 
                     location = item['venue']['location']
+
+
+                    if item['venue']['id'] not in venues_stats:
+                        venues_stats[item['venue']['id']] = str(item['venue']['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
+
 
 
                     categ = 'na'
@@ -231,6 +248,12 @@ def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox
                         else:
                             users_photos[user].append(photo)
 
+
+
+    f = open(outfolder + '/venues_info/' + city + '_photoed_venues_stats.dat', 'w')
+    for v, stat in venues_stats.items():
+        f.write(v + '\t' + stat + '\n')
+    f.close()
 
 
 
@@ -296,7 +319,15 @@ def get_users_friends(local_users, city, infolder, outfolder):
 '''  ---------------------------------------------------------  '''
 
 
+''' three types of users:
+        - live in bristol
+        - dont live in bristol
+        - we dont know
+'''
+
+
 def get_local_users(city, infolder, outfolder):
+
 
 
     print(city + ' --  get the users homeCities...')
@@ -343,6 +374,14 @@ def get_local_users(city, infolder, outfolder):
     pres.close()
 
 
+    fout = open(outfolder + 'basic_stats/user_types_count.dat', 'w')
+
+    fout.write('Number of local users (homeCity here): '          +  str(len(localss))   + '\n')
+    fout.write('Number of non-local users (homeCity not here): '  +  str(len(nonlocals)) + '\n')
+    fout.write('Number of unknown users (no homeCity given): '    +  str(len(unknown))   + '\n')
+
+    fout.close()
+
     return list(unknown), list(localss), list(nonlocals)
 
 
@@ -369,17 +408,19 @@ def write_home_locations(users_homes, city, outfolder, users):
             gres.write(str(user) + '\t' + '\t'.join(list(home)) + '\n')
     
         num_of_home.append(len(home))
-        
-
-
+       
 
     plt.hist(num_of_home)
     plt.title(str(len(users_homes)) + '/' + str(users) + '  have home locations') 
-    plt.savefig(outfolder + 'user_info/' + city + '_home_locations_freq.png')
+    plt.savefig(outfolder + 'figures/' + city + '_home_locations_freq.png')
     plt.close()
 
     fres.close()
     gres.close()
+ 
+    ffout = open(outfolder + 'basic_stats/user_types_count.dat', 'a')
+    ffout.write('Number of users w unique local Residence coordinates: ' + str(len([line.strip() for line in open(outfolder + 'user_info/'  + city + '_groundtruth_home_locations_unique.dat') ])) + '\n')
+    ffout.close()
 
 
 
@@ -388,7 +429,7 @@ def write_home_locations(users_homes, city, outfolder, users):
 '''  get the venues of the users merging liked and photod       '''
 '''  ---------------------------------------------------------  '''
 
-def get_users_venues(users_photos, users_likes, city, outfolder):
+def get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outfolder):
 
 
     print(city + ' --  get a users venues...')
@@ -396,18 +437,28 @@ def get_users_venues(users_photos, users_likes, city, outfolder):
     users_venues = {}
 
     for user, photos in users_photos.items():
+
         if user not in users_venues:
             users_venues[user] = [p[0] for p in photos]
         else:
             users_venues[user] += [p[0] for p in photos]
 
-    print(len(users_venues))
 
     for user, likes in users_likes.items():
+
         if user not in users_venues:
             users_venues[user] = [l[0] for l in likes]
         else:
             users_venues[user] += [l[0] for l in likes]
+
+
+    for user, likes in users_tips.items():
+
+        if user not in users_venues:
+            users_venues[user] = [l[0] for l in likes]
+        else:
+            users_venues[user] += [l[0] for l in likes]
+
 
     fres = open(outfolder + '/user_info/' + city + '_users_venues.dat', 'w') 
     for user, venues in users_venues.items():
@@ -458,7 +509,8 @@ def get_venues_information(city, boundingbox, infolder, outfolder):
 '''  calc the distane mtx between venues for further stuff      '''
 '''  ---------------------------------------------------------  '''
 
-def venues_distance_mtx(city, outfolder):
+
+def venues_distance_mtx(boundingbox, city, outfolder):
 
 
     print(city + ' --  get venues distance matrix...')
@@ -475,15 +527,19 @@ def venues_distance_mtx(city, outfolder):
             lng1 = float(v1[1])
             lat1 = float(v1[2])
     
-            for v2 in venues:
+            if check_box(boundingbox, city, lat1, lng1):
 
-                if v1 != v2:
+                for v2 in venues:
 
-                    id2 = v2[0]
-                    lng2 = float(v2[1])
-                    lat2 = float(v2[2])
+                    if v1 != v2:
 
-                    fout.write ( id1 + '\t' +  id2 + '\t' + str(mpu.haversine_distance((lat1, lng1), (lat2, lng2))) + '\n')
+                        id2 = v2[0]
+                        lng2 = float(v2[1])
+                        lat2 = float(v2[2])
+
+                        if check_box(boundingbox, city, lat2, lng2):
+
+                            fout.write ( id1 + '\t' +  id2 + '\t' + str(mpu.haversine_distance((lat1, lng1), (lat2, lng2))) + '\n')
 
     fout.close()
         
@@ -600,7 +656,7 @@ def get_users_distance_distr_from_home(city, outfolder):
     ax[0].set_xlabel('Users\'s locations distances from their home location [km]')
     ax[1].hist([ccc for ccc in user_dist.values() if ccc < 5], bins = 50, alpha = 0.8)
     ax[1].set_xlabel('Users\'s locations distances from their home location [km]')
-    plt.savefig(outfolder + 'user_info/' + city + '_distances_from_home_locations.png')
+    plt.savefig(outfolder + 'figures/' + city + '_distances_from_home_locations.png')
     plt.close()
    
 
@@ -650,7 +706,7 @@ def get_venues_users(city, outfolder):
         fields  = (line.strip().split('\t'))
         user    = fields[0]
         venues  = [ vv.split(',')[0] for vv in fields[1:]]
-
+ 
         for v in venues:
             if v not in venues_users:
                 venues_users[v] = [user]

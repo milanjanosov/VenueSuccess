@@ -99,6 +99,8 @@ def get_users_centroids(city, outfolder, sample, LIMIT_num = 0, plot = True):
     f, ax             = plt.subplots(4, 4, figsize=(20, 15))
 
 
+    print('Get basic centroids...')
+
 
     if sample:
         user_sample     = sorted(random.sample([uu for uu in users if len(users_coordinates[uu][0]) > LIMIT_num], 16))
@@ -124,10 +126,10 @@ def get_users_centroids(city, outfolder, sample, LIMIT_num = 0, plot = True):
             ax[i,j].legend(loc = 'left', fontsize = 9)
 
             
-    plt.legend()
-    plt.suptitle('CENTROIDS - 25 random users with > ' + str(LIMIT_num) + ' venues')
-    plt.savefig(outfolder + 'user_homes/figures/' + city + '_centroids_example_' + str(LIMIT_num) + '.png')
-    #plt.savefig(outfolder + 'user_homes/figures/' + city + '_centroids_example_' + str(time.time()).replace('.', '') + '.png')
+    if sample: plt.legend()
+    if sample: plt.suptitle('CENTROIDS - 25 random users with > ' + str(LIMIT_num) + ' venues')
+    if sample: plt.savefig(outfolder + 'figures/user_homes/' + city + '_centroids_example_' + str(LIMIT_num) + '.png')
+
 
   
     if plot: plt.show()
@@ -137,14 +139,13 @@ def get_users_centroids(city, outfolder, sample, LIMIT_num = 0, plot = True):
 
     f = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_centroids_' + str(LIMIT_num) + '.dat', 'w')
     for user, centr in user_centroids.items():
-        #print (user + '\t' + str(centr[0]) + '\t' + str(centr[1]) )
         f.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
     f.close()
 
 
     if sample: plt.yscale('log')
-    if sample: plt.hist(users_numc, bins = 50, density = True)
-    if sample: plt.savefig(outfolder + '/user_info/' + city + '_users_number_of_locations_' + str(LIMIT_num) + '.png')
+    if sample: plt.hist(users_numc, bins = 100, density = True)
+    if sample: plt.savefig(outfolder + '/figures/' + city + '_users_number_of_locations_' + str(LIMIT_num) + '.png')
     if sample: plt.close()  
     
 
@@ -158,6 +159,8 @@ def get_users_centroids(city, outfolder, sample, LIMIT_num = 0, plot = True):
 
 def get_users_centroids_with_cutoff(user_sample, city, outfolder, sample, LIMIT_num = 0, limit = 2.0, plot = True):
 
+
+    print('Get centroids with cutoff ' + str(limit) + ' km and limit_n = ' + str(LIMIT_num) + ' ...')
 
     users_coordinates = get_users_coordinates_ba(city, outfolder)    
     points_distance   = get_points_avg_dist(users_coordinates)    
@@ -183,7 +186,7 @@ def get_users_centroids_with_cutoff(user_sample, city, outfolder, sample, LIMIT_
     if sample: 
         for (u, i, j) in user_sample:  
             if u in user_centroids:
-                ax[i,j].plot(users_coordinates[u][0], users_coordinates[u][1], 'bo', alpha = 0.30, markersize = 12, label = u)          
+                ax[i,j].plot(users_coordinates[u][0], users_coordinates[u][1], 'go', alpha = 0.30, markersize = 12, label = u)          
                 ax[i,j].plot(user_centroids[u][0],    user_centroids[u][1],    'ro', markersize = 8)
                 ax[i,j].legend(loc = 'left', fontsize = 9)
 
@@ -191,13 +194,13 @@ def get_users_centroids_with_cutoff(user_sample, city, outfolder, sample, LIMIT_
     
     if sample: plt.legend()
     if sample: plt.suptitle('CENTROIDS + CUTOFF = ' + str(limit) + 'km, - 25 random users with > _limit_ venues')    
-    if sample: plt.savefig(outfolder + 'user_homes/figures/' + city + '_centroids_cutoff_' + str(limit) + '_example_' + str(LIMIT_num) + '.png')
+    if sample: plt.savefig(outfolder + 'figures/user_homes/' + city + '_centroids_cutoff_' + str(limit) + 'km_example_' + str(LIMIT_num) + '.png')
 
     if plot: plt.show()
     else:    plt.close()    
   
      
-    f = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_centroids_cutoff=' + str(limit) + '_' + str(LIMIT_num) + '.dat', 'w')
+    f = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_centroids_cutoff=' + str(limit) + 'km_' + str(LIMIT_num) + '.dat', 'w')
     for user, centr in user_centroids.items():
         f.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
     f.close()
@@ -215,6 +218,8 @@ def doDBSCAN(X, ax, sample, eps, mins, user):
 
     centers = [[1, 1], [-1, -1], [1, -1]]
 
+    print('Start doing DBSCan - eps = ' + str(eps) + ' ...')
+
     #X = StandardScaler().fit_transform(X)
 
     db = DBSCAN(eps, min_samples=mins).fit(X)
@@ -225,33 +230,36 @@ def doDBSCAN(X, ax, sample, eps, mins, user):
     
     n_clusters_    = len(set(labels)) - (1 if -1 in labels else 0)
     n_labels       = Counter(labels)
-    biggestcluster = n_labels.most_common(1)[0][0]
-    
+    n_labelss      = Counter([lll for lll in labels if lll > -1])
 
     unique_labels = set(labels)
     colors = [plt.cm.Spectral(each)  for each in np.linspace(0, 1, len(unique_labels))]
-    
+    centr  = []    
 
-    for k, col in zip(unique_labels, colors):
 
-        class_member_mask = (labels == k)
-        xy = X[class_member_mask & core_samples_mask]
+    if len(n_labelss) > 1:
 
-        if len(xy) > 0:    
-         
-            if k == -1:
-                col = [0, 0, 0, 1]
+        biggestcluster = n_labelss.most_common(1)[0][0]
 
-            if sample: ax.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),  markeredgecolor='k', markersize=12, alpha = 0.3)
-            xy = X[class_member_mask & ~core_samples_mask]
-            if sample: ax.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),  markeredgecolor='b', markersize=6, alpha = 0.3)
+        for k, col in zip(unique_labels, colors):
+
+            class_member_mask = (labels == k)
+            xy = X[class_member_mask & core_samples_mask]
+
+            if len(xy) > 0:    
+             
+                if k == -1:
+                    col = [0, 0, 0, 1]
+
+                if sample: ax.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),  markeredgecolor='k', markersize=12, alpha = 0.3)
+                xy = X[class_member_mask & ~core_samples_mask]
+                if sample: ax.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),  markeredgecolor='b', markersize=6, alpha = 0.3)
            
-            if k == biggestcluster:
-                centr = get_centroids(list(zip(*[(cc[0], cc[1]) for cc in  list(X[class_member_mask])])))
-                if sample: ax.plot(centr[0], centr[1], 'ro', label = user)
-                if sample: ax.legend(loc = 'left', fontsize = 8)
+                if k == biggestcluster:
+                    centr = get_centroids(list(zip(*[(cc[0], cc[1]) for cc in  list(X[class_member_mask])])))
+                    if sample: ax.legend(loc = 'left', fontsize = 8)
 
-
+    
     return centr
         
 
@@ -264,31 +272,27 @@ def get_db_centroids(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 
     users_coordinates = get_users_coordinates_db(city, outfolder)    
     f, ax             = plt.subplots(4, 4, figsize=(20, 15))
 
-    print (len(user_sample))
-
-    ijk = 0
 
     for (user, i, j) in user_sample:
     
         c     = users_coordinates[user]  
         x     = np.asarray(users_coordinates[user])  
+        centr = doDBSCAN(x, ax[i,j], sample, eps, mins, user)  
 
-
-        try:
-            centr = doDBSCAN(x, ax[i,j], sample, eps, mins, user)  
-            fout.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
-        except:
+        if len(centr) == 0:
             centr = get_centroids( list(zip(*c)) )   
-            fout.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
+            
+        fout.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
 
+        if sample: 
+            ax[i,j].plot(centr[0], centr[1], 'ro', label = user)
+            ax[i,j].legend(loc = 'left', fontsize = 9)
 
-
-    print(ijk)
 
 
     if sample: plt.legend()
     if sample: plt.suptitle('DBSCAN - 25 random users with > _limit_ venues')
-    if sample: plt.savefig(outfolder + 'user_homes/figures/' + city + '_dbscan_example_' + str(LIMIT_num) + '.png')
+    if sample: plt.savefig(outfolder + 'figures/user_homes/' + city + '_dbscan_example_' + str(LIMIT_num) + '_' + str(eps) + '.png')
 
 
     plt.close()

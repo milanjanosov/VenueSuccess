@@ -24,7 +24,7 @@ import pandas as pd
 '''                 the classifier                              '''
 '''  ---------------------------------------------------------  '''
 
-def classifiers(outfolder, city, X_train, y_train, X_test, pred_home):
+def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
     
     names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
              "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
@@ -51,24 +51,24 @@ def classifiers(outfolder, city, X_train, y_train, X_test, pred_home):
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         clas  = clf.fit(X_train, y_train)
-        print (name )
+ #       print (name )
         pred_home['pred_home_' + name.replace(' ', '_')] = clas.predict(X_test)
  
-    pred_home.to_csv(outfolder + '/user_homes/' + city + '_ML_home_classification_RESULTS.csv', sep='\t')
-
+    pred_home.to_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_home_classification_RESULTS_' + str(LIMIT) + '.csv', sep='\t')
+   
     
 
-def classify_data(city, outfolder):
+def classify_data(city, outfolder, LIMIT):
 
 
     ### training data budapest_ML_feature_has_home_TRAIN.csv
-    df_train =  pd.read_csv(outfolder + '/user_homes/' + city + '_ML_feature_has_home_TRAIN.csv', index_col=0, sep = '\t')
+    df_train =  pd.read_csv(outfolder + '/user_homes/MLfeatures/' + city + '_ML_feature_has_home_TRAIN_' + str(LIMIT) + '.csv', index_col=0, sep = '\t')
     X_train  =  df_train.drop(columns = ['home', 'venue', 'user']).fillna(0)
     y_train  =  df_train['home']
 
 
     ### test data budapest_ML_feature_has_home_TEST
-    df_test =  pd.read_csv(outfolder + '/user_homes/' + city + '_ML_feature_has_home_TEST.csv', index_col=0, sep = '\t')
+    df_test =  pd.read_csv(outfolder + '/user_homes/MLfeatures/' + city + '_ML_feature_has_home_TEST_' + str(LIMIT) + '.csv', index_col=0, sep = '\t')
     X_test  =  df_test.drop(columns = ['home', 'venue', 'user']).fillna(0)
 
 
@@ -78,7 +78,7 @@ def classify_data(city, outfolder):
     pred_home['venue'] = df_test['venue']
 
 
-    classifiers(outfolder, city, X_train, y_train, X_test, pred_home) 
+    classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT) 
 
 
 
@@ -87,9 +87,9 @@ def classify_data(city, outfolder):
 '''                 get results                                 '''
 '''  ---------------------------------------------------------  '''
 
-def conclude_class(city, outfolder):
+def conclude_class(city, outfolder, LIMIT):
 
-    df    = pd.read_csv(outfolder + '/user_homes/' + city + '_ML_home_classification_RESULTS.csv', sep = '\t', index_col=0)
+    df    = pd.read_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_home_classification_RESULTS_' + str(LIMIT) + '.csv', sep = '\t'  , index_col=0)
     f, ax = plt.subplots(2, 5, figsize=(20, 8))
     df_s  = df.groupby( ['user' ]).sum()
     df_c  = pd.DataFrame() 
@@ -101,8 +101,53 @@ def conclude_class(city, outfolder):
         df_c[column.replace('pred_home_', '')] = df_s[column].value_counts()     
 
 
-    f.savefig(outfolder   + '/user_homes/' + city + '_ML_home_classification_distributions.png')
-    df_c.to_csv(outfolder + '/user_homes/' + city + '_ML_feature_has_home_RES_count.csv' , sep = '\t')
+    f.savefig(outfolder   + '/figures/MLresults/' + city + '_ML_home_classification_distributions_' + str(LIMIT) + '.png')
+    plt.close()
+    df_c.to_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_feature_has_home_RES_count_' + str(LIMIT) + '.csv' , sep = '\t')
+
+
+
+    ''' GET THE PREDICTED HOME LOCATIONS FOR THE USERS'''
+
+    df = pd.read_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_home_classification_RESULTS_' + str(LIMIT) + '.csv', sep = '\t', index_col=0)
+
+    data2 = {}
+    for column in df:
+        if 'pred_home' in column:
+
+            ddf = df.groupby( ['user' ]).filter(lambda x: x[column].sum() == 1.)
+            ddf = ddf.loc[df[column] == 1]
+            ddf = ddf[['user', 'venue']]
+
+            ddf.to_csv(outfolder + '/user_homes/MLhomes/' + city + '_predicted_homes_' + str(LIMIT) + '_' + column + '.csv' , sep = '\t', index = False)
+
+
+
+
+    ''' FRACTION OF USERS WITH ML PREDICTED HOME LOCATIONS'''
+
+    df = pd.read_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_feature_has_home_RES_count_' + str(LIMIT) + '.csv' , sep = '\t', index_col=0).fillna(0)
+
+    data = {}
+    for column in df:
+        data[column.replace('pred_home', '')] =round(100*df[column][1]/float(df[column].sum()), 2)
+       
+    f, ax  = plt.subplots(1, 1, figsize=(15, 5))
+    names  = list(data.keys())
+    values = list(data.values())
+
+    ax.bar(range(len(data)),values,tick_label=names, label = 'Has 1 ML home location')
+    ax.set_ylabel('% of users', fontsize= 20)
+
+
+    f.savefig(outfolder   + '/figures/MLresults/' + city + '_ML_fraction_os_users_with_home_' + str(LIMIT) + '.png')
+    ax.set_title('Fraction of users w exactly 1 predicted home location vs different methods', fontsize = 22)
+    plt.close()
+
+
+
+
+
 
 
 
