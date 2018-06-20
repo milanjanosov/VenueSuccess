@@ -1,8 +1,14 @@
 import sys
 sys.path.append("..")
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+
 import ParseInput
 import ParseJsons 
-import matplotlib.pyplot as plt
+
 import GetHomeLocations as Home
 import MachineLearningHomeFeatures as MLFeat
 import WhereIsHomeClassification as Class
