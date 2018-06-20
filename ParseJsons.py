@@ -651,7 +651,7 @@ def get_users_distance_distr_from_home(city, outfolder):
 
 
     f, ax = plt.subplots(1, 2, figsize=(15, 5))
-    ax[0].hist(user_dist.values(), bins = 100, alpha = 0.8)
+    ax[0].hist(list(user_dist.values()), bins = 100, alpha = 0.8)
     ax[0].set_xlabel('Users\'s locations distances from their home location [km]')
     ax[1].hist([ccc for ccc in user_dist.values() if ccc < 5], bins = 50, alpha = 0.8)
     ax[1].set_xlabel('Users\'s locations distances from their home location [km]')
