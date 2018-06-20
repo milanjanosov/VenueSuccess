@@ -5,10 +5,14 @@ from collections import OrderedDict
 import csv
 import pandas as pd
 import mpu
+import matplotlib.pyplot as plt
 import random
 from pyproj import Proj
 from shapely.geometry import shape
-
+from ParseJsons import check_box
+import sys
+sys.path.append("..")
+import FourSquareFeatureMiner.ParseInput as ParseInput
 
 
 '''   venues.json -> ebben nincs benne minden liked, photos, ... location a jelek szerinti   '''
@@ -57,10 +61,85 @@ def add_distances_to_edges(G):
 
 
 
+def get_network_stats(G, city, outfolder, infile):
+
+
+
+    f, ax = plt.subplots(1, 3, figsize=(20, 5))
+
+
+
+    N    = G.degree_distribution().n
+    mean = round(G.degree_distribution().mean, 2)
+    sd   = round(G.degree_distribution().sd, 2)
+    xs, ys = zip(*[(left, count) for left, _, count in  G.degree_distribution().bins()])
+
+    ax[0].bar(xs, ys)
+    ax[0].set_title('Degree distribution, N = ' + str(N) + ', mean = ' + str(mean) + ', std = ' + str(sd) )
+    ax[0].set_xlabel('Node degree')
+    ax[0].set_ylabel('Degree distribution')
+    ax[0].set_xscale('log')
+    ax[0].set_yscale('log')
+
+    
+
+    distances = G.es['distances']
+    ax[1].hist(distances, bins = 50)
+    ax[1].set_yscale('log')
+    ax[1].set_title('Distance distribution, mean = ' + str(round(np.mean(distances), 2)) + ', std = ' + str(round(np.std(distances),2)) )
+    ax[1].set_xlabel('Distance between pairs of users within the city')
+    ax[1].set_ylabel('Distance distribution')
+
+
+    try:    
+
+        weights = G.es['weight']
+        ax[2].hist(G.es['weight'], bins = 50)
+        ax[2].set_yscale('log')
+        ax[2].set_title('Distance distribution, mean = ' + str(round(np.mean(weights), 2)) + ', std = ' + str(round(np.std(weights),2)) )
+        ax[2].set_xlabel('Edge weights (Jaccard sim)')
+        ax[2].set_ylabel('Weight distribution')
+
+    except:
+        pass    
+
+
+    plt.suptitle(city, fontsize = 18)    
+    plt.savefig(outfolder + 'figures/network_data/' + city + infile + '.png')
+
+
+
+
+
+
 
 ''' =========================================================== '''
 ''' ======= USERS FULL FRIENDSHIP NW AND GEOTAGGED NW  ======== '''
 ''' =========================================================== '''
+def get_gephi_new(G, outfolder, outname):
+
+       
+    f = open( outfolder + 'networks/gephi/' + outname + '_edges.dat', 'w')
+    f.write('Source'+'\t'+'Target'+'\t'+'Distance'+'\t'+'Type'+'\n')      
+    for e in G.es():
+        f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['distances']) + '\tundirected' + '\n')
+    f.close()
+
+    
+    g = open( outfolder + 'networks/gephi/' + outname + '_nodes.dat', 'w')
+    g.write('ID' + '\t' + 'Label' +'\t'+  'lon' + '\t' + 'lat' + '\n')    
+    for n in G.vs():
+        g.write(n['name'] + '\t' + n['name'] + '\t' + str(n['location'][0]) + '\t' + str(n['location'][1]) + '\n')
+    g.close()
+
+    
+
+
+
+
+
+
+
 
 def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
@@ -69,25 +148,33 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
     # read the full friendshipnw
     filename  = outfolder + '/user_info/' + city  + '_users_friends.lgl' 
-    '''filename  = outfolder + '/user_info/' + city  + '_users_friends_sample.lgl' '''
-    G_topol   = Graph.Read_Lgl(filename, names = True, weights = False, directed = False)
+    #filename  = outfolder + '/user_info/' + city  + '_users_friends_sample.lgl' '''
+
     all_users = set([line.strip().split('\t')[0] for line in open(infile)])
 
-    # read the friendhip nw w geo contraints
+
+    # write the friendhip nw w geo contraints
     fout        = open(outfolder + '/user_info/' + city  + '_users_geo_friends.lgl', 'w')
     users_nghbs = {}
 
    
     with open (filename, "r") as myfile:
-        data=  str(myfile.read()).strip().split('#')
+        data = str(myfile.read()).strip().split('#')
 
-    for d in data:
-        ngbhs = d.split('\n')
-        if ngbhs[0].replace(' ', '') in all_users:
-            users_nghbs[ngbhs[0]] = []
-            for n in ngbhs[1:]:                
-                if n in all_users:
-                    users_nghbs[ngbhs[0]].append(n)
+
+    for ind, d in enumerate(data):
+ 
+        users = d.split('\n')
+        user  = users[0].replace(' ', '')
+
+        if user in all_users:
+
+            nghbs = [uuu for uuu in users[1:] if uuu in all_users]
+     
+            if len(nghbs) > 0:
+                users_nghbs[user] = nghbs
+         
+ 
 
 
     for user, friends in users_nghbs.items():
@@ -114,9 +201,8 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
     add_distances_to_edges(G_geo)
 
     print 'Friendship network done.'
-
-    return G_topol, G_geo
-
+    
+    return G_geo
 
 
 
@@ -154,8 +240,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
             users_venues[user] = venues
             users.append(user)
 
-  
- 
+
     # buld the network
     G = Graph()
 
@@ -163,6 +248,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
     weights   = []
     all_users = set()
 
+  
     for ind, user1 in enumerate(users):
         for user2 in users:
             all_users.add(user1)
@@ -175,13 +261,14 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
     '''        if ind == 50: break '''
     
 
+
+
     G.add_vertices(list(all_users))
     G.add_edges(edges)
     G.es['weight'] = weights
     locations      = [users_location[g['name']] for g in G.vs()]  #[users_location[user] if user in users_location else 'nan'     for user in all_user] 
     G.vs['location'] = locations
     add_distances_to_edges(G)
-
 
     print 'Users\'s similarity network done.'
     
@@ -234,10 +321,10 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
     
         for venue in venues:
             venid, lng, lat, cat = venue.split(',')
-            if venid in venues_users:
+
+            if venid in venues_users and check_box(bbox, city, float(lat), float(lng)):
                 venues_location[venid] = (float(lng), float(lat))   
  
-
 
    
     # build the nw
@@ -257,25 +344,23 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
                 edges.append((venue1, venue2))
                 weights.append(w)
 
-        '''if ind == 100: break '''
-
+      
 
     all_venues = list(all_venues)
     locations  = [venues_location[venue] if venue in venues_location else 'nan' for venue in all_venues] 
 
- 
 
     G.add_vertices(all_venues)
     G.add_edges(edges)
     G.es['weight']   = weights
     G.vs['location'] = [venues_location[g['name']] for g in G.vs()]  
     add_distances_to_edges(G)
-
+    
 
     print 'Venue\'s similarity network done.'
 
     return G
-    
+
 
 
 ''' =========================================================== '''
@@ -487,53 +572,56 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 
 
 
-def do_all_the_networks(city, outroot, infile):
+def do_all_the_networks(city, outroot, infile, bbox):
 
 
-    print city, infile
+  
 
-
-    G_friends_topol, G_friends_geo = get_user_user_friendship_network_igraph(city, outroot, infile)
-#    G_users       = get_user_user_similarity_network_igraph(city, outroot, infile)
-#    G_venues      = get_venue_venue_similarity_network_igraph(city, outroot, infile)
-
-
-    calc_network_centralities(G_friends_geo,   outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
- #   calc_network_centralities(G_friends_topol, outroot, city, infile, 'users_topo',      geo = False, weighted = False, venue = False)
- #   calc_network_centralities(G_users,         outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
-#    calc_network_centralities(G_venues,        outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
+    G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
+    G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+    G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile)
 
 
 
-if __name__ == '__main__':  
-
-    do_all_the_networks(city, outroot, infile)
-
-
-
-'''if __name__ == '__main__':  
+    calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+    calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+    calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
 
 
-
-    city = 'bristol'
-    outroot = '../ProcessedData/' + city + '/'
-
-    eps       = 0.02
-    mins      = 3
-    LIMIT_num = 5
-    infile    = outroot + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat'
+    print 'Creating gephi files'
+    get_gephi_new(G_friends, outroot, city + '_friendship')
+    get_gephi_new(G_users,   outroot, city + '_users_similarity')
+    get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
 
 
 
-    G_friends_topol, G_friends_geo = get_user_user_friendship_network_igraph(city, outroot, infile)
-    G_users       = get_user_user_similarity_network_igraph(city, outroot, infile)
-    G_venues      = get_venue_venue_similarity_network_igraph(city, outroot, infile)
+    print 'Creating network stats'
+    get_network_stats(G_friends, city, outroot, '_friendship')
+    get_network_stats(G_users,   city, outroot, '_users_similarity')
+    get_network_stats(G_venues,  city, outroot, '_venues_similarity')
+
+
+city      = 'bristol'
+eps       = 0.01
+mins      = 3
+LIMIT_num = 0
+outroot   = '../ProcessedData/' + city + '/'
+infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'
 
 
 
-    calc_network_centralities(G_friends_geo,   outroot, city, infile, 'users_geo',      geo = True,  weighted = False, venue = False)
-    calc_network_centralities(G_friends_topol, outroot, city, infile, 'users_topo',     geo = False, weighted = False, venue = False)
-    calc_network_centralities(G_users,         outroot, city, infile, 'users_sim_geo',  geo = True,  weighted = True,  venue = False)
-    calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True, venue = True)
-'''
+inputs = ParseInput.get_inputs()
+
+bbox  = inputs[city]
+
+do_all_the_networks(city, outroot, infile, bbox)
+
+
+
+
+
+
+
+
+
 

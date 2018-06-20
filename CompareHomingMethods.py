@@ -123,7 +123,7 @@ def plot_final_results(city, outfolder):
 
     ''' put the centroid methods on the plot '''
 
-    '''methods_series_centroid = {}
+    methods_series_centroid = {}
     methods_series_cutoff   = {}
     methods_series_dbscan   = {}
 
@@ -175,8 +175,6 @@ def plot_final_results(city, outfolder):
                 
 
 
-
-
     for m, s in methods_series_dbscan.items():
         s.sort(key=lambda tup: tup[0])     
         ind, avg = zip(*s)
@@ -197,8 +195,6 @@ def plot_final_results(city, outfolder):
 
 
 
-
-
     ### THIS WILL BE SPARES BECAUSE THERE ARE MULTIPLE CONDITIONS
     ###    - HAS UNIQUE GROUNDTRUTH LOCATION (50 PPL...)
     ###    - LOCAL OR UNKNOWN USER
@@ -207,18 +203,14 @@ def plot_final_results(city, outfolder):
     ax[0].legend(loc = 'left', fontsize = 8)    
     ax[1].legend(loc = 'left', fontsize = 8)    
 
-    plt.show()
-    '''
+   
 
-    '''ax[0].set_xlabel('Min. number of locations/user')
-    ax[0].set_ylabel('Avg distance between estimated and real residence location [km]')
-    ax[1].set_xlabel('Min. number of locations/user')
-    ax[1].set_ylabel('Avg distance between estimated and real residence location [km]')
+    ax[0].set_xlabel('Min. number of locations/user', fontsize = 13)
+    ax[0].set_ylabel('Avg distance between estimated and real residence location [km]', fontsize = 13)
+    ax[1].set_xlabel('Min. number of locations/user', fontsize = 13)
+    ax[1].set_ylabel('Avg distance between estimated and real residence location [km]', fontsize = 13)
     ax[0].legend(loc = 'left', fontsize = 8)
     ax[1].legend(loc = 'left', fontsize = 8)
-    plt.savefig(outfolder   + '/figures/user_homes/' + city + '_home_distance_from_groundtruth_FULL.png')
-    plt.show() 
-    '''
 
 
 
@@ -291,13 +283,18 @@ def plot_final_results(city, outfolder):
 
         ax[1].plot(ind, dist, 'o-', label = c)
 
-    '''for m, s in users_classifiers.items():
-        s.sort(key=lambda tup: tup[0])
-        ind, dist = zip(*s)
-        print(ind)
-        
-    '''
-    plt.show()
+    
+
+    ax[1].set_xlabel('Min. number of locations of users', fontsize = 13)    
+    ax[1].set_ylabel('Distance between DBScan and MLpred home locations (km)', fontsize = 13)
+    ax[1].set_title('Compare DBscan and ML', fontsize = 15)
+    ax[0].set_title('Compare DBScan and centroids', fontsize = 15)
+    ax[1].legend(loc = 'left', fontsize = 8)    
+
+
+    plt.savefig(outfolder   + '/figures/' + city + '_COMPARE_centroids_dbscan_mlhomepred.png')
+ #   plt.show() 
+
 
 
 

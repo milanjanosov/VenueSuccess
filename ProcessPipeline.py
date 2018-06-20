@@ -34,7 +34,9 @@ ParseJsons.create_folder(outroot + 'basic_stats')
 ParseJsons.create_folder(outroot + 'venues_info')
 ParseJsons.create_folder(outroot + 'user_homes')
 ParseJsons.create_folder(outroot + 'networks')
+ParseJsons.create_folder(outroot + 'networks/gephi')
 ParseJsons.create_folder(outroot + 'figures/user_homes')
+ParseJsons.create_folder(outroot + 'figures/network_data')
 ParseJsons.create_folder(outroot + 'user_homes/comparison')
 ParseJsons.create_folder(outroot + 'user_homes/MLfeatures')
 ParseJsons.create_folder(outroot + 'user_homes/MLresults')
@@ -42,6 +44,17 @@ ParseJsons.create_folder(outroot + 'user_homes/MLhomes')
 ParseJsons.create_folder(outroot + 'user_homes/centroids')
 ParseJsons.create_folder(outroot + 'figures')
 ParseJsons.create_folder(outroot + 'figures/MLresults')
+
+
+
+def call_python_version(Version, Module, Function, ArgumentList):
+    gw      = execnet.makegateway("popen//python=python%s" % Version)
+    channel = gw.remote_exec("""
+        from %s import %s as the_function
+        channel.send(the_function(*channel.receive()))
+    """ % (Module, Function))
+    channel.send(ArgumentList)
+    return channel.receive()
 
 
 
@@ -120,28 +133,28 @@ elif sys.argv[2] == 'home_full':
         print ('LIMIT = ' + str(LIMIT))
 
         ''' these are the centroid based things '''
-#        users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
+        users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
 
-#        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
-#        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
-#        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
-#        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 5.0, plot = False)
-#        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
-#        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 3)
-#        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 5)
-#        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
-#        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 5.0, plot = False)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 3)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 5)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
 
         ''' this is the messy ML part '''
-#        MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
-#        Class.classify_data(city, outroot, LIMIT)
-#        Class.conclude_class(city, outroot, LIMIT)
+        MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
+        Class.classify_data(city, outroot, LIMIT)
+        Class.conclude_class(city, outroot, LIMIT)
 
         
      # this has to be run only once after that loop above
- #   FilterH.copy_filtered(city, outroot, bbox)
+    FilterH.copy_filtered(city, outroot, bbox)
 
- #   for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
+    for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     ''' this compares the different methods '''
     
     Compare.plot_final_results(city, outroot)
@@ -158,14 +171,16 @@ elif sys.argv[2] == 'home_full':
 
 elif sys.argv[2] == 'networks':
 
-    eps       = 0.02
+    eps       = 0.01
     mins      = 3
-    LIMIT_num = 5
+    LIMIT_num = 0
     infile    = outroot + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat'
    
 
-    Call.call_python_version('2.7', 'BuildNetworks', 'do_all_the_networks', [city, outroot, infile])
 
+    call_nw  =call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile])
+
+    print(call_nw)
 
 
     ''' 
