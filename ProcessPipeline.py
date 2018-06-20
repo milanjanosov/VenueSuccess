@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..")
-import FourSquareFeatureMiner.ParseInput as ParseInput
-import FourSquareFeatureMiner.ParseJsons as ParseJsons
+import ParseInput
+import ParseJsons 
 import GetHomeLocations as Home
 import MachineLearningHomeFeatures as MLFeat
 import WhereIsHomeClassification as Class
