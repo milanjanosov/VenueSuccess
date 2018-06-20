@@ -74,7 +74,7 @@ if sys.argv[2] == 'preproc':
 
     users_homes   = {}
 
-  #  unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
+    unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
 
   #  users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
   #  users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
