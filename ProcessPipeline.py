@@ -13,7 +13,6 @@ import GetHomeLocations as Home
 import MachineLearningHomeFeatures as MLFeat
 import WhereIsHomeClassification as Class
 import CompareHomingMethods as Compare
-import CallOldPython as Call 
 import time
 import FilterHomeLocatoins as FilterH
 #import SumNetworks as SNW
@@ -183,9 +182,9 @@ elif sys.argv[2] == 'networks':
    
 
 
-    call_nw  =call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile])
+    #call_nw  =call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile])
 
-    print(call_nw)
+    #print(call_nw)
 
 
     ''' 
