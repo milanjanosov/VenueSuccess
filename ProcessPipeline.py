@@ -83,13 +83,13 @@ if sys.argv[2] == 'preproc':
   #  ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_likes.keys()))
   #  ParseJsons.get_users_coordinates(nonlocal_users, users_likes, users_tips, users_photos, city, outroot)
     ParseJsons.get_users_distance_distr_from_home(city, outroot) 
-    ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
+ #   ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
 
 
 
 
-    ParseJsons.venues_distance_mtx(bbox, city, outroot)
-    ParseJsons.get_venues_users(city, outroot)       
+   # ParseJsons.venues_distance_mtx(bbox, city, outroot)
+   # ParseJsons.get_venues_users(city, outroot)       
 
 
     t2 = time.time()
