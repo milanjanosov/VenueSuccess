@@ -144,7 +144,7 @@ def get_users_centroids(city, outfolder, sample, LIMIT_num = 0, plot = True):
 
 
     if sample: plt.yscale('log')
-    if sample: plt.hist(users_numc, bins = 100, density = True)
+    if sample: plt.hist(users_numc, bins = 100)
     if sample: plt.savefig(outfolder + '/figures/' + city + '_users_number_of_locations_' + str(LIMIT_num) + '.png')
     if sample: plt.close()  
     
