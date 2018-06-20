@@ -2,6 +2,7 @@ import sys
 sys.path.append("..")
 import ParseInput
 import ParseJsons 
+import matplotlib.pyplot as plt
 import GetHomeLocations as Home
 import MachineLearningHomeFeatures as MLFeat
 import WhereIsHomeClassification as Class
@@ -10,6 +11,7 @@ import CallOldPython as Call
 import time
 import FilterHomeLocatoins as FilterH
 #import SumNetworks as SNW
+
 
 
 
@@ -23,6 +25,12 @@ inputs = ParseInput.get_inputs()
 
 city  = sys.argv[1]
 bbox  = inputs[city]
+server = False
+
+#if len(sys.argv == 4):
+#    matplotlib.use('Agg')
+#    server = True
+#import matplotlib.pyplot as plt
 
 
 inroot  = '../Data/fsqdb/'    + city + '/'

@@ -1,18 +1,14 @@
 import numpy as np
-import networkx as nx
 from igraph import Graph
 from collections import OrderedDict
-import csv
 import pandas as pd
 import mpu
 import matplotlib.pyplot as plt
 import random
-from pyproj import Proj
-from shapely.geometry import shape
 from ParseJsons import check_box
 import sys
 sys.path.append("..")
-import FourSquareFeatureMiner.ParseInput as ParseInput
+import ParseInput
 
 
 '''   venues.json -> ebben nincs benne minden liked, photos, ... location a jelek szerinti   '''

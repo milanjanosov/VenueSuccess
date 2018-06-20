@@ -1,7 +1,6 @@
 # https://developer.foursquare.com/docs/api/photos/details 
 import os, sys
 import json
-from pprint import pprint
 import numpy as np
 import csv
 import mpu
