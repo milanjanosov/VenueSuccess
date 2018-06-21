@@ -220,7 +220,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
 
     # parse the files
-    users_venfn  = outfolder + '/user_info/' + city + '_user_venues_full.dat'  
+    users_venfn  = outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'  
     users_venues = {}
     users        = []
 
@@ -310,7 +310,7 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
 
     ### get venues locations
     venues_location = {}
-    for  line in open(outfolder + '/user_info/' + city + '_user_venues_full.dat'):
+    for  line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
         fields = line.strip().split('\t')
         user   = fields[0]
         venues = fields[1:]
@@ -433,7 +433,7 @@ def get_venue_homogenity(G, city, outfolder):
     
     users_venues = {} 
 
-    for line in open( outfolder + '/user_info/' + city + '_user_venues_full.dat'):
+    for line in open( outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
         fields                  = (line.strip().split('\t'))
         users_venues[fields[0]] = set([ vv.split(',')[0] for vv in fields[1:]])
 

@@ -15,6 +15,7 @@ import WhereIsHomeClassification as Class
 import CompareHomingMethods as Compare
 import time
 import FilterHomeLocatoins as FilterH
+import OptimizeDBScan as Optimize
 #import SumNetworks as SNW
 
 
@@ -55,6 +56,8 @@ ParseJsons.create_folder(outroot + 'user_homes/MLfeatures')
 ParseJsons.create_folder(outroot + 'user_homes/MLresults')
 ParseJsons.create_folder(outroot + 'user_homes/MLhomes')
 ParseJsons.create_folder(outroot + 'user_homes/centroids')
+ParseJsons.create_folder(outroot + 'user_homes/optimize_centroids/')
+ParseJsons.create_folder(outroot + 'user_homes/optimize_centroids/series')
 ParseJsons.create_folder(outroot + 'figures')
 ParseJsons.create_folder(outroot + 'figures/MLresults')
 
@@ -80,16 +83,16 @@ if sys.argv[2] == 'preproc':
     users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
     users_tips    = ParseJsons.get_tips_locations_and_users(    unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
 
-    ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_likes.keys()))
-    ParseJsons.get_users_coordinates(nonlocal_users, users_likes, users_tips, users_photos, city, outroot)
-    ParseJsons.get_users_distance_distr_from_home(city, outroot) 
-    ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
+    ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_photos.keys()))
 
+    ParseJsons.get_users_coordinates(users_homes, local_users, users_likes, users_tips, users_photos, city, outroot, bbox)
+  #  ParseJsons.get_users_distance_distr_from_home(city, outroot) 
+  #  ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
 
+ #   ParseJsons. get_users_friends(local_users, city, inroot, outroot)
 
-
-    ParseJsons.venues_distance_mtx(bbox, city, outroot)
-    ParseJsons.get_venues_users(city, outroot)       
+ #   ParseJsons.venues_distance_mtx(bbox, city, outroot)
+ #   ParseJsons.get_venues_users(city, outroot)       
 
 
     t2 = time.time()
@@ -110,6 +113,11 @@ elif sys.argv[2] == 'home_sample':
 
     ''' this sample stuff creates vizs '''
 
+
+
+    ''' REWRITE ERRE: _user_venues_full_locals_filtered   '''
+
+
     for LIMIT in [0, 10]:
 
         t1 = time.time()
@@ -126,7 +134,6 @@ elif sys.argv[2] == 'home_sample':
     t2 = time.time()
 
     print ('Sample home clustering with plots: ', t2 - t1)   
-
 
 
 
@@ -174,8 +181,12 @@ elif sys.argv[2] == 'home_full':
 
 
 
+elif sys.argv[2] == 'opt_dbscan':
 
+    Optimize.optimize_db_scan(city, outroot)
+    Optimize.visualize_opt_res(city, outroot)
 
+    
 
 elif sys.argv[2] == 'networks':
 

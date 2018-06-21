@@ -550,8 +550,10 @@ def venues_distance_mtx(boundingbox, city, outfolder):
 '''  ---------------------------------------------------------  '''
 
 
+#check_box(boundingbox, city, lat, lng)
 
-def get_users_coordinates(nonlocal_users, users_likes, users_tips, users_photos, city, outfolder):
+
+def get_users_coordinates(users_homes, local_users, users_likes, users_tips, users_photos, city, outfolder, bbox):
 
     print(city + ' --  get users coordinates...')
 
@@ -586,37 +588,62 @@ def get_users_coordinates(nonlocal_users, users_likes, users_tips, users_photos,
 
     
 
-
-
     ''' save coordinates '''
     f = open(outfolder + '/user_info/' + city + '_user_coordinates_raw.dat', 'w')
     g = open(outfolder + '/user_info/' + city + '_user_venues_full.dat',     'w')
+    h = open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat',     'w')
+    l = open(outfolder + '/user_info/' + city + '_user_coordinates_raw_locals_filtered.dat', 'w')
     f.write('userid\tcoordinates\n')
 
-    ii = 0
+
     for user, venues in likes_tips_photos.items():
 
-        ii += 1
 
         f.write(str(user) + '\t')            
         g.write(str(user) + '\t')
+        h.write(str(user) + '\t')            
+        l.write(str(user) + '\t')
+
+
 
         venues = list(set(venues))
 
+
+        f.write('\t'.join([ str(v[1]) + ', ' + str(v[2]) for v in venues] )  + '\n')
         g.write('\t'.join([v[0] + ',' + str(v[1]) + ', ' + str(v[2]) +  ',' + v[3] for v in venues] )  + '\n')
 
-        for venue in venues:
 
-            f.write( str( venue[1] ) + ', ' + str( venue[2] ) + '\t' )
-            #g.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
 
-        f.write('\n')
-        #g.write('\n')
+        if int(user) in users_homes:
+            print('szia')   
 
-    print (ii)
+
+        if int(user) in users_homes:# or user in local_users:
+            for venue in venues:
+
+                if 15395472 == int(user):
+                    print('elso  ', venue)
+
+                if check_box(bbox, city, venue[2], venue[1]):
+                    if 15395472 == int(user):
+                        print('BBOX  ', venue)
+
+                    l.write( str( venue[1] ) + ', ' + str( venue[2] ) + '\t' )
+                    h.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
+
+        elif (user not in users_homes and local_users):
+            for venue in venues:
+                l.write( str( venue[1] ) + ', ' + str( venue[2] ) + '\t' )
+                h.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
+
+        l.write('\n')
+        h.write('\n')
+
+
     f.close()
     g.close()
-    
+    h.close()   
+    l.close()
 
 
 

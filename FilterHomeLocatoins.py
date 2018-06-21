@@ -33,7 +33,7 @@ def copy_filtered(city, outfolder, bbox):
 
     venues_coordinates = {}
     
-    for ind, line in enumerate(open(outfolder + '/user_info/bristol_user_venues_full.dat')):
+    for ind, line in enumerate(open(outfolder + '/user_info/bristol_user_venues_full_locals_filtered.dat')):
         
         venues = line.strip().split('\t')[1:]
 

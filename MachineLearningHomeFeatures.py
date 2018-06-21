@@ -16,7 +16,7 @@ def get_user_venues(city, outfolder, LIMIT_num):
     venues_categories = {}
     all_users         = []
     
-    for line in open(outfolder + '/user_info/' + city + '_user_venues_full.dat'):
+    for line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
         if 'userid' not in line:
             fields = line.strip().split('\t')
             user   = fields[0]

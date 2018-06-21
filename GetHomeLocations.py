@@ -23,7 +23,7 @@ def get_users_coordinates_ba(city, outfolder):
 
     users_coordinates = {}
 
-    for line in open(outfolder + '/user_info/' + city + '_user_coordinates_raw.dat'):
+    for line in open(outfolder + '/user_info/' + city + '_user_coordinates_raw_locals_filtered.dat'):
         if 'userid' not in line:
             fields = line.strip().split('\t')
             users_coordinates[fields[0]] = list(zip(*[tuple([float(fff.split(',')[0]), float(fff.split(',')[1])]) for fff in fields[1:]]))
@@ -36,7 +36,7 @@ def get_users_coordinates_db(city, outfolder):
 
     users_coordinates = {}
 
-    for line in open(outfolder + '/user_info/' + city + '_user_coordinates_raw.dat'):
+    for line in open(outfolder + '/user_info/' + city + '_user_coordinates_raw_locals_filtered.dat'):
         if 'userid' not in line:
             fields = line.strip().split('\t')
             users_coordinates[fields[0]] = [tuple([float(fff.split(',')[0]), float(fff.split(',')[1])]) for fff in fields[1:]]
@@ -262,6 +262,9 @@ def doDBSCAN(X, ax, sample, eps, mins, user):
     
     return centr
         
+
+
+
 
 
 
