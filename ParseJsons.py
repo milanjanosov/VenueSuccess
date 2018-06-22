@@ -193,7 +193,7 @@ def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox
         count = jsono['totalCount']
         user  = jsono['id']
 
-       # print(str(user), user in set(unknown_users + local_users))
+
         if str(user) in set(unknown_users + local_users) and count > 0:
 
 
@@ -612,21 +612,15 @@ def get_users_coordinates(users_homes, local_users, users_likes, users_tips, use
         f.write('\t'.join([ str(v[1]) + ', ' + str(v[2]) for v in venues] )  + '\n')
         g.write('\t'.join([v[0] + ',' + str(v[1]) + ', ' + str(v[2]) +  ',' + v[3] for v in venues] )  + '\n')
 
-
-
-        if int(user) in users_homes:
-            print('szia')   
+  
 
 
         if int(user) in users_homes:# or user in local_users:
             for venue in venues:
 
-                if 15395472 == int(user):
-                    print('elso  ', venue)
-
+        
                 if check_box(bbox, city, venue[2], venue[1]):
-                    if 15395472 == int(user):
-                        print('BBOX  ', venue)
+         
 
                     l.write( str( venue[1] ) + ', ' + str( venue[2] ) + '\t' )
                     h.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
