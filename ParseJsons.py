@@ -187,7 +187,7 @@ def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox
 
     for ind, line in enumerate(open(infolder + city + '_photos.json', 'r')):
 
-        #if ind == 5: break
+        if ind % 1000 == 0: print (ind)
 
         jsono = json.loads(line)
 
@@ -339,7 +339,7 @@ def get_local_users(city, infolder, outfolder):
 
     for ind, line in enumerate(open(infolder + city + '_users.json', 'r')):
 
-        #if ind == 5: break
+        if ind % 1000 == 0: print (ind)
 
         jsono = json.loads(line)
         user  = jsono['id']

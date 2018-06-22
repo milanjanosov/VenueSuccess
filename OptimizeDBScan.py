@@ -307,21 +307,8 @@ def visualize_opt_res(city, outroot):
 
     plt.savefig(outroot   + '/figures/' + city + '_OPTIMIZE_DBscan.png')
 
-    plt.show()
 
     
-
-'''
-city    = 'bristol'
-outroot = '../ProcessedData/' + city + '/'
-
-
-
-
-optimize_db_scan(city, outroot)
-visualize_opt_res(city, outroot)
-
-'''
 
 
 
