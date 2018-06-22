@@ -45,12 +45,12 @@ def add_distances_to_edges(G):
 
             target_loc = target['location']           
             source_loc = source['location']      
-   
-            dist    =  mpu.haversine_distance((target_loc[1], target_loc[0]), (source_loc[1], source_loc[0]))
-            if dist == 0: dist = 0.0000000001
-        
 
-            distances.append( dist )
+       
+        dist    =  mpu.haversine_distance((target_loc[1], target_loc[0]), (source_loc[1], source_loc[0]))
+        if dist == 0: dist = 0.0000000001
+    
+        distances.append( dist )
   
     G.es['distances'] = distances
 
@@ -116,9 +116,16 @@ def get_gephi_new(G, outfolder, outname):
 
        
     f = open( outfolder + 'networks/gephi/' + outname + '_edges.dat', 'w')
-    f.write('Source'+'\t'+'Target'+'\t'+'Distance'+'\t'+'Type'+'\n')      
+    f.write('Source' + '\t' + 'Target' + '\t' + 'Distance' + '\t' + 'Weight' + '\t' + 'Type' + '\n')      
     for e in G.es():
-        f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['distances']) + '\tundirected' + '\n')
+
+        try:
+            f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['distances']) + '\t' + str(e['weight'])+ '\tundirected' + '\n')
+        except:
+            f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['distances']) + '\t' + str(0)          + '\tundirected' + '\n')
+            pass
+
+
     f.close()
 
     
@@ -247,16 +254,17 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
   
     for ind, user1 in enumerate(users):
         for user2 in users:
-            all_users.add(user1)
-            all_users.add(user2)
-            w = len(users_venues[user1].intersection(users_venues[user2]))
-            if w > 0 and 'user' not in user1:               
-                edges.append((user1, user2))
-                weights.append(w)
 
-    '''        if ind == 50: break '''
-    
+            if user1 != user2:
 
+                all_users.add(user1)
+                all_users.add(user2)
+                w = len(users_venues[user1].intersection(users_venues[user2]))
+                if w > 0 and 'user' not in user1:               
+                    edges.append((user1, user2))
+                    weights.append(w)
+
+ 
 
 
     G.add_vertices(list(all_users))
@@ -277,7 +285,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 ''' =======     GET THE VENUES SIMILARITY NETWORK      ======== '''
 ''' =========================================================== '''
 
-def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
+def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
 
 
     print 'Start creating the venues\'s similarity network...'
@@ -304,10 +312,7 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
     
         vv += venues
 
-        '''if ind == 100: break '''
-
-
-
+    
     ### get venues locations
     venues_location = {}
     for  line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
@@ -333,14 +338,20 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile):
 
     for ind, venue1 in enumerate(venues_location.keys()):
         for venue2 in venues_location.keys():
-            all_venues.add(venue1)
-            all_venues.add(venue2)
-            w = len(set(venues_users[venue1]).intersection(set(venues_users[venue2])))
-            if w > 0:
-                edges.append((venue1, venue2))
-                weights.append(w)
 
-      
+            if venue1 != venue2:
+
+                all_venues.add(venue1)
+                all_venues.add(venue2)
+
+                w = len(set(venues_users[venue1]).intersection(set(venues_users[venue2])))
+           
+                if w > 0:
+                    edges.append((venue1, venue2))
+                    weights.append(w)
+
+
+             
 
     all_venues = list(all_venues)
     locations  = [venues_location[venue] if venue in venues_location else 'nan' for venue in all_venues] 
@@ -571,46 +582,51 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 def do_all_the_networks(city, outroot, infile, bbox):
 
 
-  
 
+    print 'Create networks...'
     G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
-    G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
-    G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile)
+    #G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+    #G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
 
 
+    print 'Calc centrality measures...'
+   # calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+   # calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+   # calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
 
-    calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
-    calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
-    calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
 
-
-    print 'Creating gephi files'
+    print 'Creating gephi files...'
     get_gephi_new(G_friends, outroot, city + '_friendship')
-    get_gephi_new(G_users,   outroot, city + '_users_similarity')
-    get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
+    #get_gephi_new(G_users,   outroot, city + '_users_similarity')   
+    #get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
 
 
-
-    print 'Creating network stats'
+    print 'Creating network stats...'
     get_network_stats(G_friends, city, outroot, '_friendship')
-    get_network_stats(G_users,   city, outroot, '_users_similarity')
-    get_network_stats(G_venues,  city, outroot, '_venues_similarity')
+    #get_network_stats(G_users,   city, outroot, '_users_similarity')
+    #get_network_stats(G_venues,  city, outroot, '_venues_similarity')
+    
 
 
-city      = 'bristol'
-eps       = 0.01
-mins      = 3
-LIMIT_num = 0
-outroot   = '../ProcessedData/' + city + '/'
-infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'
+  #  return 'FASZ'
+
+if __name__ == '__main__': 
+
+    city      = 'bristol'
+    eps       = 0.01
+    mins      = 3
+    LIMIT_num = 0
+    outroot   = '../ProcessedData/' + city + '/'
+    infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'
 
 
+    
 
-inputs = ParseInput.get_inputs()
+    inputs = ParseInput.get_inputs()
 
-bbox  = inputs[city]
+    bbox  = inputs[city]
 
-do_all_the_networks(city, outroot, infile, bbox)
+    do_all_the_networks(city, outroot, infile, bbox)
 
 
 

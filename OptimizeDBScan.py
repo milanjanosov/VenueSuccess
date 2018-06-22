@@ -241,14 +241,14 @@ def optimize_db_scan(city, outroot):
 
 
 
-    for eps_ in [0.001, 0.005, 0.01, 0.03, 0.1, 0.2]:
+    for eps_ in [0.0005, 0.001, 0.003, 0.005, 0.007, 0.01, 0.02, 0.03, 0.05, 0.1, 1.5, 0.2]:
 
-        for mins_ in [2,3,4,5, 6]:
+        for mins_ in [2,3,4,5,6, 7, 8, 9, 10]:
 
             fout  = open(outroot + 'user_homes/optimize_centroids/series/dbscan_opt_limit_series_' + str(eps_) + '_' + str(mins_) + '.dat', 'w') 
             fout.close()
 
-            for LIMIT_ in range(0, 15):
+            for LIMIT_ in range(0, 20):
 
                 print(eps_, '\t', mins_, '\t', LIMIT_)
 

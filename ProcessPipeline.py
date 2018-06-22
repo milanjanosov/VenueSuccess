@@ -16,6 +16,7 @@ import CompareHomingMethods as Compare
 import time
 import FilterHomeLocatoins as FilterH
 import OptimizeDBScan as Optimize
+import subprocess
 #import SumNetworks as SNW
 
 
@@ -200,6 +201,15 @@ elif sys.argv[2] == 'networks':
     #call_nw  =call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile])
 
     #print(call_nw)
+
+
+    python3_command = "BuildNetworks.py"# + city + "_" + outroot + "_" + infile #arg2"  # launch your python2 script using bash
+
+    process = subprocess.Popen(python3_command.split(), stdout=subprocess.PIPE)#, shell=True)
+    output, error = process.communicate() 
+
+
+
 
 
     ''' 
