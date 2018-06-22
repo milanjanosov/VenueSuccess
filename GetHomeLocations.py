@@ -26,7 +26,8 @@ def get_users_coordinates_ba(city, outfolder):
     for line in open(outfolder + '/user_info/' + city + '_user_coordinates_raw_locals_filtered.dat'):
         if 'userid' not in line:
             fields = line.strip().split('\t')
-            users_coordinates[fields[0]] = list(zip(*[tuple([float(fff.split(',')[0]), float(fff.split(',')[1])]) for fff in fields[1:]]))
+            if len(fields[1:]) > 0:
+                users_coordinates[fields[0]] = list(zip(*[tuple([float(fff.split(',')[0]), float(fff.split(',')[1])]) for fff in fields[1:]]))
                     
     return users_coordinates
 
@@ -39,7 +40,8 @@ def get_users_coordinates_db(city, outfolder):
     for line in open(outfolder + '/user_info/' + city + '_user_coordinates_raw_locals_filtered.dat'):
         if 'userid' not in line:
             fields = line.strip().split('\t')
-            users_coordinates[fields[0]] = [tuple([float(fff.split(',')[0]), float(fff.split(',')[1])]) for fff in fields[1:]]
+            if len(fields[1:]) > 0:
+                users_coordinates[fields[0]] = [tuple([float(fff.split(',')[0]), float(fff.split(',')[1])]) for fff in fields[1:]]
                     
     return users_coordinates
 
@@ -103,11 +105,11 @@ def get_users_centroids(city, outfolder, sample, LIMIT_num = 0, plot = True):
 
 
     if sample:
-        user_sample     = sorted(random.sample([uu for uu in users if len(users_coordinates[uu]) > LIMIT_num], 16))
+        user_sample     = sorted(random.sample([uu for uu in users if len(users_coordinates[uu][0]) > LIMIT_num], 16))
         indicies        = [(i,j) for i in range(4) for j in range(4)]
         user_sample_ind = [(user_sample[k], indicies[k][0], indicies[k][1]) for  k in range(len(user_sample))]
     else:
-        user_sample     = [uu for uu in users if len(users_coordinates[uu]) > LIMIT_num]
+        user_sample     = [uu for uu in users if len(users_coordinates[uu][0]) > LIMIT_num]
         user_sample_ind = [(user_sample[k], 0, 0) for  k in range(len(user_sample))]
 
 
@@ -273,7 +275,8 @@ def get_db_centroids(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 
 
     fout              = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat', 'w')
     users_coordinates = get_users_coordinates_db(city, outfolder)    
-    f, ax             = plt.subplots(4, 4, figsize=(20, 15))
+    if sample: f, ax  = plt.subplots(4, 4, figsize=(20, 15))
+    else: ax = []
 
 
     for (user, i, j) in user_sample:
