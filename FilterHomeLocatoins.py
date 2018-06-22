@@ -5,6 +5,8 @@ from ParseJsons import check_box
 def copy_filtered(city, outfolder, bbox):
 
 
+    print ('Drop locations of of the bounding box...')
+
     ''' filter out the centroid-based screwed up home locations '''
 
     folders_i = outfolder + '/user_homes/centroids/'

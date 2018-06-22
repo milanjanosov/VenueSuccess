@@ -220,8 +220,6 @@ def doDBSCAN(X, ax, sample, eps, mins, user):
 
     centers = [[1, 1], [-1, -1], [1, -1]]
 
-    print('Start doing DBSCan - eps = ' + str(eps) + ' ...')
-
     #X = StandardScaler().fit_transform(X)
 
     db = DBSCAN(eps, min_samples=mins).fit(X)
@@ -276,8 +274,9 @@ def get_db_centroids(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 
     fout              = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat', 'w')
     users_coordinates = get_users_coordinates_db(city, outfolder)    
     if sample: f, ax  = plt.subplots(4, 4, figsize=(20, 15))
-    else: ax = []
+    else: ax = np.asarray([[0],[0],[0]])
 
+    print('Start doing DBSCan - eps = ' + str(eps) + ' ...')
 
     for (user, i, j) in user_sample:
     

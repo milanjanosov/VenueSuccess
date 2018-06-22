@@ -20,7 +20,8 @@ def get_user_venues(city, outfolder, LIMIT_num):
         if 'userid' not in line:
             fields = line.strip().split('\t')
             user   = fields[0]
-                      
+                  
+                
             for field in fields[1:]:
                 
                 dields = field.split(',')
@@ -58,17 +59,19 @@ def get_venues_distances_sorted(city, outfolder, venues_categories):
         v1, v2, dist = line.strip().split('\t')
         dist = float(dist)
         
+        if v1 in venues_categories and v2 in venues_categories:
         
-        if v1 not in venues_distances:
-            venues_distances[v1] = {}
-        
-        venues_distances[v1][v2] = dist
+
+            if v1 not in venues_distances:
+                venues_distances[v1] = {}
             
-        
-        if v2 not in venues_distances:
-            venues_distances[v2] = {}
-        
-        venues_distances[v2][v1] = dist    
+            venues_distances[v1][v2] = dist
+                
+            
+            if v2 not in venues_distances:
+                venues_distances[v2] = {}
+            
+            venues_distances[v2][v1] = dist    
 
          
     venues_distances_sorted = {}        
@@ -211,6 +214,8 @@ def get_users_features(city, outfolder, venues_features, user_venues, users_home
 
 def gennerate_classification_features(city, outfolder, LIMIT_num, N = 5, R = 1.0):
 
+
+    print ('Generating MLhomepred classification features...')
     
 
     user_venues, venues_categories = get_user_venues(city, outfolder, LIMIT_num)

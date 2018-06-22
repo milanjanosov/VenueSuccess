@@ -50,12 +50,9 @@ def get_homes_from_methods(city, outfolder, LIMIT_num):
     for fn in files:
 
         method      = fn.split('homes_')[1].replace('_' + str(LIMIT_num) + '.dat' ,'').split('_filtered')[0]
-
-
         users_homes = get_users_homes(fn, city, outfolder)
 
-
-      
+  
         for user, home in users_homes.items():
 
             if user not in methods_homes:
@@ -63,10 +60,6 @@ def get_homes_from_methods(city, outfolder, LIMIT_num):
 
             methods_homes[user][method] = home
         
-
-    #{user1: {method1 : predhome1, method2 :  predhome2, ...}, user2: {method2 : predhome3}, ... } ... }
-    for k, v in methods_homes.items():
-        print(k)
 
     return methods_homes
 
@@ -120,6 +113,8 @@ def plot_final_results(city, outfolder):
     methods_series = {}
 
 
+    print ('Plot final ML stuff...')
+
 
     ''' put the centroid methods on the plot '''
 
@@ -145,7 +140,6 @@ def plot_final_results(city, outfolder):
                 if 'dbscan' in method:
 
                     method, index = method.rsplit('_',  1)
-                   # print(method, index)
                     if method not in methods_series_dbscan:
                         methods_series_dbscan[method] = [(float(index), avg)]
                     else:
@@ -155,7 +149,6 @@ def plot_final_results(city, outfolder):
                 elif 'cutoff' in method:
 
                     a, method, index = method.rsplit('_')
-
                     if method not in methods_series_cutoff:
                         methods_series_cutoff[method] = [(float(index), avg)]
                     else:
@@ -166,7 +159,6 @@ def plot_final_results(city, outfolder):
                 elif 'cutoff' not in method and 'centroid' in method:
             
                     method, index = method.split('_')
-
                     if method not in methods_series_centroid:
                         methods_series_centroid[method] = [(float(index), avg)]
                     else:
@@ -230,17 +222,12 @@ def plot_final_results(city, outfolder):
 
     for ind, fn in enumerate(ML_files):
     
-       # if ind == 10: break
-
 
         LIMIT = int(fn.split('predicted_homes_')[1].split('_pred_home')[0])
         best_centroids = {} 
         for line in open(outfolder + '/user_homes/centroids_filtered/' + city + '_user_homes_'  + best_method + '_' + str(LIMIT) + '_filtered.dat' ):
             user, lng, lat = line.strip().split('\t')
             best_centroids[user] = (lng, lat)
-
-
-
 
 
 
@@ -271,11 +258,7 @@ def plot_final_results(city, outfolder):
             users_classifiers_avg[c] = []
 
         for ind, dist in indist.items():
-
             users_classifiers_avg[c].append((ind, np.mean(dist))) 
-
-            #print(c, ind, np.mean(dist))
-   
 
     for c, data in users_classifiers_avg.items():
 

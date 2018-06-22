@@ -51,7 +51,6 @@ def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         clas  = clf.fit(X_train, y_train)
- #       print (name )
         pred_home['pred_home_' + name.replace(' ', '_')] = clas.predict(X_test)
  
     pred_home.to_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_home_classification_RESULTS_' + str(LIMIT) + '.csv', sep='\t')
@@ -60,6 +59,7 @@ def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
 
 def classify_data(city, outfolder, LIMIT):
 
+    print ('Do the MLhomepred classification...')
 
     ### training data budapest_ML_feature_has_home_TRAIN.csv
     df_train =  pd.read_csv(outfolder + '/user_homes/MLfeatures/' + city + '_ML_feature_has_home_TRAIN_' + str(LIMIT) + '.csv', index_col=0, sep = '\t')
@@ -88,6 +88,8 @@ def classify_data(city, outfolder, LIMIT):
 '''  ---------------------------------------------------------  '''
 
 def conclude_class(city, outfolder, LIMIT):
+
+    print ('Merge the MLhomepred results...')
 
     df    = pd.read_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_home_classification_RESULTS_' + str(LIMIT) + '.csv', sep = '\t'  , index_col=0)
     f, ax = plt.subplots(2, 5, figsize=(20, 8))
