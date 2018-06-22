@@ -124,9 +124,9 @@ elif sys.argv[2] == 'home_sample':
         t1 = time.time()
 
         user_sample = Home.get_users_centroids(           city, outroot, sample = True, LIMIT_num = LIMIT,              plot = False)
-     #   Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 1.0, plot = False)
-     #   Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 2.0, plot = False)
-     #   Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 3.0, plot = False)
+        Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 1.0, plot = False)
+        Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 2.0, plot = False)
+        Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 3.0, plot = False)
         Home.get_db_centroids(               user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, eps = 0.01,  mins = 3)
         Home.get_db_centroids(               user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, eps = 0.02,  mins = 3)
         Home.get_db_centroids(               user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, eps = 0.1,   mins = 3)
@@ -151,15 +151,15 @@ elif sys.argv[2] == 'home_full':
         ''' these are the centroid based things '''
         users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
 
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 5.0, plot = False)
+  #      Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
+  #      Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
+  #      Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
+  #      Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 5.0, plot = False)
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 3)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 5)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
+ #       Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 3)
+ #       Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 5)
+ #       Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
+ #       Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
 
         ''' this is the messy ML part '''
         MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
@@ -187,6 +187,7 @@ elif sys.argv[2] == 'opt_dbscan':
     Optimize.optimize_db_scan(city, outroot)
     Optimize.visualize_opt_res(city, outroot)
 
+
     
 
 elif sys.argv[2] == 'networks':
@@ -198,33 +199,10 @@ elif sys.argv[2] == 'networks':
    
 
 
-    #call_nw  =call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile])
-
-    #print(call_nw)
+    call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile, bbox])
 
 
-    python3_command = "BuildNetworks.py"# + city + "_" + outroot + "_" + infile #arg2"  # launch your python2 script using bash
-
-    process = subprocess.Popen(python3_command.split(), stdout=subprocess.PIPE)#, shell=True)
-    output, error = process.communicate() 
-
-
-
-
-
-    ''' 
-    1. FINISH SUMNETWORKS WHEN I HAVE THE NW MEASURES
-
-
-    MERGELES: 
-    - venue -> zipcode map
-    - full_locationt atmappelni
-    - networkos reszt atparameterezni ugyh venue, zipcode, ...
-
-    '''
-
-
-
+    
 
 
 elif sys.argv[2] == 'success' : 

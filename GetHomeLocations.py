@@ -279,10 +279,6 @@ def get_db_centroids(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 
     for (user, i, j) in user_sample:
     
         c     = users_coordinates[user]  
-
-
-        print(c)
-
         x     = np.asarray(users_coordinates[user])  
         centr = doDBSCAN(x, ax[i,j], sample, eps, mins, user)  
 
