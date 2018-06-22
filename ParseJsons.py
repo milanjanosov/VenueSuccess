@@ -41,13 +41,14 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
     for ind, line in enumerate(open(infolder + city + '_likes.json', 'r')):
     
 
-        #if ind == 5: break
+        if ind % 1000 == 0: print (ind)
 
         jsono = json.loads(line)
         user  = jsono['list']['user']['id']
 
         if str(user) in set(unknown_users + local_users):
     
+
 
 
             for item in  jsono['list']['listItems']['items']:
