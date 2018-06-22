@@ -11,9 +11,9 @@ import numpy as np
 '''             load the shapefile of UK                        '''
 ''' =========================================================== '''
 
-def load_shp():
+def load_shp(city):
     
-    print 'Loading the shapefile...'
+    print ('Loading the shapefile...')
     lsoa_shp_df = gpd.read_file('full2/england_lsoa_2011_gen.shp')
     return lsoa_shp_df[lsoa_shp_df['name'].str.contains(city.title())].to_crs({'init': 'epsg:4326'})  
 
@@ -49,7 +49,7 @@ def coordinates_to_lsoa(lats, lons, cityshape):
 
 def get_venues_coordinates(city, outfolder):
 
-    print 'Parsing venue coordinates...'
+    print ('Parsing venue coordinates...')
 
     venues_coordinates = {}
 
@@ -71,9 +71,9 @@ def get_venues_coordinates(city, outfolder):
 '''              get the venues within lsoa-s                   '''
 ''' =========================================================== '''
 
-def get_lsoa_venues(venues_coordinates):
+def get_lsoa_venues(cityshape, venues_coordinates):
 
-    print 'Converting (lat, long) to LSOA-s...'
+    print ('Converting (lat, long) to LSOA-s...')
     
     lsoa_venues  = {}
     lsoa_polygons = {}
@@ -105,7 +105,7 @@ def get_lsoa_venues(venues_coordinates):
 
 def get_edge_weights(city, outfolder):
 
-    print 'Parsing venue similarity network edge list...'
+    print ('Parsing venue similarity network edge list...')
     
     edges_weights = {}
     all_edges   = set()
@@ -133,7 +133,7 @@ def get_edge_weights(city, outfolder):
 
 def get_node_edge_list(edges_weights):
 
-    print 'Listing each nodes neighbours and those edge weights...'
+    print ('Listing each nodes neighbours and those edge weights...')
 
     # for each node list the edges (weights) in which they are present
     nodes_edge_weights = {}
@@ -167,7 +167,7 @@ def get_node_edge_list(edges_weights):
 
 def get_lsoa_mininw_edges(lsoa_venues):
     
-    print 'Create the LSOA level mini-network edge lists...'
+    print ('Create the LSOA level mini-network edge lists...')
 
     lsoa_edges = {}
 
@@ -200,7 +200,7 @@ def get_lsoa_mininw_edges(lsoa_venues):
 
 def get_lsoa_nw_features(lsoa_edges, edges_weights):
 
-    print 'Deriving the LSOA network features...'
+    print ('Deriving the LSOA network features...')
 
     all_edges = [set(e.split('_')) for e in edges_weights.keys()]
     all_nodes = list(([ e.split('_')[0]  for e in edges_weights.keys()] + [ e.split('_')[1]  for e in edges_weights.keys()]))
@@ -248,7 +248,7 @@ def get_lsoa_nw_features(lsoa_edges, edges_weights):
 
 def get_venues_features(lsoa_weights_density, edge_density_glb, edge_avg_weight_glb):
 
-    print 'Summing up the LSOA level network features...'
+    print ('Summing up the LSOA level network features...')
 
     venues_features = {}
 
@@ -269,9 +269,7 @@ def get_venues_features(lsoa_weights_density, edge_density_glb, edge_avg_weight_
         else:
             lsoa_weight = 0.0
             lsoa_dens   = 0.0
-                
-        print lsoa_weight, lsoa_dens
-            
+             
 
         for venue in venues:
 
@@ -297,22 +295,23 @@ def get_venues_features(lsoa_weights_density, edge_density_glb, edge_avg_weight_
 
 
 
+def get_lsoa_level_networks( city, outfolder ):
 
-city               = 'bristol'
-outfolder          = '../ProcessedData/' + city + '/'
+    #city               = 'bristol'
+    #outfolder          = '../ProcessedData/' + city + '/'
 
-cityshape                   = load_shp()
-venues_coordinates          = get_venues_coordinates(city, outfolder)
-lsoa_venues, lsoa_polygons  = get_lsoa_venues(venues_coordinates)
-all_venues                  = set([venue for venues in lsoa_venues.values() for venue in venues])
-edges_weights               = get_edge_weights(city, outfolder)     # node1_node2 -> weight
-nodes_edge_weights          = get_node_edge_list(edges_weights)     # node0 -> [(node1, w1), (node2, w2), ...]
-lsoa_edges                  = get_lsoa_mininw_edges(lsoa_venues)    # edges within the mini lsoa level networks
+    cityshape                   = load_shp(city)
+    venues_coordinates          = get_venues_coordinates(city, outfolder)
+    lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates)
+    all_venues                  = set([venue for venues in lsoa_venues.values() for venue in venues])
+    edges_weights               = get_edge_weights(city, outfolder)     # node1_node2 -> weight
+    nodes_edge_weights          = get_node_edge_list(edges_weights)     # node0 -> [(node1, w1), (node2, w2), ...]
+    lsoa_edges                  = get_lsoa_mininw_edges(lsoa_venues)    # edges within the mini lsoa level networks
 
 
-lsoa_weights_density, edge_density_glb, edge_avg_weight_glb  =  get_lsoa_nw_features(lsoa_edges, edges_weights)
+    lsoa_weights_density, edge_density_glb, edge_avg_weight_glb  =  get_lsoa_nw_features(lsoa_edges, edges_weights)
 
-get_venues_features(lsoa_weights_density, edge_density_glb, edge_avg_weight_glb)      
+    get_venues_features(lsoa_weights_density, edge_density_glb, edge_avg_weight_glb)      
 
 
 
