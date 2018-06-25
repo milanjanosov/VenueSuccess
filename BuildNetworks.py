@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import random
 from ParseJsons import check_box
 import sys
+from multiprocessing import Process, Manager
 sys.path.append("..")
 import ParseInput
 
@@ -212,11 +213,70 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
 
 
+
 ''' =========================================================== '''
 ''' =======        GET USERS SIMILARITY NETWORK        ======== '''
 ''' =========================================================== '''
 
+
+def chunkIt(seq, num):
+    avg = len(seq) / float(num)
+    out = []
+    last = 0.0
+
+    while last < len(seq):
+        out.append(seq[int(last):int(last + avg)])
+        last += avg
+
+    return out
+
+
+
+def get_users_edges(args):
+
+
+    users       = args[0]
+    users0      = args[1]
+    thread_id   = args[2]
+    num_threads = args[3]
+    edges       = args[4]
+    weights     = args[5]
+    all_users   = args[6]
+    users_venues = args[7]
+    
+
+    nnn = len(users0)
+
+    for ind, user1 in enumerate(users0):
+
+      #  if ind == 20: break
+
+        print thread_id, '/', num_threads, '\t', ind, '/', nnn, '\t numedges:  ', len(edges)
+
+        for user2 in users:
+
+            if user1 != user2:
+
+                all_users.append(user1)
+                all_users.append(user2)
+                w = len(users_venues[user1].intersection(users_venues[user2]))
+
+
+
+
+                if w > 0 and 'user' not in user1 and 'user' not in user2:               
+                    edges.append((user1, user2))
+                    weights.append(w)
+
+                    #print '\t', edges[0], len(edges)
+
+
+
+
+
 def get_user_user_similarity_network_igraph(city, outfolder, infile):
+
+
 
 
     print 'Start creating the users\'s similarity network...'
@@ -248,42 +308,63 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
 
     # buld the network
-    G = Graph()
 
-    edges     = []
-    weights   = []
-    all_users = set()
 
-    nnn = len(users)
+  ##  edges     = []
+  ##  weights   = []
+ ##   all_users = set()
+
+
+
+
+
+
+    manager = Manager()
+    L = manager.list()
+
+
+
+    edges     = manager.list()  
+    weights   = manager.list()
+    all_users = manager.list()
+
+
+    num_threads = 4
+    users_chunks = chunkIt(users, num_threads)
+    Pros = []
+                
+        
+    for i in range(0,num_threads):                 
+        p = Process(target = get_users_edges, args=([users, users_chunks[i], i+1, num_threads, edges, weights, all_users, users_venues], ))
+        p.start()
+        Pros.append(p)
+       
+    for t in Pros:
+        t.join()
+
+
+
+
+    print 'kesz: ', len([e for e in edges]), len(edges), len(set(all_users))
+
+
+
   
-    for ind, user1 in enumerate(users):
-
-        print ind, '/', nnn
-
-        for user2 in users:
-
-            if user1 != user2:
-
-                all_users.add(user1)
-                all_users.add(user2)
-                w = len(users_venues[user1].intersection(users_venues[user2]))
-                if w > 0 and 'user' not in user1:               
-                    edges.append((user1, user2))
-                    weights.append(w)
-
- 
 
 
+    #141616 1932
+    #G = Graph()
+    '''
     G.add_vertices(list(all_users))
     G.add_edges(edges)
     G.es['weight'] = weights
     locations      = [users_location[g['name']] for g in G.vs()]  #[users_location[user] if user in users_location else 'nan'     for user in all_user] 
     G.vs['location'] = locations
     add_distances_to_edges(G)
-
+    '''
     print 'Users\'s similarity network done.'
     
-    return G
+    return 0#G
 
     
 
@@ -623,7 +704,8 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 if __name__ == '__main__': 
 
-    city      = 'london'
+    city = sys.argv[1]
+    #city      = 'bristol'
     eps       = 0.01
     mins      = 3
     LIMIT_num = 0
