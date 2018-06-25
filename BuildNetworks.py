@@ -451,8 +451,17 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     all_venues = set()
 
 
-    for ind, venue1 in enumerate(venues_location.keys()):
-        for venue2 in venues_location.keys():
+    venueslist = venues_location.keys() 
+    nnn = len(venueslist)
+
+
+    for ind, venue1 in enumerate(venueslist):
+
+        print ind, '/', nnn
+
+        for venue2 in venueslist:
+
+    
 
             if venue1 != venue2:
 
