@@ -340,11 +340,6 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
 
 
-
-
-
-
-
     '''manager = Manager()
     L = manager.list()
 
@@ -701,23 +696,28 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 
             #vertice_attributes[name]['name']             = name
             vertice_attributes[name]['degree']           = degrees[i]
-            vertice_attributes[name]['betweenness']      = betweennesses[i]
+            if 'friend' in tipus: vertice_attributes[name]['betweenness']      = betweennesses[i]
             vertice_attributes[name]['clustering']       = clusterings[i]
-            vertice_attributes[name]['closeness']        = closenesses[i]
+            if 'friend' in tipus:vertice_attributes[name]['closeness']        = closenesses[i]
             vertice_attributes[name]['pagerank']         = pageranks[i]
             vertice_attributes[name]['eigenvector']      = eigenvectors[i]
-            vertice_attributes[name]['constraint']       = constraint[i]
-            vertice_attributes[name]['egosize']          = neighborhood_sizes[i]
+            if 'friend' in tipus:vertice_attributes[name]['constraint']       = constraint[i]
+            if 'friend' in tipus:vertice_attributes[name]['egosize']          = neighborhood_sizes[i]
        
+
+    
+
+
+
          
             if geo: 
-                vertice_attributes[name]['betweenness_geo']  = betweennesses_geo[i]
-                vertice_attributes[name]['closeness_geo']    = closenesses_geo[i]
+                if 'friend' in tipus:vertice_attributes[name]['betweenness_geo']  = betweennesses_geo[i]
+                if 'friend' in tipus:vertice_attributes[name]['closeness_geo']    = closenesses_geo[i]
                 vertice_attributes[name]['clustering_geo']   = clusterings_geo[i]
                 vertice_attributes[name]['strength_geo']     = strengthes_geo[i]
                 vertice_attributes[name]['pagerank_geo']     = pageranks_geo[i]
                 vertice_attributes[name]['eigenvector_geo']  = eigenvectors_geo[i]
-                vertice_attributes[name]['constraint_geo']   = constraint_geo[i]
+                if 'friend' in tipus:vertice_attributes[name]['constraint_geo']   = constraint_geo[i]
 
                 vertice_attributes[name]['social_stretch']   = social_stretch(  G, G.vs[i], neighborhoods[i])              
                 vertice_attributes[name]['triangle_size']    = triangle_size(   G, G.vs[i], neighborhoods[i])
@@ -726,8 +726,8 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 
 
             if weighted:
-                vertice_attributes[name]['betweenness_w']  = betweennesses_w[i]
-                vertice_attributes[name]['closeness_w']    = closenesses_w[i]
+                if 'friend' in tipus:vertice_attributes[name]['betweenness_w']  = betweennesses_w[i]
+                if 'friend' in tipus:vertice_attributes[name]['closeness_w']    = closenesses_w[i]
                 vertice_attributes[name]['clustering_w']   = clusterings_w[i]
                 vertice_attributes[name]['strength_w']     = strengthes_w[i]
                 vertice_attributes[name]['pagerank_w']     = pageranks_w[i]
@@ -762,26 +762,26 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 
     print 'Create networks...'
- #   G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
- #   G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+    G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
+    G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
     G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
 
 
-    print 'Calc centrality measures...'
- #   calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
- #   calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
-    calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
-
-
     print 'Creating gephi files...'
-#    get_gephi_new(G_friends, outroot, city + '_friendship')
-#    get_gephi_new(G_users,   outroot, city + '_users_similarity')   
+    get_gephi_new(G_friends, outroot, city + '_friendship')
+    get_gephi_new(G_users,   outroot, city + '_users_similarity')   
     get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
 
 
+    print 'Calc centrality measures...'
+    calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+    calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+    calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
+
+
     print 'Creating network stats...'
- #   get_network_stats(G_friends, city, outroot, '_friendship')
- #   get_network_stats(G_users,   city, outroot, '_users_similarity')
+    get_network_stats(G_friends, city, outroot, '_friendship')
+    get_network_stats(G_users,   city, outroot, '_users_similarity')
     get_network_stats(G_venues,  city, outroot, '_venues_similarity')
     
    
@@ -808,13 +808,76 @@ if __name__ == '__main__':
 
 
     inputs = ParseInput.get_inputs()
-
     bbox  = inputs[city]
-
     do_all_the_networks(city, outroot, infile, bbox)
 
 
+
+    if len(sys.argv) > 1:
+
+
+        if sys.argv[1] == 'friend':
+
+            print 'Create friendship network' 
+            G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
+
+            '''print 'Creating gephi files...'
+            get_gephi_new(G_friends, outroot, city + '_friendship')     
+       
+            print 'Calc centrality measures...'
+            calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+
+            print 'Creating network stats...'
+            get_network_stats(G_friends, city, outroot, '_friendship')
+            '''
+
+
+        elif sys.argv[1] == 'user':
+
+            print 'Create users network' 
+            '''G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+            print 'Creating gephi files...'
+            get_gephi_new(G_users,   outroot, city + '_users_similarity')   
+            print 'Calc centrality measures...'
+            calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+            print 'Creating network stats...'
+            get_network_stats(G_users,   city, outroot, '_users_similarity')
+            '''
+    
+        elif sys.argv[1] == 'venues':
+
+            '''print 'Create venues network' 
+            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+            print 'Creating gephi files...'
+            get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
+            print 'Calc centrality measures...'
+            calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
+            print 'Creating network stats...'
+            get_network_stats(G_venues,  city, outroot, '_venues_similarity')
+            '''
+
 ## source /opt/virtualenv-python2.7/bin/activate
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
 
 
 
