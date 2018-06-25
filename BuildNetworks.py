@@ -579,6 +579,9 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 
 
 
+
+
+
 def do_all_the_networks(city, outroot, infile, bbox):
 
 
@@ -606,14 +609,16 @@ def do_all_the_networks(city, outroot, infile, bbox):
     get_network_stats(G_users,   city, outroot, '_users_similarity')
     get_network_stats(G_venues,  city, outroot, '_venues_similarity')
     
+   
+
 
 
 
 if __name__ == '__main__': 
 
-    city      = 'bristol'
+    city      = 'london'
     eps       = 0.01
-    mins      = 3
+    mins      = 4
     LIMIT_num = 0
     outroot   = '../ProcessedData/' + city + '/'
     infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'

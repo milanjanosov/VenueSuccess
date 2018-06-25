@@ -209,16 +209,12 @@ elif sys.argv[2] == 'home_full':
         t.join()
 
 
-
-
-
-
-
-
+   
            
      # this has to be run only once after that loop above
     FilterH.copy_filtered(city, outroot, bbox)
     
+
     for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     ''' this compares the different methods '''
     
@@ -249,7 +245,7 @@ elif sys.argv[2] == 'networks':
     infile    = outroot + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat'
    
 
-    call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile, bbox])
+   # call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile, bbox])
     
     LSOA.get_lsoa_level_networks( city, outroot )
     
