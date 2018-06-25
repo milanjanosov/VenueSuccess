@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-
+from multiprocessing import Process
 import ParseInput
 import ParseJsons 
 import execnet
@@ -21,6 +21,7 @@ import MergeLSOAs as LSOA
 #import SumNetworks as SNW
 
 
+
 def call_python_version(Version, Module, Function, ArgumentList):
     gw      = execnet.makegateway("popen//python=python%s" % Version)
     channel = gw.remote_exec("""
@@ -30,6 +31,47 @@ def call_python_version(Version, Module, Function, ArgumentList):
     channel.send(ArgumentList)
     return channel.receive()
 
+
+
+def chunkIt(seq, num):
+    avg = len(seq) / float(num)
+    out = []
+    last = 0.0
+
+    while last < len(seq):
+        out.append(seq[int(last):int(last + avg)])
+        last += avg
+
+    return out
+        
+
+
+
+def do_full_home_stuff(args):
+
+
+        city      = args[0]
+        outfolder = args[1]
+        LIMIT     = args[2]
+
+
+        ##these are the centroid based things 
+        users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
+
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
+        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 5.0, plot = False)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 3)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 5)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
+
+        ## this is the messy ML part 
+        MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
+        Class.classify_data(city, outroot, LIMIT)
+        Class.conclude_class(city, outroot, LIMIT)
 
 
 
@@ -157,30 +199,23 @@ elif sys.argv[2] == 'home_full':
 
     t1 = time.time()
 
+    Pros = [] 
+    for LIMIT in range(0,20):  
+        p = Process(target = do_full_home_stuff, args=([city, outroot, LIMIT], ))
+        Pros.append(p)
+        p.start()
+       
+    for t in Pros:
+        t.join()
 
-    '''for LIMIT in range(20):
 
-        print ('LIMIT = ' + str(LIMIT))
 
-        ##these are the centroid based things 
-        users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
 
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
-        Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 5.0, plot = False)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 3)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 5)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
 
-        ## this is the messy ML part 
-        MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
-        Class.classify_data(city, outroot, LIMIT)
-        Class.conclude_class(city, outroot, LIMIT)
 
-    '''        
+
+
+           
      # this has to be run only once after that loop above
     FilterH.copy_filtered(city, outroot, bbox)
     
