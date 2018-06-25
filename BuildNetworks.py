@@ -809,7 +809,7 @@ if __name__ == '__main__':
 
     inputs = ParseInput.get_inputs()
     bbox  = inputs[city]
-    do_all_the_networks(city, outroot, infile, bbox)
+    #do_all_the_networks(city, outroot, infile, bbox)
 
 
 
