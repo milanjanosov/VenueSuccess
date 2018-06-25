@@ -3,6 +3,9 @@ from igraph import Graph
 from collections import OrderedDict
 import pandas as pd
 import mpu
+
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import random
 from ParseJsons import check_box
@@ -632,6 +635,8 @@ if __name__ == '__main__':
 
     do_all_the_networks(city, outroot, infile, bbox)
 
+
+## source /opt/virtualenv-python2.7/bin/activate
 
 
 
