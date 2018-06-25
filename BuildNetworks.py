@@ -3,11 +3,12 @@ from igraph import Graph
 from collections import OrderedDict
 import pandas as pd
 import mpu
-
+import time
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import random
+from ParseJsons import create_folder
 from ParseJsons import check_box
 import sys
 from multiprocessing import Process, Manager
@@ -249,7 +250,7 @@ def get_users_edges(args):
 
     for ind, user1 in enumerate(users0):
 
-      #  if ind == 20: break
+        #if ind == 3: break
 
         print thread_id, '/', num_threads, '\t', ind, '/', nnn, '\t numedges:  ', len(edges)
 
@@ -329,7 +330,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
     all_users = manager.list()
 
 
-    num_threads = 3
+    num_threads = 40
     users_chunks = chunkIt(users, num_threads)
     Pros = []
                 
@@ -566,26 +567,77 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
     vertice_attributes = {}
     all_users          = set([line.strip().split('\t')[0] for line in open(infile)])
 
+
+    t1 = time.time()
     degrees            = G.degree()   
+    print '\n\nDegrees: ', time.time() - t1
+
+    t1 = time.time()
     betweennesses      = G.betweenness()
+    print 'Betweennes: ', time.time() - t1 
+
+    t1 = time.time()
     closenesses        = G.closeness()
+    print 'closeness: ', time.time() - t1    
+
+    t1 = time.time()
     clusterings        = G.transitivity_local_undirected()
+    print 'clustering: ', time.time() - t1
+
+    t1 = time.time()
     pageranks          = G.pagerank()
+    print 'pagerank: ', time.time() - t1
+
+
+    t1 = time.time()
     eigenvectors       = G.eigenvector_centrality()
+    print 'eigenvector: ', time.time() - t1
+
+
+    t1 = time.time()
     neighborhood_sizes = G.neighborhood_size(vertices=None, order=1)
+    print 'egosize: ', time.time() - t1
+
+
+    t1 = time.time()
     neighborhoods      = G.neighborhood(vertices=None, order=1)
+    print 'ego: ', time.time() - t1
+
+
+    t1 = time.time()
     constraint         = G.constraint() 
     print tipus + '  - Topological measures done.'
 
 
     if geo: 
+
+        t1 = time.time()
         betweennesses_geo  = G.betweenness(                   weights='distances')
+        print '\n\nBetweennes_geo: ', time.time() - t1 
+
+        t1 = time.time()
         closenesses_geo    = G.closeness(                     weights='distances')
+        print 'closeness_geo: ', time.time() - t1 
+
+        t1 = time.time()
         clusterings_geo    = G.transitivity_local_undirected( weights='distances')
+        print 'clustering_geo: ', time.time() - t1 
+
+        t1 = time.time()
         strengthes_geo     = G.strength(                      weights='distances')
+        print 'strentgh_geo: ', time.time() - t1 
+
+        t1 = time.time()
         pageranks_geo      = G.pagerank(                      weights='distances')
+        print 'pagerank_geo: ', time.time() - t1 
+
+        t1 = time.time()
         eigenvectors_geo   = G.eigenvector_centrality(        weights='distances')
-        constraint_geo     = G.constraint(                    weights='distances') 
+        print 'eigenvector_goe: ', time.time() - t1 
+
+        t1 = time.time()
+        constraint_geo     = G.constraint(                    weights='distances')
+        print 'constraint_geo: ', time.time() - t1  , '\n\n'
 
 
 
@@ -676,26 +728,26 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 
     print 'Create networks...'
-    G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
-  #  G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+#    G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
+    G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
  #   G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
 
 
     print 'Calc centrality measures...'
-    calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
-#    calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+#    calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+    calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
  #   calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
 
 
     print 'Creating gephi files...'
-    get_gephi_new(G_friends, outroot, city + '_friendship')
- #   get_gephi_new(G_users,   outroot, city + '_users_similarity')   
+#    get_gephi_new(G_friends, outroot, city + '_friendship')
+    get_gephi_new(G_users,   outroot, city + '_users_similarity')   
   #  get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
 
 
     print 'Creating network stats...'
-    get_network_stats(G_friends, city, outroot, '_friendship')
-#    get_network_stats(G_users,   city, outroot, '_users_similarity')
+#    get_network_stats(G_friends, city, outroot, '_friendship')
+    get_network_stats(G_users,   city, outroot, '_users_similarity')
  #   get_network_stats(G_venues,  city, outroot, '_venues_similarity')
     
    
@@ -704,6 +756,7 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 
 if __name__ == '__main__': 
+
 
     city = sys.argv[1]
     #city      = 'bristol'
@@ -714,7 +767,11 @@ if __name__ == '__main__':
     infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'
 
 
+    create_folder(outroot + 'networks')
+    create_folder(outroot + 'networks/gephi')
+    create_folder(outroot + 'figures/network_data')
     
+
 
     inputs = ParseInput.get_inputs()
 
