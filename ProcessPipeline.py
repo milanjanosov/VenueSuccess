@@ -180,10 +180,10 @@ elif sys.argv[2] == 'home_full':
         Class.classify_data(city, outroot, LIMIT)
         Class.conclude_class(city, outroot, LIMIT)
 
-        
+    '''        
      # this has to be run only once after that loop above
     FilterH.copy_filtered(city, outroot, bbox)
-    '''
+    
     for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     ''' this compares the different methods '''
     
