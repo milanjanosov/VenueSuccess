@@ -254,8 +254,12 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
     weights   = []
     all_users = set()
 
+    nnn = len(users)
   
     for ind, user1 in enumerate(users):
+
+        print ind, '/', nnn
+
         for user2 in users:
 
             if user1 != user2:
@@ -590,27 +594,27 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 
     print 'Create networks...'
-    G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
+ #   G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
     G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
-    G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+ #   G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
 
 
     print 'Calc centrality measures...'
-    calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+  #  calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
     calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
-    calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
+ #   calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
 
 
     print 'Creating gephi files...'
-    get_gephi_new(G_friends, outroot, city + '_friendship')
+ #   get_gephi_new(G_friends, outroot, city + '_friendship')
     get_gephi_new(G_users,   outroot, city + '_users_similarity')   
-    get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
+  #  get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
 
 
     print 'Creating network stats...'
-    get_network_stats(G_friends, city, outroot, '_friendship')
+  #  get_network_stats(G_friends, city, outroot, '_friendship')
     get_network_stats(G_users,   city, outroot, '_users_similarity')
-    get_network_stats(G_venues,  city, outroot, '_venues_similarity')
+ #   get_network_stats(G_venues,  city, outroot, '_venues_similarity')
     
    
 
@@ -619,7 +623,7 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 if __name__ == '__main__': 
 
-    city      = 'london'
+    city      = 'bristol'
     eps       = 0.01
     mins      = 3
     LIMIT_num = 0
