@@ -702,7 +702,7 @@ def get_users_distance_distr_from_home(city, outfolder):
 
 
 
-    f, ax = plt.subplots(1, 2, figsize=(15, 5))
+    f, ax = plt.subplots(1, 3, figsize=(18, 5))
 
     
     ax[0].hist(users_num_homes, bins = 60)
@@ -710,8 +710,16 @@ def get_users_distance_distr_from_home(city, outfolder):
     ax[0].set_yscale('log')
 
 
-    ax[1].hist([ d for d in   list(user_dist.values())  if d > 0.0 and d < 10.0]   , bins = 60, alpha = 0.8)
-    ax[1].set_xlabel('Users\'s locations\' distances from their home location [km]', fontsize = 12)
+
+    ax[1].hist([d for d in users_num_homes if d < 50], bins = 40)
+    ax[1].set_xlabel('Users\'s number of venues', fontsize = 12)
+    ax[1].set_yscale('log')
+
+
+
+
+    ax[2].hist([ d for d in   list(user_dist.values())  if d > 0.0 and d < 10.0]   , bins = 60, alpha = 0.8)
+    ax[2].set_xlabel('Users\'s locations\' distances from their home location [km]', fontsize = 12)
 
 
     plt.show()
