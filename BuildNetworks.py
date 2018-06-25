@@ -811,12 +811,12 @@ if __name__ == '__main__':
     bbox  = inputs[city]
     #do_all_the_networks(city, outroot, infile, bbox)
 
+    print len(sys.argv)
+
+    if len(sys.argv) == 3:
 
 
-    if len(sys.argv) > 1:
-
-
-        if sys.argv[1] == 'friend':
+        if sys.argv[2] == 'friend':
 
             print 'Create friendship network' 
             G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
@@ -832,7 +832,7 @@ if __name__ == '__main__':
             
 
 
-        elif sys.argv[1] == 'user':
+        elif sys.argv[2] == 'user':
 
             print 'Create users network' 
             G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
@@ -844,7 +844,7 @@ if __name__ == '__main__':
             get_network_stats(G_users,   city, outroot, '_users_similarity')
             
     
-        elif sys.argv[1] == 'venues':
+        elif sys.argv[2] == 'venues':
 
             print 'Create venues network' 
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
