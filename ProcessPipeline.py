@@ -158,11 +158,11 @@ elif sys.argv[2] == 'home_full':
     t1 = time.time()
 
 
-    for LIMIT in range(20):
+    '''for LIMIT in range(20):
 
         print ('LIMIT = ' + str(LIMIT))
 
-        ''' these are the centroid based things '''
+        ##these are the centroid based things 
         users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
 
         Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
@@ -175,7 +175,7 @@ elif sys.argv[2] == 'home_full':
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
 
-        ''' this is the messy ML part '''
+        ## this is the messy ML part 
         MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
         Class.classify_data(city, outroot, LIMIT)
         Class.conclude_class(city, outroot, LIMIT)
@@ -183,7 +183,7 @@ elif sys.argv[2] == 'home_full':
         
      # this has to be run only once after that loop above
     FilterH.copy_filtered(city, outroot, bbox)
-
+    '''
     for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     ''' this compares the different methods '''
     

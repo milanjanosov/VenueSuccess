@@ -276,7 +276,9 @@ def plot_final_results(city, outfolder):
 
 
     plt.savefig(outfolder   + '/figures/' + city + '_COMPARE_centroids_dbscan_mlhomepred.png')
- #   plt.show() 
+    print ('Figure saved.')
+    plt.close()
+    #plt.show() 
 
 
 
