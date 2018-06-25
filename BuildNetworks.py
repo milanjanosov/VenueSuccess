@@ -329,7 +329,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
     all_users = manager.list()
 
 
-    num_threads = 4
+    num_threads = 3
     users_chunks = chunkIt(users, num_threads)
     Pros = []
                 
@@ -348,24 +348,25 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
     print 'kesz: ', len([e for e in edges]), len(edges), len(set(all_users))
 
 
-
+    edges   = [e for e in edges]
+    weights = [w for w in weights]
   
 
 
     #141616 1932
-    #G = Graph()
-    '''
-    G.add_vertices(list(all_users))
+    G = Graph()
+
+    G.add_vertices(list([u for u in all_users]))
     G.add_edges(edges)
     G.es['weight'] = weights
     locations      = [users_location[g['name']] for g in G.vs()]  #[users_location[user] if user in users_location else 'nan'     for user in all_user] 
     G.vs['location'] = locations
     add_distances_to_edges(G)
-    '''
+ 
     print 'Users\'s similarity network done.'
     
-    return 0#G
-
+    return G
+   
     
 
 
@@ -675,26 +676,26 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 
     print 'Create networks...'
- #   G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
-    G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+    G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
+  #  G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
  #   G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
 
 
     print 'Calc centrality measures...'
-  #  calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
-    calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+    calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+#    calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
  #   calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
 
 
     print 'Creating gephi files...'
- #   get_gephi_new(G_friends, outroot, city + '_friendship')
-    get_gephi_new(G_users,   outroot, city + '_users_similarity')   
+    get_gephi_new(G_friends, outroot, city + '_friendship')
+ #   get_gephi_new(G_users,   outroot, city + '_users_similarity')   
   #  get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
 
 
     print 'Creating network stats...'
-  #  get_network_stats(G_friends, city, outroot, '_friendship')
-    get_network_stats(G_users,   city, outroot, '_users_similarity')
+    get_network_stats(G_friends, city, outroot, '_friendship')
+#    get_network_stats(G_users,   city, outroot, '_users_similarity')
  #   get_network_stats(G_venues,  city, outroot, '_venues_similarity')
     
    
