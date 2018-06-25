@@ -717,7 +717,8 @@ def get_users_distance_distr_from_home(city, outfolder):
     plt.show()
 
     plt.savefig(outfolder + 'figures/' + city + '_distances_from_home_locations.png')
-#    plt.close()
+    print('Figure saved.')
+    plt.close()
 
 
 
