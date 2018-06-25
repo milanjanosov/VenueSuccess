@@ -623,7 +623,7 @@ def do_all_the_networks(city, outroot, infile, bbox):
 
 if __name__ == '__main__': 
 
-    city      = 'bristol'
+    city      = 'london'
     eps       = 0.01
     mins      = 3
     LIMIT_num = 0
