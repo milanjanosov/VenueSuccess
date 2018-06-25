@@ -821,7 +821,7 @@ if __name__ == '__main__':
             print 'Create friendship network' 
             G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
 
-            '''print 'Creating gephi files...'
+            print 'Creating gephi files...'
             get_gephi_new(G_friends, outroot, city + '_friendship')     
        
             print 'Calc centrality measures...'
@@ -829,24 +829,24 @@ if __name__ == '__main__':
 
             print 'Creating network stats...'
             get_network_stats(G_friends, city, outroot, '_friendship')
-            '''
+            
 
 
         elif sys.argv[1] == 'user':
 
             print 'Create users network' 
-            '''G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
             print 'Creating gephi files...'
             get_gephi_new(G_users,   outroot, city + '_users_similarity')   
             print 'Calc centrality measures...'
             calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
             print 'Creating network stats...'
             get_network_stats(G_users,   city, outroot, '_users_similarity')
-            '''
+            
     
         elif sys.argv[1] == 'venues':
 
-            '''print 'Create venues network' 
+            print 'Create venues network' 
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
             get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
@@ -854,7 +854,7 @@ if __name__ == '__main__':
             calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
             print 'Creating network stats...'
             get_network_stats(G_venues,  city, outroot, '_venues_similarity')
-            '''
+          
 
 ## source /opt/virtualenv-python2.7/bin/activate
 
