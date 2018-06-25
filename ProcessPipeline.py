@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
@@ -91,21 +91,23 @@ if sys.argv[2] == 'preproc':
 
     unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
 
-    users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
-    users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
-    users_tips    = ParseJsons.get_tips_locations_and_users(    unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
+ #   users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
+ #   users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
+ #   users_tips    = ParseJsons.get_tips_locations_and_users(    unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
 
-    ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_photos.keys()))
+### ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_photos.keys()))
 
-    ParseJsons.get_users_coordinates(users_homes, local_users, users_likes, users_tips, users_photos, city, outroot, bbox)
+ #   ParseJsons.get_users_coordinates(users_homes, local_users, unknown_users, users_likes, users_tips, users_photos, city, outroot, bbox)
     ParseJsons.get_users_distance_distr_from_home(city, outroot) 
-    ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
+#    ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
 
-    ParseJsons. get_users_friends(local_users, city, inroot, outroot)
+#    ParseJsons. get_users_friends(local_users, city, inroot, outroot)
 
-    ParseJsons.venues_distance_mtx(bbox, city, outroot)
-    ParseJsons.get_venues_users(city, outroot)       
+#    ParseJsons.venues_distance_mtx(bbox, city, outroot)
+#    ParseJsons.get_venues_users(city, outroot)       
 
+
+    ParseJsons.get_venues_stat(city, outroot)
 
     t2 = time.time()
 

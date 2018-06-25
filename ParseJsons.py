@@ -374,6 +374,7 @@ def get_local_users(city, infolder, outfolder):
 
     fout = open(outfolder + 'basic_stats/user_types_count.dat', 'w')
 
+    fout.write('Total number of users: '                          +  str(len(localss) + len(nonlocals) +  len(unknown)      )   + '\n')
     fout.write('Number of local users (homeCity here): '          +  str(len(localss))   + '\n')
     fout.write('Number of non-local users (homeCity not here): '  +  str(len(nonlocals)) + '\n')
     fout.write('Number of unknown users (no homeCity given): '    +  str(len(unknown))   + '\n')
@@ -419,6 +420,25 @@ def write_home_locations(users_homes, city, outfolder, users):
     ffout = open(outfolder + 'basic_stats/user_types_count.dat', 'a')
     ffout.write('Number of users w unique local Residence coordinates: ' + str(len([line.strip() for line in open(outfolder + 'user_info/'  + city + '_groundtruth_home_locations_unique.dat') ])) + '\n')
     ffout.close()
+
+
+def get_venues_stat(city, outfolder):
+
+
+    fout = open(outfolder + 'basic_stats/user_types_count.dat', 'a')
+
+
+    files = [outfolder + '/venues_info/' + fn for fn in [city + '_liked_venues_stats.dat', city + '_photoed_venues_stats.dat', city + '_tipped_venues_stats.dat']]
+
+    n = []
+    for fn in files:
+        n += [line.strip().split('\t')[0] for line in open(fn)]
+
+    print (len(set(n)))
+
+    fout.write('\nTotal number of venues: ' +  str(len(set(n)))  + '\n')
+    fout.close()
+    
 
 
 
@@ -552,7 +572,7 @@ def venues_distance_mtx(boundingbox, city, outfolder):
 #check_box(boundingbox, city, lat, lng)
 
 
-def get_users_coordinates(users_homes, local_users, users_likes, users_tips, users_photos, city, outfolder, bbox):
+def get_users_coordinates(users_homes, local_users, unknown_users, users_likes, users_tips, users_photos, city, outfolder, bbox):
 
     print(city + ' --  get users coordinates...')
 
@@ -585,6 +605,7 @@ def get_users_coordinates(users_homes, local_users, users_likes, users_tips, use
             likes_tips_photos[u] += v
 
 
+
     
 
     ''' save coordinates '''
@@ -611,20 +632,18 @@ def get_users_coordinates(users_homes, local_users, users_likes, users_tips, use
         f.write('\t'.join([ str(v[1]) + ', ' + str(v[2]) for v in venues] )  + '\n')
         g.write('\t'.join([v[0] + ',' + str(v[1]) + ', ' + str(v[2]) +  ',' + v[3] for v in venues] )  + '\n')
 
-  
 
 
-        if int(user) in users_homes:# or user in local_users:
+        if int(user) in users_homes:
+
             for venue in venues:
-
-        
+    
                 if check_box(bbox, city, venue[2], venue[1]):
-         
-
+     
                     l.write( str( venue[1] ) + ', ' + str( venue[2] ) + '\t' )
                     h.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
 
-        elif (user not in users_homes and local_users):
+        else:
             for venue in venues:
                 l.write( str( venue[1] ) + ', ' + str( venue[2] ) + '\t' )
                 h.write(venue[0] + ',' + str( venue[1] ) + ', ' + str( venue[2] ) +  ',' + venue[3] + '\t')
@@ -670,14 +689,41 @@ def get_users_distance_distr_from_home(city, outfolder):
                 user_dist[user] = mpu.haversine_distance((latv, lngv), (users_home[user][1], users_home[user][0]))
 
 
+
+    users_num_homes = []
+    for ind, line in enumerate(open( outfolder + 'user_info/'  + city + '_user_venues_full_locals_filtered.dat')):
+        if ind == 100: break
+    
+        users_num_homes.append(len(line.strip().split('\t')))# (len(line.strip().split('\t')[1:])/3.0)
+
+
+
+
+
+
+
     f, ax = plt.subplots(1, 2, figsize=(15, 5))
-    ax[0].hist(list(user_dist.values()), bins = 100, alpha = 0.8)
-    ax[0].set_xlabel('Users\'s locations distances from their home location [km]')
-    ax[1].hist([ccc for ccc in user_dist.values() if ccc < 5], bins = 50, alpha = 0.8)
-    ax[1].set_xlabel('Users\'s locations distances from their home location [km]')
+
+    
+    ax[0].hist(users_num_homes, bins = 30)
+    ax[0].set_xlabel('Users\'s number of venues', fontsize = 12)
+    ax[0].set_yscale('log')
+
+
+    ax[1].hist([ d for d in   list(user_dist.values())  if d > 0.0 and d < 10.0]   , bins = 30, alpha = 0.8)
+    ax[1].set_xlabel('Users\'s locations\' distances from their home location [km]', fontsize = 12)
+
+
+    plt.show()
+
     plt.savefig(outfolder + 'figures/' + city + '_distances_from_home_locations.png')
-    plt.close()
-   
+#    plt.close()
+
+
+
+
+
+
 
 
 
