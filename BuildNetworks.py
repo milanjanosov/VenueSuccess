@@ -75,6 +75,8 @@ def get_network_stats(G, city, outfolder, infile):
     sd   = round(G.degree_distribution().sd, 2)
     xs, ys = zip(*[(left, count) for left, _, count in  G.degree_distribution().bins()])
 
+    print xs
+
     ax[0].bar(xs, ys)
     ax[0].set_title('Degree distribution, N = ' + str(N) + ', mean = ' + str(mean) + ', std = ' + str(sd) )
     ax[0].set_xlabel('Node degree')
@@ -108,7 +110,7 @@ def get_network_stats(G, city, outfolder, infile):
     plt.suptitle(city, fontsize = 18)    
     plt.savefig(outfolder + 'figures/network_data/' + city + infile + '.png')
 
-
+    plt.close()
 
 
 
