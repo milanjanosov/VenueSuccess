@@ -75,7 +75,7 @@ def get_network_stats(G, city, outfolder, infile):
     sd   = round(G.degree_distribution().sd, 2)
     xs, ys = zip(*[(left, count) for left, _, count in  G.degree_distribution().bins()])
 
-    print xs
+    print ys
 
     ax[0].bar(xs, ys)
     ax[0].set_title('Degree distribution, N = ' + str(N) + ', mean = ' + str(mean) + ', std = ' + str(sd) )
