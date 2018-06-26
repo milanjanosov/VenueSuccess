@@ -148,58 +148,7 @@ def get_gephi_new(G, outfolder, outname):
         g.write(n['name'] + '\t' + n['name'] + '\t' + str(n['location'][0]) + '\t' + str(n['location'][1]) + '\n')
     g.close()
 
-    
-
-
-
-
-def transform_gephi_to_backbone(outfolder, outname):
-
-
-    fnin   = outfolder + 'networks/gephi/' + outname + '_edges.dat'
-    fnout  = outfolder + 'networks/gephi/backboneformat_' + outname + '_edges.dat'
-
-    fout = open(fnout, 'w')
-    fout.write('src\ttrg\tnij\n')
-
-    print 'Start reading the edge list...'
-
-    for ind, line in enumerate(open( fnin )):
-        if ind % 1000 == 0: 
-            print ind
-#        if ind == 10 : break
-        if 'Source' not in line:
-            src, trg, aa, nij, bb = line.strip().split('\t')
-            fout.write( src + '\t' + trg + '\t' + str(float(nij)) + '\n')
-
-    fout.close()
-    #src	trg	nij
-
-
-    print 'Do the NC backboning'
-    table_nc = backboning.noise_corrected(toy_table, undirected = True)
-    bb_neffke = backboning.thresholding(table_nc, 4)
-
-    print 'Do  the DF backboning'
-    table_df      = backboning.disparity_filter(toy_table, undirected = True)
-    bb_vespignani = backboning.thresholding(table_df, 0.66)
-
-    fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
-    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
-
-
-    print "Writing the NC Backbone"
-    bb_neffke.to_csv(fout_nc, sep = '\t', index = False)
-
-    print "Writing DF Backbone"
-    bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
-
-
-
-
-
-
-
+ 
 
 
 def get_user_user_friendship_network_igraph(city, outfolder, infile):
@@ -393,38 +342,6 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
 
 
-    '''manager = Manager()
-    L = manager.list()
-
-
-
-    edges     = manager.list()  
-    weights   = manager.list()
-    all_users = manager.list()
-
-
-    num_threads = 4
-    users_chunks = chunkIt(users, num_threads)
-    Pros = []
-                
-        
-    for i in range(0,num_threads):                 
-        p = Process(target = get_users_edges, args=([users, users_chunks[i], i+1, num_threads, edges, weights, all_users, users_venues], ))
-        p.start()
-        Pros.append(p)
-       
-    for t in Pros:
-        t.join()
-
-
-
-
-    print 'kesz: ', len([e for e in edges]), len(edges), len(set(all_users))
-
-
-    edges   = [e for e in edges]
-    weights = [w for w in weights]
-    '''
 
 
     #141616 1932
@@ -539,6 +456,73 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     print 'Venue\'s similarity network done.'
 
     return G
+
+
+
+
+
+
+''' =========================================================== '''
+''' ==============   DO THE BACKBONE FILTERING    ============= '''
+''' =========================================================== '''
+
+
+
+def transform_gephi_to_backbone(outfolder, outname):
+
+
+    fnin   = outfolder + 'networks/gephi/' + outname + '_edges.dat'
+    fnout  = outfolder + 'networks/gephi/backboneformat_' + outname + '_edges.dat'
+
+    fout = open(fnout, 'w')
+    fout.write('src\ttrg\tnij\n')
+
+    print 'Start reading the edge list...'
+
+    for ind, line in enumerate(open( fnin )):
+        if ind % 1000 == 0: 
+            print ind
+#        if ind == 10 : break
+        if 'Source' not in line:
+            src, trg, aa, nij, bb = line.strip().split('\t')
+            fout.write( src + '\t' + trg + '\t' + str(float(nij)) + '\n')
+
+    fout.close()
+    #src	trg	nij
+
+    real_table = pd.read_csv(fnout, sep = "\t")
+
+    print 'Do the NC backboning'
+    table_nc = backboning.noise_corrected(real_table, undirected = True)
+    bb_neffke = backboning.thresholding(table_nc, 4)
+
+    print 'Do  the DF backboning'
+    table_df      = backboning.disparity_filter(real_table, undirected = True)
+    bb_vespignani = backboning.thresholding(table_df, 0.66)
+
+    fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
+    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
+
+
+    print "Writing the NC Backbone"
+    bb_neffke.to_csv(fout_nc, sep = '\t', index = False)
+
+    print "Writing DF Backbone"
+    bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
+
+
+
+
+
+
+#def create_igraphnw_from_backbone(outroot, city + '_users_similarity'):
+
+
+
+
+
+
+
 
 
 
@@ -907,7 +891,7 @@ if __name__ == '__main__':
 
 
             transform_gephi_to_backbone(outroot, city + '_users_similarity')
-
+           # create_igraphnw_from_backbone(outroot, city + '_users_similarity')
             
     
         elif sys.argv[2] == 'venues':
