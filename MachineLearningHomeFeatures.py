@@ -115,7 +115,7 @@ def get_venues_features(city, outfolder, venues_distances_sorted, venues_categor
 
 
 
-        print ind, '/', nnn
+        print (ind, '/', nnn)
 
            
         if v0 not in venues_features:
