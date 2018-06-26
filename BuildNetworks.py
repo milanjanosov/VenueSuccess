@@ -494,21 +494,21 @@ def transform_gephi_to_backbone(outfolder, outname):
 
     print 'Do the NC backboning'
     table_nc = backboning.noise_corrected(real_table, undirected = True)
-    #bb_neffke = backboning.thresholding(table_nc, 4)
+    bb_neffke = backboning.thresholding(table_nc, 4)
 
     print 'Do  the DF backboning'
-    table_df      = backboning.disparity_filter(real_table, undirected = True)
-    bb_vespignani = backboning.thresholding(table_df, 0.66)
+    #table_df      = backboning.disparity_filter(real_table, undirected = True)
+    #bb_vespignani = backboning.thresholding(table_df, 0.66)
 
-    #fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
-    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
+    fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
+    #fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
 
 
     print "Writing the NC Backbone"
-    #bb_neffke.to_csv(fout_nc, sep = '\t', index = False)
+    bb_neffke.to_csv(fout_nc, sep = '\t', index = False)
 
     print "Writing DF Backbone"
-    bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
+    #bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
 
 
 
