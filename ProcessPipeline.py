@@ -199,7 +199,7 @@ elif sys.argv[2] == 'home_full':
 
     t1 = time.time()
 
-    Pros = [] 
+    '''Pros = [] 
     for LIMIT in range(0,1):  
         p = Process(target = do_full_home_stuff, args=([city, outroot, LIMIT], ))
         Pros.append(p)
@@ -213,7 +213,7 @@ elif sys.argv[2] == 'home_full':
            
      # this has to be run only once after that loop above
     FilterH.copy_filtered(city, outroot, bbox)
-    
+    '''
 
     for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     ''' this compares the different methods '''
