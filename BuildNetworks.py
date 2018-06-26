@@ -5,7 +5,7 @@ import pandas as pd
 import mpu
 import time
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import random
 from ParseJsons import create_folder
@@ -925,7 +925,7 @@ if __name__ == '__main__':
             '''     
             transform_gephi_to_backbone(outroot, city + '_venues_similarity')
 
-        
+            
 
 
 ## source /opt/virtualenv-python2.7/bin/activate
