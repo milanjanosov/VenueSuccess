@@ -124,10 +124,12 @@ def get_gephi_new(G, outfolder, outname):
     f.write('Source' + '\t' + 'Target' + '\t' + 'Distance' + '\t' + 'Weight' + '\t' + 'Type' + '\n')      
     for e in G.es():
 
+        
+
         try:
             f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['distances']) + '\t' + str(e['weight'])+ '\tundirected' + '\n')
         except:
-            f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['distances']) + '\t' + str(0)          + '\tundirected' + '\n')
+            f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['distances']) + '\t' + str(1)          + '\tundirected' + '\n')
             pass
 
 
