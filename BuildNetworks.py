@@ -5,7 +5,7 @@ import pandas as pd
 import mpu
 import time
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import random
 from ParseJsons import create_folder
@@ -75,16 +75,16 @@ def get_network_stats(G, city, outfolder, infile):
     sd   = round(G.degree_distribution().sd, 2)
     xs, ys = zip(*[(left, count) for left, _, count in  G.degree_distribution().bins()])
 
-    print ys
+ 
 
     ax[0].bar(xs, ys)
     ax[0].set_title('Degree distribution, N = ' + str(N) + ', mean = ' + str(mean) + ', std = ' + str(sd) )
     ax[0].set_xlabel('Node degree')
     ax[0].set_ylabel('Degree distribution')
-    ax[0].set_xscale('log')
+   # ax[0].set_xscale('log')
     ax[0].set_yscale('log')
 
-    
+
 
     distances = G.es['distances']
     ax[1].hist(distances, bins = 50)
@@ -108,9 +108,11 @@ def get_network_stats(G, city, outfolder, infile):
 
 
     plt.suptitle(city, fontsize = 18)    
+    plt.show()   
     plt.savefig(outfolder + 'figures/network_data/' + city + infile + '.png')
 
-    plt.close()
+   
+# plt.close()
 
 
 
@@ -850,11 +852,12 @@ if __name__ == '__main__':
             print 'Create users network' 
             G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
             print 'Creating gephi files...'
-            get_gephi_new(G_users,   outroot, city + '_users_similarity')   
+            get_gephi_new(G_users,   outroot, city + '_users_similarity') 
+            print 'Creating network stats...'
+            get_network_stats(G_users,   city, outroot, '_users_similarity')  
             print 'Calc centrality measures...'
             calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
-            print 'Creating network stats...'
-            get_network_stats(G_users,   city, outroot, '_users_similarity')
+
             
     
         elif sys.argv[2] == 'venues':
@@ -863,12 +866,11 @@ if __name__ == '__main__':
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
             get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
-            print 'Calc centrality measures...'
-            calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
             print 'Creating network stats...'
             get_network_stats(G_venues,  city, outroot, '_venues_similarity')
-  
-
+            print 'Calc centrality measures...'
+            calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
+     
 ## source /opt/virtualenv-python2.7/bin/activate
 
 
