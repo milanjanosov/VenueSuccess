@@ -104,7 +104,9 @@ def get_venues_features(city, outfolder, venues_distances_sorted, venues_categor
 
     venues_features = {}
 
-    for v0, venues in venues_distances_sorted.items():
+    nnn = len(venues_distances_sorted)
+
+    for ind, (v0, venues) in enumerate(venues_distances_sorted.items()):
         
         first_N_avg_dist    = np.mean([ v1[1] for index, v1 in enumerate(venues) if index < N ])
         first_N_categories  = Counter([ v1[2] for index, v1 in enumerate(venues) if index < N ])    
@@ -112,6 +114,8 @@ def get_venues_features(city, outfolder, venues_distances_sorted, venues_categor
         all_categories      = set(venues_categories.values())
 
 
+
+        print ind, '/', nnn
 
            
         if v0 not in venues_features:
