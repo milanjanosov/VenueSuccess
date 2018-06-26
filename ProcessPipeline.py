@@ -199,8 +199,8 @@ elif sys.argv[2] == 'home_full':
 
     t1 = time.time()
 
-    '''Pros = [] 
-    for LIMIT in range(0,1):  
+    Pros = [] 
+    for LIMIT in range(0,20):  
         p = Process(target = do_full_home_stuff, args=([city, outroot, LIMIT], ))
         Pros.append(p)
         p.start()
@@ -213,7 +213,10 @@ elif sys.argv[2] == 'home_full':
            
      # this has to be run only once after that loop above
     FilterH.copy_filtered(city, outroot, bbox)
-    '''
+    
+### scp janosovm@cns2.servers.ceu.edu:/mnt/cns_storage3/janosovm/UrbanSuccess/ProcessedData/london/figures/london_COMPARE_centroids_dbscan_mlhomepred.png ../ProcessedData/london/figures/
+
+
 
     for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     ''' this compares the different methods '''
