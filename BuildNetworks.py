@@ -162,8 +162,11 @@ def transform_gephi_to_backbone(outfolder, outname):
     fout = open(fnout, 'w')
     fout.write('src\ttrg\tnij\n')
 
+    print 'Start reading the edge list...'
 
     for ind, line in enumerate(open( fnin )):
+        if ind % 1000 == 0: 
+            print ind
 #        if ind == 10 : break
         if 'Source' not in line:
             src, trg, aa, nij, bb = line.strip().split('\t')
@@ -173,25 +176,22 @@ def transform_gephi_to_backbone(outfolder, outname):
     #src	trg	nij
 
 
-
-    toy_table = pd.read_csv(fnout, sep = "\t")
-
-    print toy_table
-
+    print 'Do the NC backboning'
     table_nc = backboning.noise_corrected(toy_table, undirected = True)
-    table_df = backboning.disparity_filter(toy_table, undirected = True)
-
     bb_neffke = backboning.thresholding(table_nc, 4)
+
+    print 'Do  the DF backboning'
+    table_df      = backboning.disparity_filter(toy_table, undirected = True)
     bb_vespignani = backboning.thresholding(table_df, 0.66)
 
     fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
     fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
 
 
-    print "NC Backbone:"
+    print "Writing the NC Backbone"
     bb_neffke.to_csv(fout_nc, sep = '\t', index = False)
 
-    print "DF Backbone:"
+    print "Writing DF Backbone"
     bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
 
 
