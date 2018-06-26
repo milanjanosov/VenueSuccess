@@ -12,6 +12,8 @@ import pandas as pd
 def get_user_venues(city, outfolder, LIMIT_num):
 
     
+    print ('Load users venues...')
+
     user_venues       = {}
     venues_categories = {}
     all_users         = []
@@ -53,12 +55,17 @@ def get_user_venues(city, outfolder, LIMIT_num):
 def get_venues_distances_sorted(city, outfolder, venues_categories):
 
 
+    print ('Read the venue distance matrix...')
+
     venues_distances = {}
 
     for index, line in enumerate(open(outfolder + '/venues_info/' + city + '_venues_distance_matrix.dat')):
         v1, v2, dist = line.strip().split('\t')
         dist = float(dist)
         
+        if ind % 1000 == 0:
+            print ind, '/91480480'
+
         if v1 in venues_categories and v2 in venues_categories:
         
 
@@ -92,6 +99,8 @@ def get_venues_distances_sorted(city, outfolder, venues_categories):
 '''  ---------------------------------------------------------  '''
 
 def get_venues_features(city, outfolder, venues_distances_sorted, venues_categories, N = 4, R = 1.1):
+
+    print ('Collect venues features...')
 
     venues_features = {}
 
@@ -141,6 +150,8 @@ def get_venues_features(city, outfolder, venues_distances_sorted, venues_categor
 def get_users_home(city, outfolder):
 
 
+    print ('Load users home locations...')
+
     users_home = {} 
 
     for line in open(outfolder + '/user_info/' + city + '_groundtruth_home_locations_unique.dat'):
@@ -164,6 +175,7 @@ def get_users_features(city, outfolder, venues_features, user_venues, users_home
     users_features_with_home = []
     users_features_no_home   = []
 
+    print ('Get users features...')
 
 
     for user, venues in user_venues.items():
