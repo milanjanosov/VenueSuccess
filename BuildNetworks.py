@@ -831,10 +831,10 @@ if __name__ == '__main__':
             G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
 
             print 'Creating gephi files...'
-            get_gephi_new(G_friends, outroot, city + '_friendship')     
+           # get_gephi_new(G_friends, outroot, city + '_friendship')     
        
             print 'Calc centrality measures...'
-            calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
+           # calc_network_centralities(G_friends, outroot, city, infile, 'users_geo',       geo = True,  weighted = False, venue = False)
 
             print 'Creating network stats...'
             get_network_stats(G_friends, city, outroot, '_friendship')
