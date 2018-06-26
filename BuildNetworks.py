@@ -601,13 +601,15 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
     degrees            = G.degree()   
     print '\n\nDegrees: ', time.time() - t1
 
-    t1 = time.time()
-    betweennesses      = G.betweenness()
-    print 'Betweennes: ', time.time() - t1 
 
-    t1 = time.time()
-    closenesses        = G.closeness()
-    print 'closeness: ', time.time() - t1    
+    if 'friend' in tipus: 
+        t1 = time.time()
+        betweennesses      = G.betweenness()
+        print 'Betweennes: ', time.time() - t1 
+
+        t1 = time.time()
+        closenesses        = G.closeness()
+        print 'closeness: ', time.time() - t1    
 
     t1 = time.time()
     clusterings        = G.transitivity_local_undirected()
@@ -633,20 +635,22 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
     print 'ego: ', time.time() - t1
 
 
-    t1 = time.time()
-    constraint         = G.constraint() 
-    print tipus + '  - Topological measures done.'
+    if 'friend' in tipus: 
+        t1 = time.time()
+        constraint         = G.constraint() 
+        print tipus + '  - Topological measures done.'
 
 
     if geo: 
 
-        t1 = time.time()
-        betweennesses_geo  = G.betweenness(                   weights='distances')
-        print '\n\nBetweennes_geo: ', time.time() - t1 
+        if 'friend' in tipus: 
+            t1 = time.time()
+            betweennesses_geo  = G.betweenness(                   weights='distances')
+            print '\n\nBetweennes_geo: ', time.time() - t1 
 
-        t1 = time.time()
-        closenesses_geo    = G.closeness(                     weights='distances')
-        print 'closeness_geo: ', time.time() - t1 
+            t1 = time.time()
+            closenesses_geo    = G.closeness(                     weights='distances')
+            print 'closeness_geo: ', time.time() - t1 
 
         t1 = time.time()
         clusterings_geo    = G.transitivity_local_undirected( weights='distances')
@@ -664,20 +668,21 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
         eigenvectors_geo   = G.eigenvector_centrality(        weights='distances')
         print 'eigenvector_goe: ', time.time() - t1 
 
-        t1 = time.time()
-        constraint_geo     = G.constraint(                    weights='distances')
-        print 'constraint_geo: ', time.time() - t1  , '\n\n'
+        if 'friend' in tipus: 
+            t1 = time.time()
+            constraint_geo     = G.constraint(                    weights='distances')
+            print 'constraint_geo: ', time.time() - t1  , '\n\n'
 
 
 
     if weighted: 
-        betweennesses_w  = G.betweenness(                   weights='weight')
-        closenesses_w    = G.closeness(                     weights='weight')
+        if 'friend' in tipus: betweennesses_w  = G.betweenness(                   weights='weight')
+        if 'friend' in tipus: closenesses_w    = G.closeness(                     weights='weight')
         clusterings_w    = G.transitivity_local_undirected( weights='weight')
         strengthes_w     = G.strength(                      weights='weight')
         pageranks_w      = G.pagerank(                      weights='weight')
         eigenvectors_w   = G.eigenvector_centrality(        weights='weight')
-        constraint_w     = G.constraint(                    weights='weight') 
+        if 'friend' in tipus: constraint_w     = G.constraint(                    weights='weight') 
         print tipus + '  - Weighted geo measures done.'
 
     if venue:
@@ -693,6 +698,8 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 
             if name not in vertice_attributes:
                 vertice_attributes[name] = {}
+
+
 
             #vertice_attributes[name]['name']             = name
             vertice_attributes[name]['degree']           = degrees[i]
@@ -732,7 +739,7 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
                 vertice_attributes[name]['strength_w']     = strengthes_w[i]
                 vertice_attributes[name]['pagerank_w']     = pageranks_w[i]
                 vertice_attributes[name]['eigenvector_w']  = eigenvectors_w[i]
-                vertice_attributes[name]['constraint_w']   = constraint_w[i]
+                if 'friend' in tipus: vertice_attributes[name]['constraint_w']   = constraint_w[i]
           
 
             if venue: 
@@ -757,7 +764,7 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 
 
 
-def do_all_the_networks(city, outroot, infile, bbox):
+'''f do_all_the_networks(city, outroot, infile, bbox):
 
 
 
@@ -784,7 +791,7 @@ def do_all_the_networks(city, outroot, infile, bbox):
     get_network_stats(G_users,   city, outroot, '_users_similarity')
     get_network_stats(G_venues,  city, outroot, '_venues_similarity')
     
-   
+'''
 
 
 
@@ -829,10 +836,12 @@ if __name__ == '__main__':
 
             print 'Creating network stats...'
             get_network_stats(G_friends, city, outroot, '_friendship')
-            
+     
 
 
         elif sys.argv[2] == 'user':
+
+            print 'OOK'
 
             print 'Create users network' 
             G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
@@ -854,7 +863,7 @@ if __name__ == '__main__':
             calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
             print 'Creating network stats...'
             get_network_stats(G_venues,  city, outroot, '_venues_similarity')
-          
+  
 
 ## source /opt/virtualenv-python2.7/bin/activate
 
