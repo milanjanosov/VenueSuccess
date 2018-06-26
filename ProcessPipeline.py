@@ -56,7 +56,7 @@ def do_full_home_stuff(args):
 
 
         ##these are the centroid based things 
-        users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
+        '''users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
 
         Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
         Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
@@ -67,7 +67,7 @@ def do_full_home_stuff(args):
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.02, mins = 5)
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.1,  mins = 3)
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
-
+        '''
         ## this is the messy ML part 
         MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
         Class.classify_data(city, outroot, LIMIT)
@@ -200,7 +200,7 @@ elif sys.argv[2] == 'home_full':
     t1 = time.time()
 
     Pros = [] 
-    for LIMIT in range(0,20):  
+    for LIMIT in range(0,1):  
         p = Process(target = do_full_home_stuff, args=([city, outroot, LIMIT], ))
         Pros.append(p)
         p.start()
