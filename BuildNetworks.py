@@ -12,6 +12,8 @@ from ParseJsons import create_folder
 from ParseJsons import check_box
 import sys
 from multiprocessing import Process, Manager
+sys.path.append("./backboning")
+import backboning
 sys.path.append("..")
 import ParseInput
 
@@ -147,6 +149,51 @@ def get_gephi_new(G, outfolder, outname):
     g.close()
 
     
+
+
+
+
+def transform_gephi_to_backbone(outfolder, outname):
+
+
+    fnin   = outfolder + 'networks/gephi/' + outname + '_edges.dat'
+    fnout  = outfolder + 'networks/gephi/backboneformat_' + outname + '_edges.dat'
+
+    fout = open(fnout, 'w')
+    fout.write('src\ttrg\tnij\n')
+
+
+    for ind, line in enumerate(open( fnin )):
+#        if ind == 10 : break
+        if 'Source' not in line:
+            src, trg, aa, nij, bb = line.strip().split('\t')
+            fout.write( src + '\t' + trg + '\t' + str(float(nij)) + '\n')
+
+    fout.close()
+    #src	trg	nij
+
+
+
+    toy_table = pd.read_csv(fnout, sep = "\t")
+
+    print toy_table
+
+    table_nc = backboning.noise_corrected(toy_table, undirected = True)
+    table_df = backboning.disparity_filter(toy_table, undirected = True)
+
+    bb_neffke = backboning.thresholding(table_nc, 4)
+    bb_vespignani = backboning.thresholding(table_df, 0.66)
+
+    fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
+    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
+
+
+    print "NC Backbone:"
+    bb_neffke.to_csv(fout_nc, sep = '\t', index = False)
+
+    print "DF Backbone:"
+    bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
+
 
 
 
@@ -847,21 +894,25 @@ if __name__ == '__main__':
 
         elif sys.argv[2] == 'user':
 
-            print 'OOK'
 
-            print 'Create users network' 
-            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
-            print 'Creating gephi files...'
-            get_gephi_new(G_users,   outroot, city + '_users_similarity') 
-            print 'Creating network stats...'
-            get_network_stats(G_users,   city, outroot, '_users_similarity')  
-            print 'Calc centrality measures...'
-            calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+
+            #print 'Create users network' 
+            #G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+            #print 'Creating gephi files...'
+            #get_gephi_new(G_users,   outroot, city + '_users_similarity') 
+            #print 'Creating network stats...'
+            #get_network_stats(G_users,   city, outroot, '_users_similarity')  
+            #print 'Calc centrality measures...'
+            #calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+
+
+            transform_gephi_to_backbone(outroot, city + '_users_similarity')
 
             
     
         elif sys.argv[2] == 'venues':
 
+            '''
             print 'Create venues network' 
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
@@ -870,7 +921,13 @@ if __name__ == '__main__':
             get_network_stats(G_venues,  city, outroot, '_venues_similarity')
             print 'Calc centrality measures...'
             calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
-     
+            
+            '''     
+            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
+
+        
+
+
 ## source /opt/virtualenv-python2.7/bin/activate
 
 
