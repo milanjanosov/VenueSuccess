@@ -63,8 +63,8 @@ def get_venues_distances_sorted(city, outfolder, venues_categories):
         v1, v2, dist = line.strip().split('\t')
         dist = float(dist)
         
-        if ind % 1000 == 0:
-            print (ind, '/91480480')
+        if index % 1000 == 0:
+            print (index, '/91480480')
 
         if v1 in venues_categories and v2 in venues_categories:
         
