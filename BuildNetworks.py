@@ -518,9 +518,6 @@ def transform_gephi_to_backbone(outfolder, outname):
 def create_igraphnw_from_backbone(outfolder, inname, tipus, infile):
 
 
-
-    
-    
     print 'Creating backbone igraph network ' + tipus
 
     ininfile = outfolder + 'networks/gephi/' + tipus + '_BACKBONE_' + inname + '_edges.dat'
@@ -556,15 +553,77 @@ def create_igraphnw_from_backbone(outfolder, inname, tipus, infile):
             G.delete_vertices(v.index)
 
 
-
-
     add_distances_to_edges(G)
     
     #for e in G.es():
      #   print G.vs[e.source]['name'], G.vs[e.target]['name'], e['distances']
-    
+  
 
     return G
+
+
+
+
+
+
+
+def create_igraphnw_from_backbone_for_venues(outfolder, inname, tipus, infile):
+
+
+    print 'Creating backbone igraph network ' + tipus
+
+    ininfile = outfolder + 'networks/gephi/' + tipus + '_BACKBONE_' + inname + '_edges.dat'
+    outfile  = outfolder + 'networks/gephi/' + tipus + '_IGRAPH_'   + inname + '_edges.dat'
+
+
+    print outfile
+
+    # get the edges
+    fout = open(outfile, 'w')
+    for line in open(ininfile):
+        fout.write( '\t'.join(line.strip().split('\t')[0:3]) + '\n') 
+    fout.close()
+
+
+    G = Graph.Read_Ncol(outfile, weights = True, directed=False)
+
+
+    # get the nodes
+    venues_location = {}
+    for  line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
+        fields = line.strip().split('\t')
+        user   = fields[0]
+        venues = fields[1:]
+        for venue in venues:    
+            venid, lng, lat, cat = venue.split(',')
+            venues_location[venid] = (float(lng), float(lat))   
+
+
+
+    for ind, v in enumerate(G.vs()):
+        if v['name']  == 'src': G.delete_vertices(v.index)
+        if v['name']  == 'trg': G.delete_vertices(v.index)
+
+        try:
+            v['location'] = venues_location[v['name']]
+        except:
+            G.delete_vertices(v.index)
+
+
+    add_distances_to_edges(G)
+
+
+    return G
+
+
+
+
+
+
+
+
+
+
 
 
 ''' =========================================================== '''
@@ -933,11 +992,11 @@ if __name__ == '__main__':
 
 
 #            transform_gephi_to_backbone(outroot, city + '_users_similarity')
-#            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
-#            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
+            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
+            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
 
-            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
-            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
+            G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
+            calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
 
 
 
@@ -955,9 +1014,14 @@ if __name__ == '__main__':
             calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
             
             '''     
-            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
+#            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
 
-            
+            G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile)
+            calc_network_centralities(G_venues_NC,   outroot, city, infile, 'venues_similarity_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
+
+            G_venues_DF = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'DF', infile)
+            calc_network_centralities(G_venues_DF,   outroot, city, infile, 'venues_similarity_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
+
 
 
 ## source /opt/virtualenv-python2.7/bin/activate
