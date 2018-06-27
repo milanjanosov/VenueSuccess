@@ -488,7 +488,7 @@ def transform_gephi_to_backbone(outfolder, outname):
             fout.write( src + '\t' + trg + '\t' + str(float(nij)) + '\n')
 
     fout.close()
-    #src	trg	nij
+
 
     real_table = pd.read_csv(fnout, sep = "\t")
 
@@ -497,18 +497,18 @@ def transform_gephi_to_backbone(outfolder, outname):
     bb_neffke = backboning.thresholding(table_nc, 4)
 
     print 'Do  the DF backboning'
-    #table_df      = backboning.disparity_filter(real_table, undirected = True)
-    #bb_vespignani = backboning.thresholding(table_df, 0.66)
+    table_df      = backboning.disparity_filter(real_table, undirected = True)
+    bb_vespignani = backboning.thresholding(table_df, 0.66)
 
     fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
-    #fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
+    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
 
 
     print "Writing the NC Backbone"
     bb_neffke.to_csv(fout_nc, sep = '\t', index = False)
 
     print "Writing DF Backbone"
-    #bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
+    bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
 
 
 
@@ -518,17 +518,23 @@ def transform_gephi_to_backbone(outfolder, outname):
 def create_igraphnw_from_backbone(outfolder, inname, tipus, infile):
 
 
+
+    
+    
     print 'Creating backbone igraph network ' + tipus
 
     ininfile = outfolder + 'networks/gephi/' + tipus + '_BACKBONE_' + inname + '_edges.dat'
     outfile  = outfolder + 'networks/gephi/' + tipus + '_IGRAPH_'   + inname + '_edges.dat'
 
 
+    print outfile
 
     # get the edges
     fout = open(outfile, 'w')
     for line in open(ininfile):
         fout.write( '\t'.join(line.strip().split('\t')[0:3]) + '\n') 
+    fout.close()
+
 
     G = Graph.Read_Ncol(outfile, weights = True, directed=False)
 
@@ -553,10 +559,10 @@ def create_igraphnw_from_backbone(outfolder, inname, tipus, infile):
 
 
     add_distances_to_edges(G)
-
+    
     #for e in G.es():
      #   print G.vs[e.source]['name'], G.vs[e.target]['name'], e['distances']
-
+    
 
     return G
 
@@ -801,7 +807,7 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
                 if 'friend' in tipus:vertice_attributes[name]['constraint_geo']   = constraint_geo[i]
 
                 vertice_attributes[name]['social_stretch']   = social_stretch(  G, G.vs[i], neighborhoods[i])              
-         #       vertice_attributes[name]['triangle_size']    = triangle_size(   G, G.vs[i], neighborhoods[i])
+                vertice_attributes[name]['triangle_size']    = triangle_size(   G, G.vs[i], neighborhoods[i])
                 vertice_attributes[name]['geo_size_of_ego']  = geo_size_of_ego( G, G.vs[i], neighborhoods[i])
                 vertice_attributes[name]['geo_stdev_of_ego'] = geo_stdev_of_ego(G, G.vs[i], neighborhoods[i])
 
@@ -889,10 +895,9 @@ if __name__ == '__main__':
 
 
     inputs = ParseInput.get_inputs()
-    bbox  = inputs[city]
+    bbox   = inputs[city]
     #do_all_the_networks(city, outroot, infile, bbox)
 
-    print len(sys.argv)
 
     if len(sys.argv) == 3:
 
@@ -927,9 +932,13 @@ if __name__ == '__main__':
             #calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
 
 
-            #transform_gephi_to_backbone(outroot, city + '_users_similarity')
-            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
-            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
+#            transform_gephi_to_backbone(outroot, city + '_users_similarity')
+#            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
+#            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
+
+            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
+            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
+
 
 
     
