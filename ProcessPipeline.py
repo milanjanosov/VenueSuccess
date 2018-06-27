@@ -200,7 +200,7 @@ elif sys.argv[2] == 'home_full':
     t1 = time.time()
 
     Pros = [] 
-    for LIMIT in range(0,2):  
+    for LIMIT in range(0,20):  
         p = Process(target = do_full_home_stuff, args=([city, outroot, LIMIT], ))
         Pros.append(p)
         p.start()

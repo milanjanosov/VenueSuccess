@@ -12,6 +12,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import RBF
+import time
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -26,8 +27,8 @@ import pandas as pd
 
 def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
     
-    names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
-             "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
+    names = ["Nearest Neighbors", "Linear SVM", "RBF SVM",
+             "Decision Tree", "Random Forest", "Neural Net",
              "Naive Bayes", "QDA"]
 
     
@@ -36,11 +37,11 @@ def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
         KNeighborsClassifier(3),
         SVC(kernel="linear", C=0.025),
         SVC(gamma=2, C=1),
-        GaussianProcessClassifier(1.0 * RBF(1.0)),
+        #GaussianProcessClassifier(1.0 * RBF(1.0)),
         DecisionTreeClassifier(max_depth=5),
         RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
         MLPClassifier(alpha=1),
-        AdaBoostClassifier(),
+        #AdaBoostClassifier(),
         GaussianNB(),
         QuadraticDiscriminantAnalysis()]    
 
@@ -51,10 +52,13 @@ def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
 
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
-        print('\t\t', name)
+        t1 = time.time()
+        print('\t\t', name, )
         clas  = clf.fit(X_train, y_train)
         pred_home['pred_home_' + name.replace(' ', '_')] = clas.predict(X_test)
- 
+        print('\t', time.time()-t1 )
+
+
     pred_home.to_csv(outfolder + '/user_homes/MLresults/' + city + '_ML_home_classification_RESULTS_' + str(LIMIT) + '.csv', sep='\t')
    
     
