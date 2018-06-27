@@ -929,7 +929,7 @@ if __name__ == '__main__':
 
             #transform_gephi_to_backbone(outroot, city + '_users_similarity')
             G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
-            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
 
 
     
