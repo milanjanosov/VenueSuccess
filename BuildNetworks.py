@@ -866,7 +866,7 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
                 if 'friend' in tipus:vertice_attributes[name]['constraint_geo']   = constraint_geo[i]
 
                 vertice_attributes[name]['social_stretch']   = social_stretch(  G, G.vs[i], neighborhoods[i])              
-                vertice_attributes[name]['triangle_size']    = triangle_size(   G, G.vs[i], neighborhoods[i])
+               # vertice_attributes[name]['triangle_size']    = triangle_size(   G, G.vs[i], neighborhoods[i])
                 vertice_attributes[name]['geo_size_of_ego']  = geo_size_of_ego( G, G.vs[i], neighborhoods[i])
                 vertice_attributes[name]['geo_stdev_of_ego'] = geo_stdev_of_ego(G, G.vs[i], neighborhoods[i])
 
