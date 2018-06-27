@@ -10,21 +10,30 @@ import numpy as np
 '''             load the shapefile of UK                        '''
 ''' =========================================================== '''
 
-def load_shp(city):
+'''def load_shp(city):
     
     print ('Loading the shapefile...')
     lsoa_shp_df = gpd.read_file('full2/england_lsoa_2011_gen.shp')
+
+    if 'london' == city:
+        
+
     return lsoa_shp_df[lsoa_shp_df['name'].str.contains(city.title())].to_crs({'init': 'epsg:4326'})  
 
-
-
+'''
+def load_shp(city):
+    
+    print ('Loading the shapefile...')
+    lsoa_shp_df = gpd.read_file('area_matching/lsoa_shp/lsoa.shp')
+    #return lsoa_shp_df[lsoa_shp_df['name'].str.contains(city.title())].to_crs({'init': 'epsg:4326'})  
+    return lsoa_shp_df
 
 
 ''' ========================================================================== '''
 ''' get the LSOA id and the polygon of each coordinate (if its within the city '''
 ''' ========================================================================== '''
 
-def coordinates_to_lsoa(lats, lons, cityshape):
+'''def coordinates_to_lsoa(lats, lons, cityshape):
     
     poly = (0,0)
     
@@ -39,12 +48,46 @@ def coordinates_to_lsoa(lats, lons, cityshape):
     return poly
 
 
+'''
 
+
+def coordinates_to_lsoa(lats, lons, cityshape):
+    
+    poly = (0,0)
+    
+    try:
+        pnt = Point(lons, lats)
+        query_df = cityshape[cityshape.contains(pnt)]
+        if query_df.shape[0] == 1:
+            poly = (query_df.iloc[0]['lsoa11cd'], query_df.iloc[0]['geometry'])
+    except Exception as exception:
+        pass
+    
+    return poly
 
 
 ''' =========================================================== '''
 '''          parse the coordinates of the 4sqr venues           '''
 ''' =========================================================== '''
+
+'''def get_venues_coordinates(city, outfolder):
+
+    print ('Parsing venue coordinates...')
+
+    venues_coordinates = {}
+
+    for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat')):
+        #if ind == 10: break
+        fields = line.strip().split('\t')
+        venues = [fff.split(',') for fff in fields[1:]]
+
+        for v in venues:
+            venues_coordinates[v[0]] = (float(v[1]), float(v[2]))
+
+    return venues_coordinates
+
+'''
+
 
 def get_venues_coordinates(city, outfolder):
 
@@ -53,7 +96,10 @@ def get_venues_coordinates(city, outfolder):
     venues_coordinates = {}
 
     for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat')):
-        #if ind == 10: break
+
+#        if ind == 100: break
+        if ind % 5000 == 0:
+            print (ind)
         fields = line.strip().split('\t')
         venues = [fff.split(',') for fff in fields[1:]]
 
@@ -77,9 +123,13 @@ def get_lsoa_venues(cityshape, venues_coordinates):
     lsoa_venues  = {}
     lsoa_polygons = {}
 
+    nnn = len(venues_coordinates)
+
     for ind, (v, c) in enumerate(venues_coordinates.items()):
-        #if ind == 50: break
+#        if ind == 100: break
         
+        print (ind, '/', nnn)
+
         lsoa, polygon = coordinates_to_lsoa( c[1], c[0], cityshape )
 
         if lsoa != 0:          
@@ -127,7 +177,7 @@ def get_edge_weights2(city, outfolder, venues_users, lsoa_venues):
     
     for ind, (lsoa, venues) in enumerate(lsoa_venues.items()):
                                          
-        if ind == 100: break
+#        if ind == 100: break
                                          
         for v1 in venues:
             for v2 in venues:
@@ -148,13 +198,17 @@ def get_node_edge_list(edges_weights):
 
     print ('Listing each nodes neighbours and those edge weights...')
 
+    print (edges_weights)
+
     # for each node list the edges (weights) in which they are present
     nodes_edge_weights = {}
-    
+    nnn = len(edges_weights)    
+
     for ind, (e, w) in enumerate(edges_weights.items()):
     
-        #if ind == 100: break
-            
+#        if ind == 100: break
+        print (ind, '/', nnn)           
+ 
         e1, e2 = e.split('_')
         
         if e1 not in nodes_edge_weights:
@@ -181,13 +235,16 @@ def get_node_edge_list(edges_weights):
 def get_users_friends(outfolder, city):
     
     friends_list = {}
-    
+
+    print ('Get users friends')
+        
+
     for ind, line in enumerate(open( outfolder + 'networks/gephi/' + city + '_friendship_edges.dat')):
  
         if 'Source' not in line:
         
-       #     if ind == 10: break
-        
+#            if ind == 100: break
+            
             source, target, a, b, c = line.strip().split('\t')
             
             if source not in friends_list:
@@ -208,13 +265,18 @@ def get_users_friends(outfolder, city):
 
 def get_friendship_ties_within_lsoa(lsoa_venues, venues_users, friends_list):
     
+    print ('Get friendship ties within lsoa')
+
     lsoa_friendships = {}
     lsoa_num_users   = {}
     
-    
+    nnn = len(lsoa_venues)
+
     for ind, (lsoa, venues) in enumerate(lsoa_venues.items()):
         
-        #if ind == 10 : break
+#        if ind == 100 : break
+        print (ind, '/', nnn)
+
         users = []
         for venue in venues:
             users += venues_users[venue]
@@ -248,6 +310,9 @@ def get_friendship_ties_within_lsoa(lsoa_venues, venues_users, friends_list):
 def get_users_lsoa(city, outroot, cityshape):
     
     
+
+    print ('Get users lsoa...')
+
     eps       = 0.01
     mins      = 3
     LIMIT_num = 0
@@ -255,8 +320,14 @@ def get_users_lsoa(city, outroot, cityshape):
 
     lsoa_users = {}
 
+  
+
     for ind, line in enumerate(open(infile)):
         user, lng, lat = line.strip().split('\t')
+
+
+        print (ind)
+#        if ind == 100: break
         
         lsoa, polygon = coordinates_to_lsoa( float(lat), float(lng), cityshape ) 
         
@@ -277,6 +348,9 @@ def get_users_lsoa(city, outroot, cityshape):
 
 def friendships_within_lsoa(lsoa_users, friends_list):
                 
+
+    print ('Get friendships within lsoa')
+
     users_lsoa = {}
     for lsoa, users in lsoa_users.items():
         for user in users:
@@ -289,19 +363,27 @@ def friendships_within_lsoa(lsoa_users, friends_list):
         
         
     for user, friends in friends_list.items():
-        user_lsoa = users_lsoa[user]
+
         
-        if str(user_lsoa) != 0:
+        if user in users_lsoa:
 
-            for friend in friends:
-                if user_lsoa == users_lsoa[friend]:
+            user_lsoa = users_lsoa[user]
 
-                    friendship = '_'.join([user, friend])
+            if str(user_lsoa) != 0:
 
-                    if lsoa not in lsoa_friendships:
-                        lsoa_friendships[user_lsoa] = set([friendship])
-                    else:
-                        lsoa_friendships[user_lsoa].add(friendship)
+                for friend in friends:
+                    if user_lsoa == users_lsoa[friend]:
+
+                        friendship = '_'.join([user, friend])
+
+                        if lsoa not in lsoa_friendships:
+                            lsoa_friendships[user_lsoa] = set([friendship])
+                        else:
+                            lsoa_friendships[user_lsoa].add(friendship)
+
+        else:
+            print (user)
+
                     
         
     for lsoa in lsoa_users:
@@ -310,6 +392,7 @@ def friendships_within_lsoa(lsoa_users, friends_list):
         else:
             lsoa_friendships[lsoa] = len(lsoa_friendships[lsoa])
     
+    print ('LSOA USERS: ', len(lsoa_users))
         
     return lsoa_friendships
         
