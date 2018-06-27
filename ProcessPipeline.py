@@ -1,4 +1,4 @@
-import sys
+import sys  
 sys.path.append("..")
 
 import matplotlib
@@ -69,7 +69,7 @@ def do_full_home_stuff(args):
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.2,  mins = 3)
         '''
         ## this is the messy ML part 
-        MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
+        #MLFeat.gennerate_classification_features(city, outroot, LIMIT, N = 4, R = 1.0)
         Class.classify_data(city, outroot, LIMIT)
         Class.conclude_class(city, outroot, LIMIT)
 
@@ -200,7 +200,7 @@ elif sys.argv[2] == 'home_full':
     t1 = time.time()
 
     Pros = [] 
-    for LIMIT in range(0,20):  
+    for LIMIT in range(0,2):  
         p = Process(target = do_full_home_stuff, args=([city, outroot, LIMIT], ))
         Pros.append(p)
         p.start()
