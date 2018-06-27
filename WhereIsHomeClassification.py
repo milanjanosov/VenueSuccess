@@ -31,6 +31,7 @@ def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
              "Naive Bayes", "QDA"]
 
     
+    print ('\tstart the classifications...')
     classifiers = [
         KNeighborsClassifier(3),
         SVC(kernel="linear", C=0.025),
@@ -50,6 +51,7 @@ def classifiers(outfolder, city, X_train, y_train, X_test, pred_home, LIMIT):
 
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
+        print('\t\t', name)
         clas  = clf.fit(X_train, y_train)
         pred_home['pred_home_' + name.replace(' ', '_')] = clas.predict(X_test)
  
@@ -62,12 +64,14 @@ def classify_data(city, outfolder, LIMIT):
     print ('Do the MLhomepred classification...')
 
     ### training data budapest_ML_feature_has_home_TRAIN.csv
+    print ('\t read train data')
     df_train =  pd.read_csv(outfolder + '/user_homes/MLfeatures/' + city + '_ML_feature_has_home_TRAIN_' + str(LIMIT) + '.csv', index_col=0, sep = '\t')
     X_train  =  df_train.drop(columns = ['home', 'venue', 'user']).fillna(0)
     y_train  =  df_train['home']
 
 
     ### test data budapest_ML_feature_has_home_TEST
+    print ('\t read test data')
     df_test =  pd.read_csv(outfolder + '/user_homes/MLfeatures/' + city + '_ML_feature_has_home_TEST_' + str(LIMIT) + '.csv', index_col=0, sep = '\t')
     X_test  =  df_test.drop(columns = ['home', 'venue', 'user']).fillna(0)
 
