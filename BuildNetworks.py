@@ -609,6 +609,7 @@ def create_igraphnw_from_backbone_for_venues(outfolder, inname, tipus, infile):
         except:
             G.delete_vertices(v.index)
 
+    print tipus, len(G.vs()), len(G.es())
 
     add_distances_to_edges(G)
 
@@ -734,9 +735,13 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
     all_users          = set([line.strip().split('\t')[0] for line in open(infile)])
 
 
+
+
     t1 = time.time()
     degrees            = G.degree()   
     print '\n\nDegrees: ', time.time() - t1
+
+
 
 
     if 'friend' in tipus: 
@@ -827,69 +832,74 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
         homogenity = get_venue_homogenity(G, city, outfolder)
         print tipus + '  - Venue homogenity done.'
 
-    
     t11 = time.time()
+
+
+
+
     for i in range(len(G.degree())):
 
         name = G.vs[i]['name']
 
-        if name in all_users or venue:
+        if name not in vertice_attributes:
 
-            if name not in vertice_attributes:
-                vertice_attributes[name] = {}
-
-
-
-            #vertice_attributes[name]['name']             = name
-            vertice_attributes[name]['degree']           = degrees[i]
-            if 'friend' in tipus: vertice_attributes[name]['betweenness']      = betweennesses[i]
-            vertice_attributes[name]['clustering']       = clusterings[i]
-            if 'friend' in tipus:vertice_attributes[name]['closeness']        = closenesses[i]
-            vertice_attributes[name]['pagerank']         = pageranks[i]
-            vertice_attributes[name]['eigenvector']      = eigenvectors[i]
-            if 'friend' in tipus:vertice_attributes[name]['constraint']       = constraint[i]
-            if 'friend' in tipus:vertice_attributes[name]['egosize']          = neighborhood_sizes[i]
-       
-
-    
+            vertice_attributes[name] = {}
 
 
 
-         
-            if geo: 
-                if 'friend' in tipus:vertice_attributes[name]['betweenness_geo']  = betweennesses_geo[i]
-                if 'friend' in tipus:vertice_attributes[name]['closeness_geo']    = closenesses_geo[i]
-                vertice_attributes[name]['clustering_geo']   = clusterings_geo[i]
-                vertice_attributes[name]['strength_geo']     = strengthes_geo[i]
-                vertice_attributes[name]['pagerank_geo']     = pageranks_geo[i]
-                vertice_attributes[name]['eigenvector_geo']  = eigenvectors_geo[i]
-                if 'friend' in tipus:vertice_attributes[name]['constraint_geo']   = constraint_geo[i]
-
-                vertice_attributes[name]['social_stretch']   = social_stretch(  G, G.vs[i], neighborhoods[i])              
-               # vertice_attributes[name]['triangle_size']    = triangle_size(   G, G.vs[i], neighborhoods[i])
-                vertice_attributes[name]['geo_size_of_ego']  = geo_size_of_ego( G, G.vs[i], neighborhoods[i])
-                vertice_attributes[name]['geo_stdev_of_ego'] = geo_stdev_of_ego(G, G.vs[i], neighborhoods[i])
+        #vertice_attributes[name]['name']             = name
+        vertice_attributes[name]['degree']           = degrees[i]
+        if 'friend' in tipus: vertice_attributes[name]['betweenness']      = betweennesses[i]
+        vertice_attributes[name]['clustering']       = clusterings[i]
+        if 'friend' in tipus:vertice_attributes[name]['closeness']        = closenesses[i]
+        vertice_attributes[name]['pagerank']         = pageranks[i]
+        vertice_attributes[name]['eigenvector']      = eigenvectors[i]
+        if 'friend' in tipus:vertice_attributes[name]['constraint']       = constraint[i]
+        if 'friend' in tipus:vertice_attributes[name]['egosize']          = neighborhood_sizes[i]
+   
 
 
-            if weighted:
-                if 'friend' in tipus:vertice_attributes[name]['betweenness_w']  = betweennesses_w[i]
-                if 'friend' in tipus:vertice_attributes[name]['closeness_w']    = closenesses_w[i]
-                vertice_attributes[name]['clustering_w']   = clusterings_w[i]
-                vertice_attributes[name]['strength_w']     = strengthes_w[i]
-                vertice_attributes[name]['pagerank_w']     = pageranks_w[i]
-                vertice_attributes[name]['eigenvector_w']  = eigenvectors_w[i]
-                if 'friend' in tipus: vertice_attributes[name]['constraint_w']   = constraint_w[i]
-          
 
-            if venue: 
-                # avg Jaccard similarity
-                vertice_attributes[name]['homogenity']     = homogenity[i]
-                ## entropy     ~  for the number of checkins, its all 1 for us
-                ## serendipity ~  pagerank
-                ## brokerage   ~  constraint
-                ## diversity of the users
+
+
+     
+        if geo: 
+            if 'friend' in tipus:vertice_attributes[name]['betweenness_geo']  = betweennesses_geo[i]
+            if 'friend' in tipus:vertice_attributes[name]['closeness_geo']    = closenesses_geo[i]
+            vertice_attributes[name]['clustering_geo']   = clusterings_geo[i]
+            vertice_attributes[name]['strength_geo']     = strengthes_geo[i]
+            vertice_attributes[name]['pagerank_geo']     = pageranks_geo[i]
+            vertice_attributes[name]['eigenvector_geo']  = eigenvectors_geo[i]
+            if 'friend' in tipus:vertice_attributes[name]['constraint_geo']   = constraint_geo[i]
+
+            vertice_attributes[name]['social_stretch']   = social_stretch(  G, G.vs[i], neighborhoods[i])              
+           # vertice_attributes[name]['triangle_size']    = triangle_size(   G, G.vs[i], neighborhoods[i])
+            vertice_attributes[name]['geo_size_of_ego']  = geo_size_of_ego( G, G.vs[i], neighborhoods[i])
+            vertice_attributes[name]['geo_stdev_of_ego'] = geo_stdev_of_ego(G, G.vs[i], neighborhoods[i])
+
+
+        if weighted:
+            if 'friend' in tipus:vertice_attributes[name]['betweenness_w']  = betweennesses_w[i]
+            if 'friend' in tipus:vertice_attributes[name]['closeness_w']    = closenesses_w[i]
+            vertice_attributes[name]['clustering_w']   = clusterings_w[i]
+            vertice_attributes[name]['strength_w']     = strengthes_w[i]
+            vertice_attributes[name]['pagerank_w']     = pageranks_w[i]
+            vertice_attributes[name]['eigenvector_w']  = eigenvectors_w[i]
+            if 'friend' in tipus: vertice_attributes[name]['constraint_w']   = constraint_w[i]
+      
+
+        if venue: 
+            # avg Jaccard similarity
+            vertice_attributes[name]['homogenity']     = homogenity[i]
+            ## entropy     ~  for the number of checkins, its all 1 for us
+            ## serendipity ~  pagerank
+            ## brokerage   ~  constraint
+            ## diversity of the users
+
+
     print 'Node level stuff ', time.time() - t11
  
+
 
     df = pd.DataFrame.from_dict(vertice_attributes, orient = 'index')
     df.to_csv(filename, na_rep='nan')
