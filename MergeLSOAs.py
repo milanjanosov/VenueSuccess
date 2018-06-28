@@ -1,10 +1,11 @@
 import pandas as pd
 import geopandas as gpd
-from geopandas.geoseries import Point
 import numpy as np
-from ParseJsons import check_box
 import time 
-
+import os
+from ParseJsons import check_box
+from multiprocessing import Process
+from geopandas.geoseries import Point
 
 
 ''' =========================================================== '''
@@ -105,7 +106,7 @@ def get_venues_coordinates(city, outfolder):
 
     for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat')):
 
-#        if ind == 100: break
+        if ind == 5000: break
         if ind % 5000 == 0:
             print (ind)
         fields = line.strip().split('\t')
@@ -126,7 +127,7 @@ def get_venues_coordinates(city, outfolder):
 '''              get the venues within lsoa-s                   '''
 ''' =========================================================== '''
 
-def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
+def get_lsoa_venues_old(cityshape, venues_coordinates, bbox, city):
 
     t1 = time.time()
     print ('Converting (lat, long) to LSOA-s...')
@@ -162,6 +163,173 @@ def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
     print ('Coordinates converted to LSOA-s\t', time.time() - t1)
 
     return lsoa_venues, lsoa_polygons
+
+
+
+
+
+
+
+########################################################################
+
+
+def chunkIt(seq, num):
+    avg = len(seq) / float(num)
+    out = []
+    last = 0.0
+
+    while last < len(seq):
+        out.append(seq[int(last):int(last + avg)])
+        last += avg
+
+    return out
+        
+
+
+
+
+
+
+
+
+
+def get_lsoas_paralel(args):
+    
+
+    venues_coord_chunks = args[0]
+    cityshape           = args[1]
+    thread_id           = args[2]
+    bbox                = args[3]
+    city                = args[4]
+    outfolder           = args[5]
+    nnn                 = len(venues_coord_chunks)
+
+
+    fout = open(outfolder + '/venue_lsoa_attributes_' + str(thread_id), 'w')
+
+    for ind, (venue, coord) in enumerate(venues_coord_chunks.items()):
+
+        if ind % 1000 == 0: 
+            print (thread_id, '\t', ind, '/', nnn)
+
+        lat = float(coord[1])
+        lng = float(coord[0])
+
+        if check_box(bbox, city, lat, lng):
+
+            pnt      = Point(lng, lat)        
+            query_df = cityshape[cityshape.contains(pnt)]
+            if query_df.shape[0] == 1:
+
+
+                try:
+                    lsoa, polygon = (query_df.iloc[0]['lsoa11cd'], query_df.iloc[0]['geometry'])
+
+                    bounds  = polygon.bounds
+                    lng0    = str(bounds[0])
+                    lat0    = str(bounds[1])
+                    lng1    = str(bounds[2])
+                    lat1    = str(bounds[3])
+                    length  = str(polygon.length)
+                    area    = str(polygon.area)
+
+                    fout.write ('\t'.join([venue, str(lng), str(lat), lsoa, lng0, lat0, lng1, lat1, length, area]) + '\n')
+
+                except:
+                    pass
+
+    fout.close()
+
+
+
+
+
+def get_lsoa_venues(cityshape, venues_coordinates, bbox, city, outfolder_):
+
+    t1 = time.time()
+    print ('Converting (lat, long) to LSOA-s...')
+    
+    lsoa_venues   = {}
+    lsoa_polygons = {}
+
+
+
+    num_threads  = 40
+    venues       = list(venues_coordinates.keys())
+    venue_chunks = chunkIt(venues, num_threads)
+
+
+
+    outfolder = outfolder_ + '/venues_info/lsoa_venues_temp/' # + city + '_venues_users.dat'
+    if not os.path.exists(outfolder):
+        os.makedirs(outfolder)
+
+
+
+    Pros = [] 
+    for i in range(0,num_threads):  
+        venues_coord_chunks = {k : venues_coordinates[k] for k in venue_chunks[i] }
+        p = Process(target = get_lsoas_paralel, args=([venues_coord_chunks, cityshape, i, bbox, city, outfolder], ))
+        Pros.append(p)
+        p.start()
+       
+    for t in Pros:
+        t.join()
+
+
+
+    files = os.listdir(outfolder)
+    fout  = open(outfolder_  + '/venues_info/venues_lsoa_full.dat', 'w')
+    fout.write('venue\tlng\tlat\tlsoa\tlng0\tlat0\tlng1\tlat1\tlength\tarea\n')
+    for fn in files:
+        for line in open(outfolder + '/' + fn):
+            fout.write(line)
+    fout.close()
+            
+
+
+
+
+    '''for ind, (v, c) in enumerate(venues_coordinates.items()):
+
+
+        lat = float(c[1])
+        lng = float(c[0])
+    
+
+        if check_box(bbox, city, lat, lng):
+
+            lsoa, polygon = coordinates_to_lsoa( lat, lng, cityshape )
+
+            if lsoa != 0:          
+                       
+                if lsoa not in lsoa_polygons:
+                    lsoa_polygons[lsoa] = polygon    
+                
+                if lsoa not in lsoa_venues:
+                    lsoa_venues[lsoa] = [v]
+                else:
+                    lsoa_venues[lsoa].append(v)
+
+    print ('Coordinates converted to LSOA-s\t', time.time() - t1)
+    '''
+    return lsoa_venues, lsoa_polygons
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -603,10 +771,10 @@ def get_lsoa_level_networks( city, outfolder, bbox ):
 
     cityshape                   = load_shp(city)
     venues_coordinates          = get_venues_coordinates(city, outfolder)
-    lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates, bbox, city)
+    lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates, bbox, city, outfolder)
 
 
-    venues_users           = get_venues_users(outfolder, city)
+    '''venues_users           = get_venues_users(outfolder, city)
     all_venues             = set([venue for venues in lsoa_venues.values() for venue in venues])
     edges_weights          = get_edge_weights2(city, outfolder, venues_users, lsoa_venues)    # node1_node2 -> weight
     nodes_edge_weights     = get_node_edge_list(edges_weights)     # node0 -> [(node1, w1), (node2, w2), ...]
@@ -628,7 +796,7 @@ def get_lsoa_level_networks( city, outfolder, bbox ):
 
 
     get_venues_features(lsoa_polygons, lsoa_local_friendships, lsoa_users, lsoa_venues, lsoa_num_users, lsoa_friendships, lsoa_weights_density, edge_density_glb, edge_avg_weight_glb, outfolder, city)      
-
+    '''
    
 
 
