@@ -3,6 +3,7 @@ import geopandas as gpd
 from geopandas.geoseries import Point
 import numpy as np
 from ParseJsons import check_box
+import time 
 
 
 
@@ -23,10 +24,16 @@ from ParseJsons import check_box
 '''
 def load_shp(city):
     
+    t1 = time.time()
+
     print ('Loading the shapefile...')
     lsoa_shp_df = gpd.read_file('area_matching/lsoa_shp/lsoa.shp')
     #return lsoa_shp_df[lsoa_shp_df['name'].str.contains(city.title())].to_crs({'init': 'epsg:4326'})  
+    print ('Shapefile loaded\t', time.time-() - t1)
     return lsoa_shp_df
+
+
+
 
 
 ''' ========================================================================== '''
@@ -91,6 +98,7 @@ def coordinates_to_lsoa(lats, lons, cityshape):
 
 def get_venues_coordinates(city, outfolder):
 
+    t1 = time.time()
     print ('Parsing venue coordinates...')
 
     venues_coordinates = {}
@@ -106,6 +114,8 @@ def get_venues_coordinates(city, outfolder):
         for v in venues:
             venues_coordinates[v[0]] = (float(v[1]), float(v[2]))
 
+
+    print ('Venue coordinates parsed\t', time.time-() - t1)
     return venues_coordinates
 
 
@@ -118,12 +128,16 @@ def get_venues_coordinates(city, outfolder):
 
 def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
 
+    t1 = time.time()
     print ('Converting (lat, long) to LSOA-s...')
     
     lsoa_venues  = {}
     lsoa_polygons = {}
 
     nnn = len(venues_coordinates)
+
+    ty = 0
+    tn = 
 
     for ind, (v, c) in enumerate(venues_coordinates.items()):
 
@@ -134,7 +148,6 @@ def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
 
         if check_box(bbox, city, lat, lng):
 
-            print ('YAS')
             lsoa, polygon = coordinates_to_lsoa( lat, lng, cityshape )
 
             if lsoa != 0:          
@@ -147,10 +160,8 @@ def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
                 else:
                     lsoa_venues[lsoa].append(v)
 
+    print ('Coordinates converted to LSOA-s\t', time.time() - t1)
 
-        else:
-            print ('noo')
-            
     return lsoa_venues, lsoa_polygons
 
 
@@ -162,6 +173,8 @@ def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
 
 def get_venues_users(outfolder, city):
     
+    t1 = time.time()
+    print ('Getting venues user list...')
     venues_users = {}
     
     for ind, line in enumerate(open(outfolder + '/venues_info/' + city + '_venues_users.dat')):
@@ -173,6 +186,8 @@ def get_venues_users(outfolder, city):
         
         venues_users[venue] = users
         
+
+    print ('Venues user lists parsed\t', time.time-() - t1)
     return venues_users
  
     
@@ -180,8 +195,10 @@ def get_venues_users(outfolder, city):
 
 def get_edge_weights2(city, outfolder, venues_users, lsoa_venues):
     
+
+    t1 = time.time()
     edges_weights2 = {}
-    print ('Parsing 222 venue similarity network edge list...')
+    print ('Parsing venue similarity network edge list...')
     
     
     for ind, (lsoa, venues) in enumerate(lsoa_venues.items()):
@@ -196,6 +213,7 @@ def get_edge_weights2(city, outfolder, venues_users, lsoa_venues):
                     if w > 0:
                         edges_weights2[edge] = w             
 
+    print ('Venues similarity network edges parsed\t', time.time-() - t1)
     return edges_weights2
         
     
@@ -205,6 +223,7 @@ def get_edge_weights2(city, outfolder, venues_users, lsoa_venues):
 
 def get_node_edge_list(edges_weights):
 
+    t1 = time.time()
     print ('Listing each nodes neighbours and those edge weights...')
 
     print (edges_weights)
@@ -231,6 +250,7 @@ def get_node_edge_list(edges_weights):
         else:
             nodes_edge_weights[e2].append((e1, w))
         
+    print ('Neighbour list created\t', time.time() - t1)
     return nodes_edge_weights
     
     
@@ -245,6 +265,7 @@ def get_users_friends(outfolder, city):
     
     friends_list = {}
 
+    t1 = time.time()
     print ('Get users friends')
         
 
@@ -267,6 +288,7 @@ def get_users_friends(outfolder, city):
             else:
                 friends_list[target].append(source)
 
+    print ('Users friends parsed\t', time.time-() - t1)
     return friends_list
         
 
@@ -274,6 +296,7 @@ def get_users_friends(outfolder, city):
 
 def get_friendship_ties_within_lsoa(lsoa_venues, venues_users, friends_list):
     
+    t1 = time.time()
     print ('Get friendship ties within lsoa')
 
     lsoa_friendships = {}
@@ -305,7 +328,8 @@ def get_friendship_ties_within_lsoa(lsoa_venues, venues_users, friends_list):
                             else:
                                 lsoa_friendships[lsoa].append(edge)
     
-    
+    print('LSOA friendship ties processed\t', time.time() - t1)    
+
     return lsoa_num_users, lsoa_friendships    
 
 
@@ -319,7 +343,7 @@ def get_friendship_ties_within_lsoa(lsoa_venues, venues_users, friends_list):
 def get_users_lsoa(city, outroot, cityshape):
     
     
-
+    t1 = time.time()
     print ('Get users lsoa...')
 
     eps       = 0.01
@@ -350,6 +374,7 @@ def get_users_lsoa(city, outroot, cityshape):
         #if ind == 10: break
         #if lsoa not in lsoa_users:
  
+    print('users within lsoa...\t', time.time() - t1)
 
     return lsoa_users
 
@@ -358,6 +383,7 @@ def get_users_lsoa(city, outroot, cityshape):
 def friendships_within_lsoa(lsoa_users, friends_list):
                 
 
+    t1 = time.time()
     print ('Get friendships within lsoa')
 
     users_lsoa = {}
@@ -401,7 +427,7 @@ def friendships_within_lsoa(lsoa_users, friends_list):
         else:
             lsoa_friendships[lsoa] = len(lsoa_friendships[lsoa])
     
-    print ('LSOA USERS: ', len(lsoa_users))
+    print ('LSOA USERS: ', len(lsoa_users), '\t', time.time() - t1)
         
     return lsoa_friendships
         
@@ -414,6 +440,7 @@ def friendships_within_lsoa(lsoa_users, friends_list):
 
 def get_lsoa_mininw_edges(lsoa_venues, edges_weights):
     
+    t1 = time.time()
     print ('Create the LSOA level mini-network edge lists...')
 
     lsoa_edges = {}
@@ -435,6 +462,8 @@ def get_lsoa_mininw_edges(lsoa_venues, edges_weights):
                         else:
                             lsoa_edges[lsoa].append((edge, weight))
 
+    print ('LSOA level networks..\t', time.time() - t1)
+
     return lsoa_edges
 
 
@@ -446,6 +475,7 @@ def get_lsoa_mininw_edges(lsoa_venues, edges_weights):
 
 def get_lsoa_nw_features(lsoa_venues, lsoa_edges, edges_weights):
 
+    t1 = time.time()
     print ('Deriving the LSOA network features...')
 
     all_edges = [set(e.split('_')) for e in edges_weights.keys()]
@@ -487,6 +517,8 @@ def get_lsoa_nw_features(lsoa_venues, lsoa_edges, edges_weights):
 
             lsoa_weights_density[lsoa] = (edge_avg_weight_in, edge_density_in)
             
+
+    print ('lsoa level network features\t', time.time() - t1)
 
     return lsoa_weights_density, edge_density_glb, edge_avg_weight_glb
 
