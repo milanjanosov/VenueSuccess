@@ -128,7 +128,7 @@ def get_lsoa_venues(cityshape, venues_coordinates):
     for ind, (v, c) in enumerate(venues_coordinates.items()):
 #        if ind == 100: break
         
-        print (ind, '/', nnn)
+ #       print (ind, '/', nnn)
 
         lsoa, polygon = coordinates_to_lsoa( c[1], c[0], cityshape )
 
@@ -207,7 +207,7 @@ def get_node_edge_list(edges_weights):
     for ind, (e, w) in enumerate(edges_weights.items()):
     
 #        if ind == 100: break
-        print (ind, '/', nnn)           
+ #       print (ind, '/', nnn)           
  
         e1, e2 = e.split('_')
         
@@ -275,7 +275,7 @@ def get_friendship_ties_within_lsoa(lsoa_venues, venues_users, friends_list):
     for ind, (lsoa, venues) in enumerate(lsoa_venues.items()):
         
 #        if ind == 100 : break
-        print (ind, '/', nnn)
+ #       print (ind, '/', nnn)
 
         users = []
         for venue in venues:
@@ -326,7 +326,7 @@ def get_users_lsoa(city, outroot, cityshape):
         user, lng, lat = line.strip().split('\t')
 
 
-        print (ind)
+#        print (ind)
 #        if ind == 100: break
         
         lsoa, polygon = coordinates_to_lsoa( float(lat), float(lng), cityshape ) 
