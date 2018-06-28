@@ -209,7 +209,7 @@ def plot_final_results(city, outfolder, user_nums):
 
     ''' compare the ML homes with the best centroid method '''
 
-    best_method = 'dbscan_0.02_3'
+    best_method = 'dbscan_0.01_3'
     ML_folder   = outfolder + '/user_homes/MLhomes_filtered/'
     ML_files    = os.listdir(ML_folder)
 
