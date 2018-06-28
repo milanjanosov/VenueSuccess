@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as gpd
 from geopandas.geoseries import Point
 import numpy as np
-
+from ParseJsons import check_box
 
 
 
@@ -130,18 +130,39 @@ def get_lsoa_venues(cityshape, venues_coordinates):
         
  #       print (ind, '/', nnn)
 
-        lsoa, polygon = coordinates_to_lsoa( c[1], c[0], cityshape )
 
-        if lsoa != 0:          
-                   
-            if lsoa not in lsoa_polygons:
-                lsoa_polygons[lsoa] = polygon    
+
+    for  line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
+        fields = line.strip().split('\t')
+        user   = fields[0]
+        venues = fields[1:]
+        for venue in venues:    
+            venid, lng, lat, cat = venue.split(',')
+            venues_location[venid] = (float(lng), float(lat))   
+
+
+
+
+
+        if check_box(bbox, city, lat, lng):
+
+            print 'YAS'
+            lsoa, polygon = coordinates_to_lsoa( lat, lng, cityshape )
+
+            if lsoa != 0:          
+                       
+                if lsoa not in lsoa_polygons:
+                    lsoa_polygons[lsoa] = polygon    
+                
+                if lsoa not in lsoa_venues:
+                    lsoa_venues[lsoa] = [v]
+                else:
+                    lsoa_venues[lsoa].append(v)
+
+
+        else:
+            print 'noo'
             
-            if lsoa not in lsoa_venues:
-                lsoa_venues[lsoa] = [v]
-            else:
-                lsoa_venues[lsoa].append(v)
-        
     return lsoa_venues, lsoa_polygons
 
 
@@ -561,7 +582,7 @@ def get_venues_features(lsoa_polygons,lsoa_local_friendships, lsoa_users, lsoa_v
     
 
 
-def get_lsoa_level_networks( city, outfolder ):
+def get_lsoa_level_networks( city, outfolder, bbox ):
 
  #   city               = 'bristol'
  #   outfolder          = '../ProcessedData/' + city + '/'
