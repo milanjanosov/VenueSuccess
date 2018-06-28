@@ -29,7 +29,7 @@ def load_shp(city):
     print ('Loading the shapefile...')
     lsoa_shp_df = gpd.read_file('area_matching/lsoa_shp/lsoa.shp')
     #return lsoa_shp_df[lsoa_shp_df['name'].str.contains(city.title())].to_crs({'init': 'epsg:4326'})  
-    print ('Shapefile loaded\t', time.time-() - t1)
+    print ('Shapefile loaded\t', time.time() - t1)
     return lsoa_shp_df
 
 
