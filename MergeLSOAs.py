@@ -126,23 +126,6 @@ def get_lsoa_venues(cityshape, venues_coordinates):
     nnn = len(venues_coordinates)
 
     for ind, (v, c) in enumerate(venues_coordinates.items()):
-#        if ind == 100: break
-        
- #       print (ind, '/', nnn)
-
-    print (ind)
-
-
-    for  line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
-        fields = line.strip().split('\t')
-        user   = fields[0]
-        venues = fields[1:]
-        for venue in venues:    
-            venid, lng, lat, cat = venue.split(',')
-            venues_location[venid] = (float(lng), float(lat))   
-
-
-
 
 
         if check_box(bbox, city, lat, lng):
