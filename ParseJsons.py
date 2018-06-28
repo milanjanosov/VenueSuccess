@@ -692,7 +692,7 @@ def get_users_distance_distr_from_home(city, outfolder):
 
     users_num_homes = []
     for ind, line in enumerate(open( outfolder + 'user_info/'  + city + '_user_venues_full_locals_filtered.dat')):
-        if ind == 100: break
+        #if ind == 100: break
     
         users_num_homes.append(len(line.strip().split('\t')))# (len(line.strip().split('\t')[1:])/3.0)
 
