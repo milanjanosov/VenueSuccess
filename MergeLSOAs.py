@@ -128,6 +128,10 @@ def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
     for ind, (v, c) in enumerate(venues_coordinates.items()):
 
 
+        lat = float(c[1])
+        lng = float(c[0])
+    
+
         if check_box(bbox, city, lat, lng):
 
             print ('YAS')
