@@ -106,7 +106,7 @@ def get_venues_coordinates(city, outfolder):
 
     for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat')):
 
-        if ind == 5000: break
+        #if ind == 5000: break
         if ind % 5000 == 0:
             print (ind)
         fields = line.strip().split('\t')
