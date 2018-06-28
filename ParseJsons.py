@@ -90,7 +90,7 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
                 except:
                     pass
 
-                fout.write(venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
+                fout.write(str(user) + '\t' + venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
 
 
 
@@ -206,7 +206,7 @@ def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox
                     except:
                         pass
 
-                    fout.write(venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
+                    fout.write(str(user) + '\t' + venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
 
 
 
@@ -344,7 +344,7 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
                 except:
                     pass
 
-                fout.write(venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
+                fout.write(str(user) + '\t' + venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
 
 
 
