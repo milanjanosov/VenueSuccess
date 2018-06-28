@@ -209,7 +209,7 @@ def get_lsoas_paralel(args):
 
     for ind, (venue, coord) in enumerate(venues_coord_chunks.items()):
 
-        if ind % 1000 == 0: 
+        if ind % 100 == 0: 
             print (thread_id, '\t', ind, '/', nnn)
 
         lat = float(coord[1])
