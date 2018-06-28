@@ -136,8 +136,7 @@ def get_lsoa_venues(cityshape, venues_coordinates, bbox, city):
 
     nnn = len(venues_coordinates)
 
-    ty = 0
-    tn = 
+
 
     for ind, (v, c) in enumerate(venues_coordinates.items()):
 
@@ -614,7 +613,7 @@ def get_lsoa_level_networks( city, outfolder, bbox ):
     lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates, bbox, city)
 
 
-    '''venues_users           = get_venues_users(outfolder, city)
+    venues_users           = get_venues_users(outfolder, city)
     all_venues             = set([venue for venues in lsoa_venues.values() for venue in venues])
     edges_weights          = get_edge_weights2(city, outfolder, venues_users, lsoa_venues)    # node1_node2 -> weight
     nodes_edge_weights     = get_node_edge_list(edges_weights)     # node0 -> [(node1, w1), (node2, w2), ...]
@@ -637,7 +636,7 @@ def get_lsoa_level_networks( city, outfolder, bbox ):
 
     get_venues_features(lsoa_polygons, lsoa_local_friendships, lsoa_users, lsoa_venues, lsoa_num_users, lsoa_friendships, lsoa_weights_density, edge_density_glb, edge_avg_weight_glb, outfolder, city)      
 
-    '''
+   
 
 
 
