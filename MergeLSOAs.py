@@ -130,7 +130,7 @@ def get_lsoa_venues(cityshape, venues_coordinates):
 
         if check_box(bbox, city, lat, lng):
 
-            print 'YAS'
+            print ('YAS')
             lsoa, polygon = coordinates_to_lsoa( lat, lng, cityshape )
 
             if lsoa != 0:          
@@ -145,7 +145,7 @@ def get_lsoa_venues(cityshape, venues_coordinates):
 
 
         else:
-            print 'noo'
+            print ('noo')
             
     return lsoa_venues, lsoa_polygons
 
