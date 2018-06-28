@@ -56,8 +56,8 @@ def do_full_home_stuff(args):
 
 
         ##these are the centroid based things 
-        '''users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
-
+        '''
+        user_sample = Home.get_users_centroids(           city, outroot, sample = True, LIMIT_num = LIMIT,              plot = False)
         Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 0.5, plot = False)
         Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 1.0, plot = False)
         Home.get_users_centroids_with_cutoff(users, city, outroot, sample = False, LIMIT_num = LIMIT, limit = 2.0, plot = False)
@@ -131,11 +131,22 @@ if sys.argv[2] == 'preproc':
 
     users_homes   = {}
 
-    unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
+ #   unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
 
-    users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
-    users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
-    users_tips    = ParseJsons.get_tips_locations_and_users(    unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
+##    users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
+#    users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
+#    users_tips    = ParseJsons.get_tips_locations_and_users(    unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
+
+
+
+    ParseJsons.merge_venue_categories_stuff( city, inroot, outroot)
+
+
+
+
+
+
+
 
 ### ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_photos.keys()))
 
@@ -178,7 +189,7 @@ elif sys.argv[2] == 'home_sample':
 
         t1 = time.time()
 
-        user_sample = Home.get_users_centroids(           city, outroot, sample = True, LIMIT_num = LIMIT,              plot = False)
+
         Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 1.0, plot = False)
         Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 2.0, plot = False)
         Home.get_users_centroids_with_cutoff(user_sample, city, outroot, sample = True, LIMIT_num = LIMIT, limit = 3.0, plot = False)
@@ -198,7 +209,7 @@ elif sys.argv[2] == 'home_full':
 
 
     t1 = time.time()
-
+    '''
     Pros = [] 
     for LIMIT in range(0,20):  
         p = Process(target = do_full_home_stuff, args=([city, outroot, LIMIT], ))
@@ -208,12 +219,22 @@ elif sys.argv[2] == 'home_full':
     for t in Pros:
         t.join()
 
-
+    '''
    
            
      # this has to be run only once after that loop above
+    user_nums = []
+
+
+    for LIMIT in range(20):
+
+        users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
+        user_nums.append (len(users))
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+
+
     FilterH.copy_filtered(city, outroot, bbox)
-    
+      
 ### scp janosovm@cns2.servers.ceu.edu:/mnt/cns_storage3/janosovm/UrbanSuccess/ProcessedData/london/figures/london_COMPARE_centroids_dbscan_mlhomepred.png ../ProcessedData/london/figures/
 
 
@@ -221,12 +242,21 @@ elif sys.argv[2] == 'home_full':
     for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
     ''' this compares the different methods '''
     
-    Compare.plot_final_results(city, outroot)
+    Compare.plot_final_results(city, outroot, user_nums)
 
 
 
     t2 = time.time()
     print ('Full home clustering with plots: ', t2 - t1)   
+
+
+
+
+
+
+
+
+
 
 
 

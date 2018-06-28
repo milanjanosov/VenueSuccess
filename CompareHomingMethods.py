@@ -106,7 +106,7 @@ def get_final_comp_results(city, outfolder, LIMIT_num):
 
 
 
-def plot_final_results(city, outfolder):
+def plot_final_results(city, outfolder, user_nums):
 
     files          = sorted([fff for fff in os.listdir(outfolder   + '/user_homes/comparison/') if 'csv' in fff])#+ city + '_CENTROID_COMPARISON_RES_' + str(LIMIT_num) + '.csv')
     f, ax          = plt.subplots(1, 2, figsize=(15, 7))
@@ -193,19 +193,19 @@ def plot_final_results(city, outfolder):
     ###    - HAVE CAREER LONGER THAN LIMIT
     ###    - GET A HOME LOCATION WITHIN THE CITY
     ax[0].legend(loc = 'left', fontsize = 8)    
-    ax[1].legend(loc = 'left', fontsize = 8)    
+ #   ax[1].legend(loc = 'left', fontsize = 8)    
 
    
 
-    ax[0].set_xlabel('Min. number of locations/user', fontsize = 13)
+    ax[0].set_xlabel('Number of venues/user', fontsize = 13)
     ax[0].set_ylabel('Avg distance between estimated and real residence location [km]', fontsize = 13)
-    ax[1].set_xlabel('Min. number of locations/user', fontsize = 13)
-    ax[1].set_ylabel('Avg distance between estimated and real residence location [km]', fontsize = 13)
+  #  ax[1].set_xlabel('Min. number of locations/user', fontsize = 13)
+  #  ax[1].set_ylabel('Avg distance between estimated and real residence location [km]', fontsize = 13)
     ax[0].legend(loc = 'left', fontsize = 8)
     ax[1].legend(loc = 'left', fontsize = 8)
 
 
-
+  
 
     ''' compare the ML homes with the best centroid method '''
 
@@ -268,11 +268,21 @@ def plot_final_results(city, outfolder):
 
     
 
-    ax[1].set_xlabel('Min. number of locations of users', fontsize = 13)    
-    ax[1].set_ylabel('Distance between DBScan and MLpred home locations (km)', fontsize = 13)
-    ax[1].set_title('Compare DBscan and ML', fontsize = 15)
+  #  ax[1].set_xlabel('Min. number of locations of users', fontsize = 13)    
+  #  ax[1].set_ylabel('Distance between DBScan and MLpred home locations (km)', fontsize = 13)
+  #  ax[1].set_title('Compare DBscan and ML', fontsize = 15)
     ax[0].set_title('Compare DBScan and centroids', fontsize = 15)
+
+
+    ax[1].plot(user_nums, 'bo')
+    ax[1].set_xlabel('Number of venues')
+    ax[1].set_ylabel('Number of users')
+
+
+
     ax[1].legend(loc = 'left', fontsize = 8)    
+
+
 
 
     plt.savefig(outfolder   + '/figures/' + city + '_COMPARE_centroids_dbscan_mlhomepred.png')

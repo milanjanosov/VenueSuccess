@@ -105,11 +105,11 @@ def get_users_centroids(city, outfolder, sample, LIMIT_num = 0, plot = True):
 
 
     if sample:
-        user_sample     = sorted(random.sample([uu for uu in users if len(users_coordinates[uu][0]) > LIMIT_num], 16))
+        user_sample     = sorted(random.sample([uu for uu in users if len(users_coordinates[uu][0]) == LIMIT_num], 16))
         indicies        = [(i,j) for i in range(4) for j in range(4)]
         user_sample_ind = [(user_sample[k], indicies[k][0], indicies[k][1]) for  k in range(len(user_sample))]
     else:
-        user_sample     = [uu for uu in users if len(users_coordinates[uu][0]) > LIMIT_num]
+        user_sample     = [uu for uu in users if len(users_coordinates[uu][0]) == LIMIT_num]
         user_sample_ind = [(user_sample[k], 0, 0) for  k in range(len(user_sample))]
 
 
