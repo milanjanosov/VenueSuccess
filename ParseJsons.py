@@ -36,12 +36,22 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
     users_likes_locations = {}
     venues_stats          = {}
 
+
     print(city + ' --  start parsing likes.json...')
+
+
+
+    fout = open(outfolder + '/venues_info/venues_liked_categories_times.dat', 'w')
+
 
     for ind, line in enumerate(open(infolder + city + '_likes.json', 'r')):
     
 
-        if ind % 1000 == 0: print (ind)
+
+        if ind % 1000 == 0: 
+            print (ind)
+
+        #if ind == 100: break
 
         jsono = json.loads(line)
         user  = jsono['list']['user']['id']
@@ -49,35 +59,64 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
         if str(user) in set(unknown_users + local_users):
     
 
-
-
             for item in  jsono['list']['listItems']['items']:
 
-                location = item['venue']['location']
+                venue    = item['venue']
+                location = venue['location']
                 categ    = 'na'
 
-                if item['venue']['id'] not in venues_stats:
-                    venues_stats[item['venue']['id']] = str(item['venue']['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
+                venueid  = venue['id']
+
+
+                if venueid not in venues_stats:
+                    venues_stats[venueid] = str(venue['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
 
                 try:
-                    categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
+                    categ = (venue['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
                 except:
                     pass
+
+
+                subcateg = 'na'
+                try:
+                    subcateg = (venue['categories'][0]['name'])#[0]['prefix'])
+                except:
+                    pass
+
+
+                createdAt = '0'
+                try:
+                    createdAt = str(item['createdAt'])
+                except:
+                    pass
+
+                fout.write(venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
+
 
 
                 lng = location['lng']
                 lat = location['lat']
 
-                venue = (item['venue']['id'], lng, lat, categ)
+                venue = (venueid, lng, lat, categ)
+
+
+
+
+
+               # print (venueid, categ, subcateg)
+
+
+
+
 
 
                 if check_box(boundingbox, city, lat, lng):
-                    if 'Residential' in str((item['venue'])):
+                    if 'Residential' in str((venue)):
 
                         if user not in users_homes:
-                            users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
+                            users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + venueid])
                         else:
-                            users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']))
+                            users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + venueid))
 
 
                 if (str(user) in local_users and check_box(boundingbox, city, lat, lng)) or (str(user) in unknown_users):
@@ -88,12 +127,143 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
                         users_likes_locations[user].append(venue)
       
 
+    fout.close()
+
     f = open(outfolder + '/venues_info/' + city + '_liked_venues_stats.dat', 'w')
     for v, stat in venues_stats.items():
         f.write(v + '\t' + stat + '\n')
     f.close()
 
     return users_likes_locations
+
+
+
+
+
+'''  ---------------------------------------------------------  '''
+'''  harness the locations of places which from the users piced '''
+'''  ---------------------------------------------------------  '''
+
+def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
+
+
+    users_photos  = {}
+    venues_stats  = {}
+
+
+    fout = open(outfolder + '/venues_info/venues_photod_categories_times.dat', 'w')
+
+    print(city + ' --  start parsing photos.json...')
+
+    for ind, line in enumerate(open(infolder + city + '_photos.json', 'r')):
+
+        if ind % 1000 == 0: print (ind)
+
+        #if ind == 100: break
+
+
+        jsono = json.loads(line)
+
+        count = jsono['totalCount']
+        user  = jsono['id']
+
+
+        if str(user) in set(unknown_users + local_users) and count > 0:
+
+
+
+            for index, item in enumerate(jsono['photos']['items']):
+
+                if 'venue' in item:
+
+                    venue    = item['venue']
+                    venueid  = venue['id']
+                    location = venue['location']
+
+
+                    if venueid not in venues_stats:
+                        venues_stats[venueid] = str(venue['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
+
+
+
+                    categ = 'na'
+                    try:
+                        categ = (venue['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
+                    except:
+                        pass
+
+
+                    subcateg = 'na'
+                    try:
+                        subcateg = (venue['categories'][0]['name'])#[0]['prefix'])
+                    except:
+                        pass
+
+
+                    createdAt = '0'
+                    try:
+                        createdAt = str(item['createdAt'])
+                    except:
+                        pass
+
+                    fout.write(venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
+
+
+
+
+                    lng = venue['location']['lng']
+                    lat = venue['location']['lat']
+
+
+                    try:
+
+                        if check_box(boundingbox, city, lat, lng):
+                            if 'Residential' in venue['categories'][0]['shortName']:
+                            
+                               if check_box(boundingbox, city, lat, lng):        
+                                
+                                   if user not in users_homes:
+                                        users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + venueid])
+                                   else:
+                                        users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + venueid))
+
+                    except: 
+                        pass
+
+
+
+                    photo = (venueid, lng, lat, categ )  
+
+                    if (str(user) in local_users and check_box(boundingbox, city, lat, lng)) or (str(user) in unknown_users):
+                
+                        if user not in users_photos:
+                            users_photos[user] = [photo]
+                        else:
+                            users_photos[user].append(photo)
+
+
+    fout.close()
+
+
+    f = open(outfolder + '/venues_info/' + city + '_photoed_venues_stats.dat', 'w')
+    for v, stat in venues_stats.items():
+        f.write(v + '\t' + stat + '\n')
+    f.close()
+
+
+
+    return users_photos
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -110,10 +280,17 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
 
     print(city + ' --  start parsing tips.json...')
 
+
+
+    fout = open(outfolder + '/venues_info/venues_tipped_categories_times.dat', 'w')
+
+
     for ind, line in enumerate(open(infolder + city + '_tips.json', 'r')):
 
 
         if ind % 1000 == 0: print (ind)
+
+        #if ind == 100: break
 
 
         jsono = json.loads(line)
@@ -123,35 +300,55 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
 
             for item in jsono['list']['listItems']['items']:
 
-                lng = item['venue']['location']['lng']
-                lat = item['venue']['location']['lat']
+                venue   = item['venue']
+                venueid = venue['id']
+
+                lng = venue['location']['lng']
+                lat = venue['location']['lat']
 
                 try:
-                    if 'Residential' in item['venue']['categories'][0]['shortName']:
+                    if 'Residential' in venue['categories'][0]['shortName']:
                     
                         if check_box(boundingbox, city, lat, lng):
                             
                             if user not in users_homes:
-                                users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
+                                users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + venueid])
                             else:
-                                users_homes[user].add((str(lng)   + '\t' + str(lat) + '\t' + item['venue']['id']))
+                                users_homes[user].add((str(lng)   + '\t' + str(lat) + '\t' + venueid))
 
                 except: 
                     pass
 
 
-                if item['venue']['id'] not in venues_stats:
-                    venues_stats[item['venue']['id']] = str(item['venue']['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
+                if venueid not in venues_stats:
+                    venues_stats[venueid] = str(venue['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
 
 
                 categ = 'na'
                 try:
-                    categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
+                    categ = (venue['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
                 except:
                     pass
 
 
-                tip = (item['venue']['id'], lng, lat, categ )  
+                subcateg = 'na'
+                try:
+                    subcateg = (venue['categories'][0]['name'])#[0]['prefix'])
+                except:
+                    pass
+
+
+                createdAt = '0'
+                try:
+                    createdAt = str(item['createdAt'])
+                except:
+                    pass
+
+                fout.write(venueid + '\t' + categ + '\t' + subcateg + '\t' + createdAt + '\n')
+
+
+
+                tip = (venueid, lng, lat, categ )  
 
 
                 if (str(user) in local_users and check_box(boundingbox, city, lat, lng)) or (str(user) in unknown_users):
@@ -161,6 +358,8 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
                     else:
                         users_tips[user].append(tip)
 
+
+    fout.close()
 
     f = open(outfolder + '/venues_info/' + city + '_tipped_venues_stats.dat', 'w')
     for v, stat in venues_stats.items():
@@ -173,95 +372,22 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
 
 
 
+
 '''  ---------------------------------------------------------  '''
-'''  harness the locations of places which from the users piced '''
+'''                 merge venue categories                      '''
 '''  ---------------------------------------------------------  '''
 
-def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox, infolder, outfolder, users_homes):
+'''def merge_venue_categories_stuff( city, infolder, outfolder):
 
 
-    users_photos  = {}
-    venues_stats  = {}
-
-    print(city + ' --  start parsing photos.json...')
-
-    for ind, line in enumerate(open(infolder + city + '_photos.json', 'r')):
-
-        if ind % 1000 == 0: print (ind)
-
-        jsono = json.loads(line)
-
-        count = jsono['totalCount']
-        user  = jsono['id']
+    files = [   outfolder + '/venues_info/venues_tipped_categories_times.dat',
+                outfolder + '/venues_info/venues_photod_categories_times.dat',
+                outfolder + '/venues_info/venues_liked_categories_times.dat']
 
 
-        if str(user) in set(unknown_users + local_users) and count > 0:
+    lines = set()
 
-
-
-            for index, item in enumerate(jsono['photos']['items']):
-
-                if 'venue' in item:
-
-                    location = item['venue']['location']
-
-
-                    if item['venue']['id'] not in venues_stats:
-                        venues_stats[item['venue']['id']] = str(item['venue']['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
-
-
-
-                    categ = 'na'
-                    try:
-                        categ = (item['venue']['categories'][0]['icon']['prefix'].split('v2')[1].split('/')[1])#[0]['prefix'])
-                    except:
-                        pass
-
-
-                    lng = item['venue']['location']['lng']
-                    lat = item['venue']['location']['lat']
-
-
-                    try:
-
-                        if check_box(boundingbox, city, lat, lng):
-                            if 'Residential' in item['venue']['categories'][0]['shortName']:
-                            
-                               if check_box(boundingbox, city, lat, lng):        
-                                
-                                   if user not in users_homes:
-                                        users_homes[user] = set([str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']])
-                                   else:
-                                        users_homes[user].add((str(lng) + '\t' + str(lat) + '\t' + item['venue']['id']))
-
-                    except: 
-                        pass
-
-                    #if check_box(boundingbox, city, lat, lng):
-
-                    photo = (item['venue']['id'], lng, lat, categ )  
-
-                    if (str(user) in local_users and check_box(boundingbox, city, lat, lng)) or (str(user) in unknown_users):
-                
-                        if user not in users_photos:
-                            users_photos[user] = [photo]
-                        else:
-                            users_photos[user].append(photo)
-
-
-
-    f = open(outfolder + '/venues_info/' + city + '_photoed_venues_stats.dat', 'w')
-    for v, stat in venues_stats.items():
-        f.write(v + '\t' + stat + '\n')
-    f.close()
-
-
-
-    return users_photos
-
-
-
-
+'''
 
 '''  ---------------------------------------------------------  '''
 '''   list the friends of all the users for the friendship nw   '''
