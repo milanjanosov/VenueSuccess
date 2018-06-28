@@ -115,7 +115,7 @@ def get_venues_coordinates(city, outfolder):
             venues_coordinates[v[0]] = (float(v[1]), float(v[2]))
 
 
-    print ('Venue coordinates parsed\t', time.time-() - t1)
+    print ('Venue coordinates parsed\t', time.time() - t1)
     return venues_coordinates
 
 
@@ -186,7 +186,7 @@ def get_venues_users(outfolder, city):
         venues_users[venue] = users
         
 
-    print ('Venues user lists parsed\t', time.time-() - t1)
+    print ('Venues user lists parsed\t', time.time() - t1)
     return venues_users
  
     
@@ -212,7 +212,7 @@ def get_edge_weights2(city, outfolder, venues_users, lsoa_venues):
                     if w > 0:
                         edges_weights2[edge] = w             
 
-    print ('Venues similarity network edges parsed\t', time.time-() - t1)
+    print ('Venues similarity network edges parsed\t', time.time() - t1)
     return edges_weights2
         
     
@@ -225,7 +225,6 @@ def get_node_edge_list(edges_weights):
     t1 = time.time()
     print ('Listing each nodes neighbours and those edge weights...')
 
-    print (edges_weights)
 
     # for each node list the edges (weights) in which they are present
     nodes_edge_weights = {}
@@ -287,7 +286,7 @@ def get_users_friends(outfolder, city):
             else:
                 friends_list[target].append(source)
 
-    print ('Users friends parsed\t', time.time-() - t1)
+    print ('Users friends parsed\t', time.time() - t1)
     return friends_list
         
 
@@ -369,9 +368,6 @@ def get_users_lsoa(city, outroot, cityshape):
             lsoa_users[lsoa].append(user)
          
         
-       
-        #if ind == 10: break
-        #if lsoa not in lsoa_users:
  
     print('users within lsoa...\t', time.time() - t1)
 
@@ -389,9 +385,7 @@ def friendships_within_lsoa(lsoa_users, friends_list):
     for lsoa, users in lsoa_users.items():
         for user in users:
             users_lsoa[user] = lsoa
-        
-  #  for user, lsoa in users_lsoa.items():
-  #      print user,lsoa
+
         
     lsoa_friendships = {}    
         
@@ -415,8 +409,7 @@ def friendships_within_lsoa(lsoa_users, friends_list):
                         else:
                             lsoa_friendships[user_lsoa].add(friendship)
 
-        else:
-            print (user)
+    
 
                     
         
