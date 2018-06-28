@@ -116,7 +116,7 @@ def get_venues_coordinates(city, outfolder):
 '''              get the venues within lsoa-s                   '''
 ''' =========================================================== '''
 
-def get_lsoa_venues(cityshape, venues_coordinates):
+def get_lsoa_venues(cityshape, venues_coordinates, bbox):
 
     print ('Converting (lat, long) to LSOA-s...')
     
@@ -575,7 +575,7 @@ def get_lsoa_level_networks( city, outfolder, bbox ):
 
     cityshape                   = load_shp(city)
     venues_coordinates          = get_venues_coordinates(city, outfolder)
-    lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates)
+    lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates, bbox)
 
 
     '''venues_users           = get_venues_users(outfolder, city)
