@@ -711,7 +711,7 @@ def get_users_distance_distr_from_home(city, outfolder):
 
 
 
-    ax[1].hist([d for d in users_num_homes if d < 50], bins = 60)
+    ax[1].hist([d for d in users_num_homes if d < 50], bins = 20)
     ax[1].set_xlabel('Users\'s number of venues', fontsize = 12)
     ax[1].set_yscale('log')
 
