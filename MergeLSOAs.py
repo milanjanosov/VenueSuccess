@@ -187,12 +187,6 @@ def chunkIt(seq, num):
 
 
 
-
-
-
-
-
-
 def get_lsoas_paralel(args):
     
 
@@ -287,45 +281,7 @@ def get_lsoa_venues(cityshape, venues_coordinates, bbox, city, outfolder_):
     fout.close()
             
 
-
-
-
-    '''for ind, (v, c) in enumerate(venues_coordinates.items()):
-
-
-        lat = float(c[1])
-        lng = float(c[0])
-    
-
-        if check_box(bbox, city, lat, lng):
-
-            lsoa, polygon = coordinates_to_lsoa( lat, lng, cityshape )
-
-            if lsoa != 0:          
-                       
-                if lsoa not in lsoa_polygons:
-                    lsoa_polygons[lsoa] = polygon    
-                
-                if lsoa not in lsoa_venues:
-                    lsoa_venues[lsoa] = [v]
-                else:
-                    lsoa_venues[lsoa].append(v)
-
-    print ('Coordinates converted to LSOA-s\t', time.time() - t1)
-    '''
     return lsoa_venues, lsoa_polygons
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -506,7 +462,7 @@ def get_friendship_ties_within_lsoa(lsoa_venues, venues_users, friends_list):
 ''' =========================================================== '''
 
 
-def get_users_lsoa(city, outroot, cityshape):
+def get_users_lsoa_old(city, outroot, cityshape):
     
     
     t1 = time.time()
@@ -519,7 +475,7 @@ def get_users_lsoa(city, outroot, cityshape):
 
     lsoa_users = {}
 
-  
+
 
     for ind, line in enumerate(open(infile)):
         user, lng, lat = line.strip().split('\t')
@@ -534,12 +490,106 @@ def get_users_lsoa(city, outroot, cityshape):
             lsoa_users[lsoa] = [user]
         else:
             lsoa_users[lsoa].append(user)
-         
-        
+ 
  
     print('users within lsoa...\t', time.time() - t1)
 
     return lsoa_users
+
+
+
+
+#####################################################################################
+
+
+
+def get_user_lsoas_paralel(args):
+    
+
+    user_coord_chunks = args[0]
+    cityshape         = args[1]
+    thread_id         = args[2]
+    city              = args[3]
+    outfolder         = args[4]
+    nnn               = len(user_coord_chunks)
+
+
+    fout = open(outfolder + '/venue_lsoa_attributes_' + str(thread_id), 'w')
+
+    for ind, (user, coord) in enumerate(user_coord_chunks.items()):
+
+        #if ind == 50: break
+        if ind % 100 == 0: 
+            print (thread_id, '\t', ind, '/', nnn)
+
+        lat = float(coord[1])
+        lng = float(coord[0])
+
+
+        pnt      = Point(lng, lat)        
+        query_df = cityshape[cityshape.contains(pnt)]
+
+        if query_df.shape[0] == 1:
+            lsoa = query_df.iloc[0]['lsoa11cd']
+            fout.write (user + '\t' + lsoa + '\n')
+
+    fout.close()
+
+
+
+def get_users_lsoa(city, outroot, cityshape):
+    
+  
+    print ('Get users lsoa...')
+
+    eps       = 0.01
+    mins      = 3
+    LIMIT_num = 0
+    infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'
+
+    users_homes = {}
+    for ind, line in enumerate(open(infile)):
+        user, lng, lat    = line.strip().split('\t')
+        users_homes[user] = (float(lng), float(lat))
+
+
+
+    num_threads  = 40
+    users        = list(users_homes.keys())
+    users_chunks = chunkIt(users, num_threads)
+
+
+
+    outfolder = outroot + '/user_info/lsoa_user_temp/' # + city + '_venues_users.dat'
+    if not os.path.exists(outfolder):
+        os.makedirs(outfolder)
+
+
+
+
+    Pros = [] 
+    for i in range(0,num_threads):  
+        user_coord_chunks = {k : users_homes[k] for k in users_chunks[i] }
+        p = Process(target = get_user_lsoas_paralel, args=([user_coord_chunks, cityshape, i, city, outfolder], ))
+        Pros.append(p)
+        p.start()
+       
+    for t in Pros:
+        t.join()
+
+
+
+    files = os.listdir(outfolder)
+    fout  = open(outroot  + '/user_info/user_lsoas.dat', 'w')
+    fout.write('user\tlsoa\n')
+    for fn in files:
+        for line in open(outfolder + '/' + fn):
+            fout.write(line)
+    fout.close()
+            
+
+
+
 
 
 
@@ -758,8 +808,16 @@ def get_venues_features(lsoa_polygons,lsoa_local_friendships, lsoa_users, lsoa_v
 
     
 
+
+def get_venue_lsoa_attributes(city, outfolder, bbox):
     
-    
+
+    cityshape                   = load_shp(city)
+    #venues_coordinates          = get_venues_coordinates(city, outfolder)
+    #lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates, bbox, city, outfolder)
+
+
+    lsoa_users             = get_users_lsoa(city, outfolder, cityshape)    
 
 
 def get_lsoa_level_networks( city, outfolder, bbox ):
@@ -769,16 +827,20 @@ def get_lsoa_level_networks( city, outfolder, bbox ):
 
     print ('================================\n==-- Start LSOA level stuff --==\n')
 
-    cityshape                   = load_shp(city)
-    venues_coordinates          = get_venues_coordinates(city, outfolder)
-    lsoa_venues, lsoa_polygons  = get_lsoa_venues(cityshape, venues_coordinates, bbox, city, outfolder)
+    get_venue_lsoa_attributes(city, outfolder, bbox)
 
+
+
+
+
+
+ 
 
     '''venues_users           = get_venues_users(outfolder, city)
     all_venues             = set([venue for venues in lsoa_venues.values() for venue in venues])
     edges_weights          = get_edge_weights2(city, outfolder, venues_users, lsoa_venues)    # node1_node2 -> weight
     nodes_edge_weights     = get_node_edge_list(edges_weights)     # node0 -> [(node1, w1), (node2, w2), ...]
-    lsoa_users             = get_users_lsoa(city, outfolder, cityshape)
+
 
     lsoa_edges   = get_lsoa_mininw_edges(lsoa_venues, edges_weights  )    # edges within the mini lsoa level networks
     venues_users = get_venues_users(outfolder, city)   
