@@ -954,7 +954,7 @@ def get_weight_distr(outfolder, outname):
 
 
 
-    fout = open('figures/network_data/weight_distribution_' + outname + '.dat', 'w'):
+    fout = open('figures/network_data/weight_distribution_' + outname + '.dat', 'w')
     for w in weights:
         fout.write(str(w) + '\n')
     fout.close()
