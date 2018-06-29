@@ -49,8 +49,12 @@ def get_homes_from_methods(city, outfolder, LIMIT_num):
     methods_homes = {}
     for fn in files:
 
+
+
         method      = fn.split('homes_')[1].replace('_' + str(LIMIT_num) + '.dat' ,'').split('_filtered')[0]
         users_homes = get_users_homes(fn, city, outfolder)
+
+      
 
   
         for user, home in users_homes.items():
@@ -74,11 +78,18 @@ def get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfol
 
     homedistances_users_methods = {}
 
+
+    print(len(groundtruth_homes))
+
     for user, home in groundtruth_homes.items():
         if user in methods_homes:
             for method, home_ in methods_homes[user].items():
                 if user not in homedistances_users_methods:
                     homedistances_users_methods[user] = {}
+
+                dist =  mpu.haversine_distance((home[1], home[0]), (home_[1], home_[0])) 
+
+
 
                 homedistances_users_methods[user][method] =  mpu.haversine_distance((home[1], home[0]), (home_[1], home_[0])) 
 
@@ -98,6 +109,9 @@ def get_final_comp_results(city, outfolder, LIMIT_num):
 
     df_res = pd.DataFrame()
     df_res['Averages'] = distance_from_groundtruth.mean(axis=0)
+
+    #print ('RES  ', df_res)
+
     #df_res['Stdevs']   = distance_from_groundtruth.std(axis=0)
 
     df_res.to_csv(outfolder + '/user_homes/comparison/' + city + '_CENTROID_COMPARISON_RES_' + str(LIMIT_num) + '.csv', sep = ',', float_format='%.3f')
@@ -137,7 +151,19 @@ def plot_final_results(city, outfolder, user_nums):
                 avg = float(avg)
                 #std = float(std)
 
-                if 'dbscan' in method:
+                
+
+                if 'dbscan' in method and 'weight' not in method:
+
+                    method, index = method.rsplit('_',  1)
+                    if method not in methods_series_dbscan:
+                        methods_series_dbscan[method] = [(float(index), avg)]
+                    else:
+                        methods_series_dbscan[method].append((float(index), avg))
+
+                elif 'weight' in method:
+
+                  
 
                     method, index = method.rsplit('_',  1)
                     if method not in methods_series_dbscan:
@@ -209,7 +235,7 @@ def plot_final_results(city, outfolder, user_nums):
 
     ''' compare the ML homes with the best centroid method '''
 
-    best_method = 'dbscan_0.01_3'
+    '''best_method = 'dbscan_0.01_3'
     ML_folder   = outfolder + '/user_homes/MLhomes_filtered/'
     ML_files    = os.listdir(ML_folder)
 
@@ -265,7 +291,7 @@ def plot_final_results(city, outfolder, user_nums):
         ind, dist = zip(*data)
 
         ax[1].plot(ind, dist, 'o-', label = c)
-
+    '''
     
 
   #  ax[1].set_xlabel('Min. number of locations of users', fontsize = 13)    
@@ -285,10 +311,10 @@ def plot_final_results(city, outfolder, user_nums):
 
 
 
-    plt.savefig(outfolder   + '/figures/' + city + '_COMPARE_centroids_dbscan_mlhomepred.png')
+    #plt.savefig(outfolder   + '/figures/' + city + '_COMPARE_centroids_dbscan_mlhomepred.png')
     print ('Figure saved.')
-    plt.close()
-    #plt.show() 
+    #plt.close()
+ #   plt.show() 
 
 
 
