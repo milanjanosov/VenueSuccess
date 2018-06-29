@@ -235,7 +235,7 @@ elif sys.argv[2] == 'home_full':
 
         users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
         user_nums.append (len(users))
-        print(len(users))
+        print(LIMIT)
         Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
         Home.get_db_centroids_weighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
 

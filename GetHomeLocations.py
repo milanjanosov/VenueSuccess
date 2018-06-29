@@ -333,8 +333,7 @@ def get_users_coordinates_db2(city, outfolder):
         cat_freq[cat] = int(round(freq/minfreq))
 
 
-    print(cat_freq)
-
+ 
 
 
 
@@ -507,7 +506,7 @@ def get_db_centroids_subcatweighted(user_sample, city, outfolder, sample, LIMIT_
     
         try:
 
-            print(ind, nn)
+           # print(ind, nn)
 
             c     = users_coordinates[user]  
             x     = np.asarray(users_coordinates[user])  
@@ -578,8 +577,8 @@ def get_users_coordinates_db3(city, outfolder):
 
 
 
-    for user, likes in users_coordinates.items():
-        print (user, likes)
+#    for user, likes in users_coordinates.items():
+#        print (user, likes)
 
 
     for line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):  # bristol
@@ -713,10 +712,6 @@ def get_users_coordinates_db4(city, outfolder):
 
 
 
-    for user, likes in users_coordinates.items():
-        print (user, likes)
-
-
     for line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):  # bristol
         if 'userid' not in line:
             fields = line.strip().split('\t')
@@ -842,8 +837,8 @@ def get_users_coordinates_db5(city, outfolder):
 
 
 
-    for user, likes in users_coordinates.items():
-        print (user, likes)
+#    for user, likes in users_coordinates.items():
+#        print (user, likes)
 
 
     for line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):  # bristol
