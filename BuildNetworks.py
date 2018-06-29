@@ -953,14 +953,22 @@ def get_weight_distr(outfolder, outname):
             weights.append(w)
 
 
-    plt.title('Weight distribution of ' + outname)
+
+    fout = open('figures/network_data/weight_distribution_' + outname + '.dat', 'w'):
+    for w in weights:
+        fout.write(str(w) + '\n')
+    fout.close()
+
+
+
+    '''plt.title('Weight distribution of ' + outname)
     plt.hist(weights, bins = 30, alpha = 0.8)
 
     #plt.xscale('log')
     plt.yscale('log')
     plt.savefig(outroot + 'figures/network_data/weight_distribution_' + outname + '.png')
     #plt.show()
-
+    '''
 
 
 
@@ -1049,7 +1057,7 @@ if __name__ == '__main__':
 #            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
 
 
-            get_weight_distr(outroot, city + '_users_similarity')
+            get_weight_distr(outroot, city + '_venues_similarity')
 
             #G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile)
             #calc_network_centralities(G_venues_NC,   outroot, city, infile, 'venues_similarity_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
