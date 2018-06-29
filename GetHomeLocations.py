@@ -4,6 +4,7 @@ import mpu
 import os
 import random
 import sys
+import datetime
 import time
 import itertools
 from sklearn.cluster import DBSCAN
@@ -272,7 +273,7 @@ def get_db_centroids(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 
         c     = users_coordinates[user]  
         x     = np.asarray(users_coordinates[user])  
 
-        print(x)
+    
 
         centr = doDBSCAN(x, ax[i,j], sample, eps, mins, user)  
 
@@ -525,6 +526,143 @@ def get_db_centroids_subcatweighted(user_sample, city, outfolder, sample, LIMIT_
     fout.close()
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''  ---------------------------------------------------------  '''
+'''          GET TIMESTAMP STUFF            '''
+'''  ---------------------------------------------------------  '''
+
+
+
+def get_users_coordinates_db3(city, outfolder):
+
+
+    #fout = ,    'w')
+    #gout = 
+
+    user_venue_times  = {}
+    users_coordinates = {}
+
+    
+    # get the checkins
+
+    for ind, line in enumerate(open(outfolder + '/venues_info/venues_all_categories_times.dat')):
+
+#        if ind == 1000: break
+
+        user, venue, cat, subcat, time = line.strip().split('\t')
+
+        time = datetime.datetime.fromtimestamp(float(time)).hour 
+
+
+        if time > 5 and time < 10:
+    
+            if user not in users_coordinates:
+                user_venue_times[user] = set()
+
+            user_venue_times[user].add(venue)
+
+
+
+    for user, likes in users_coordinates.items():
+        print (user, likes)
+
+
+    for line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):  # bristol
+        if 'userid' not in line:
+            fields = line.strip().split('\t')
+            user   = fields[0]
+
+            if user in user_venue_times and  len(fields[1:]) > 0:
+
+
+             
+              #  print ([tuple([float(fff.split(',')[1]), float(fff.split(',')[2])]) for fff in fields[1:]])
+
+                for loc in fields[1:]:
+
+                    loc   = loc.split(',')
+                    venue = loc[0]
+
+
+                    if venue in user_venue_times[user]:   
+                        if user not in users_coordinates:
+                            users_coordinates[user] = []
+                        users_coordinates[user].append(tuple([float(loc[1]), float(loc[2])])  )
+                        
+                    
+
+                # [(-2.4662153942601517, 51.45234914060858), (-2.532477378845215, 51.495198321561936), (-2.598414, 51.422593)]
+
+                #users_coordinates[fields[0]] = [tuple([float(fff.split(',')[1]), float(fff.split(',')[2])]) for fff in fields[1:]]
+            
+    
+
+
+    return users_coordinates
+
+
+
+
+def get_db_centroids_morning(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 0.01, mins = 3):
+      
+
+    fout              = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_6am_10am_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat', 'w')
+    users_coordinates = get_users_coordinates_db3(city, outfolder)    
+
+
+    print('Start doing MORNING - eps = ' + str(eps) + ' ...')
+
+    nn = len(user_sample)
+
+    for ind, (user, i, j) in enumerate(user_sample):
+    
+        if 2 == 2:
+        #try:
+
+           # print(ind, nn)
+
+            if user in users_coordinates:
+
+                c     = users_coordinates[user]  
+                x     = np.asarray(users_coordinates[user])  
+
+               # print('LIMIT', ind, user,  len(c))
+
+                centr = doDBSCAN(x, [], sample, eps, mins, user)  
+
+                
+
+                if len(centr) == 0:
+                    centr = get_centroids( list(zip(*c)) )   
+                    
+                fout.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
+                
+       # except:
+       #     pass    
+
+
+    fout.close()
+
+    
+
+
+
+
 
 
 
