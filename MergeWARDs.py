@@ -160,14 +160,16 @@ def get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder_):
 
 
 
+    wards = set()
     files = os.listdir(outfolder)
     fout  = open(outfolder_  + '/venues_info/venues_ward_full.dat', 'w')
     fout.write('venue\tlng\tlat\ward\tlng0\tlat0\tlng1\tlat1\tlength\tarea\n')
     for fn in files:
+        wards.add(line.strip().split('\t')[3])
         for line in open(outfolder + '/' + fn):
             fout.write(line)
     fout.close()
-            
+    print('Number of WARDS: ', len(wards))
 
     return ward_venues, ward_polygons
 
@@ -331,7 +333,7 @@ def get_user_wards_paralel(args):
         query_df = cityshape[cityshape.contains(pnt)]
 
         if query_df.shape[0] == 1:
-            ward = query_df.iloc[0]['ward11cd']
+            ward = query_df.iloc[0]['GSS_CODE']
             fout.write (user + '\t' + ward + '\n')
 
     fout.close()
