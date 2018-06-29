@@ -943,6 +943,25 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
 '''
 
 
+def get_weight_distr(outfolder, outname):
+
+    weights = []
+
+    for line in open(outfolder + 'networks/gephi/' + outname + '_edges.dat'):
+        if 'Source' not in line:
+            w = float(line.strip().split('\t')[3])
+            weights.append(w)
+
+
+    plt.title('Weight distribution of ' + outname)
+    plt.hist(weights, bins = 30, alpha = 0.8)
+
+    #plt.xscale('log')
+    plt.yscale('log')
+    plt.savefig(outroot + 'figures/network_data/weight_distribution_' + outname + '.png')
+    #plt.show()
+
+
 
 
 if __name__ == '__main__': 
@@ -1002,11 +1021,14 @@ if __name__ == '__main__':
 
 
 #            transform_gephi_to_backbone(outroot, city + '_users_similarity')
-            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
-            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
 
-            G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
-            calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
+            get_weight_distr(outroot, city + '_users_similarity')
+
+           # G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
+           # calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
+
+ #           G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
+  #          calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
 
 
 
@@ -1026,11 +1048,14 @@ if __name__ == '__main__':
             '''     
 #            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
 
-            G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile)
-            calc_network_centralities(G_venues_NC,   outroot, city, infile, 'venues_similarity_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
 
-            G_venues_DF = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'DF', infile)
-            calc_network_centralities(G_venues_DF,   outroot, city, infile, 'venues_similarity_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
+            get_weight_distr(outroot, city + '_users_similarity')
+
+            #G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile)
+            #calc_network_centralities(G_venues_NC,   outroot, city, infile, 'venues_similarity_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
+
+            #G_venues_DF = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'DF', infile)
+            #calc_network_centralities(G_venues_DF,   outroot, city, infile, 'venues_similarity_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
 
 
 
