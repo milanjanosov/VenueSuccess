@@ -139,7 +139,7 @@ if sys.argv[2] == 'preproc':
 
 
 
-#    ParseJsons.merge_venue_categories_stuff( city, inroot, outroot)
+    ParseJsons.merge_venue_categories_stuff( city, inroot, outroot)
 
 
     ParseJsons.get_category_stat( city, inroot, outroot)

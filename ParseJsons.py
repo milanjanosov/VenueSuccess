@@ -7,7 +7,7 @@ import mpu
 import gzip
 import pandas as pd
 import matplotlib.pyplot as plt
-
+from collections import Counter
 
 
 
@@ -377,7 +377,7 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
 '''                 merge venue categories                      '''
 '''  ---------------------------------------------------------  '''
 
-'''def merge_venue_categories_stuff( city, infolder, outfolder):
+def merge_venue_categories_stuff( city, infolder, outfolder):
 
 
     files = [   outfolder + '/venues_info/venues_tipped_categories_times.dat',
@@ -387,7 +387,61 @@ def get_tips_locations_and_users(unknown_users, local_users, city, boundingbox, 
 
     lines = set()
 
-'''
+    for fn in files:
+        for line in open(fn):
+            lines.add(line)
+
+
+    lines = list(lines)
+
+    outf =  open(outfolder + '/venues_info/venues_all_categories_times.dat', 'w')
+    for line in lines:
+        outf.write(line)
+    outf.close()
+
+
+
+def get_category_stat( city, infolder, outfolder):
+
+
+    venues_cats    = {}
+    venues_subcats = {}
+
+    for line in open(outfolder + '/venues_info/venues_all_categories_times.dat'):
+        user, venue, cat, subcat, time = line.strip().split('\t')
+
+        venues_cats[venue]    = cat
+        venues_subcats[venue] = subcat
+
+
+
+    CNT_cat    = Counter(list(venues_cats.values()))
+    CNT_subcat = Counter(list(venues_subcats.values()))
+
+    n_cat    = float(sum(CNT_cat.values()))
+    n_subcat = float(sum(CNT_subcat.values()))
+
+
+    fout = open(outfolder + '/venues_info/venues_category_frequency.dat',    'w')
+    gout = open(outfolder + '/venues_info/venues_subcategory_frequency.dat', 'w')
+
+
+    for item, freq in CNT_cat.items():
+        fout.write (item + '\t' + str(freq) + '\t' + str(n_cat) + '\t' + str(freq / n_cat) + '\n')
+
+
+    for item, freq in CNT_subcat.items():
+        gout.write (item + '\t' + str(freq) + '\t' + str(n_cat) + '\t' + str(freq / n_subcat) + '\n')
+
+
+
+
+    fout.close()
+    gout.close()
+    
+   # print (Counter(list(venues_subcats.values())))
+
+
 
 '''  ---------------------------------------------------------  '''
 '''   list the friends of all the users for the friendship nw   '''
