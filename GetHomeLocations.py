@@ -889,7 +889,7 @@ def get_db_centroids_off_work(user_sample, city, outfolder, sample, LIMIT_num = 
     users_coordinates = get_users_coordinates_db5(city, outfolder)    
 
 
-    print('Start doing EVENING - eps = ' + str(eps) + ' ...')
+    print('Start doing OFFWORK - eps = ' + str(eps) + ' ...')
 
     nn = len(user_sample)
 
