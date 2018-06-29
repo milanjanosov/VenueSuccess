@@ -12,24 +12,13 @@ from geopandas.geoseries import Point
 '''             load the shapefile of UK                        '''
 ''' =========================================================== '''
 
-'''def load_shp(city):
-    
-    print ('Loading the shapefile...')
-    ward_shp_df = gpd.read_file('full2/england_ward_2011_gen.shp')
 
-    if 'london' == city:
-        
-
-    return ward_shp_df[ward_shp_df['name'].str.contains(city.title())].to_crs({'init': 'epsg:4326'})  
-
-'''
 def load_shp(city):
     
     t1 = time.time()
 
     print ('Loading the WARD shapefile...')
-    ward_shp_df = gpd.read_file('wards/London-wards-2014_ESRI/London_Ward.shp')
-    #return ward_shp_df[ward_shp_df['name'].str.contains(city.title())].to_crs({'init': 'epsg:4326'})  
+    ward_shp_df = gpd.read_file('wards/London-wards-2014_ESRI/London_Ward.shp').to_crs({'init': 'epsg:4326'})  
     print ('Shapefile loaded\t', time.time() - t1)
     return ward_shp_df
 
@@ -37,65 +26,9 @@ def load_shp(city):
 
 
 
-''' ========================================================================== '''
-''' get the ward id and the polygon of each coordinate (if its within the city '''
-''' ========================================================================== '''
-
-'''def coordinates_to_ward(lats, lons, cityshape):
-    
-    poly = (0,0)
-    
-    try:
-        pnt = Point(lons, lats)
-        query_df = cityshape[cityshape.contains(pnt)]
-        if query_df.shape[0] == 1:
-            poly = (query_df.iloc[0]['name'], query_df.iloc[0]['geometry'])
-    except Exception as exception:
-        pass
-    
-    return poly
-
-
-'''
-
-
-def coordinates_to_ward(lats, lons, cityshape):
-    
-    poly = (0,0)
-    
-    try:
-        pnt = Point(lons, lats)
-        query_df = cityshape[cityshape.contains(pnt)]
-        if query_df.shape[0] == 1:
-            poly = (query_df.iloc[0]['ward11cd'], query_df.iloc[0]['geometry'])
-    except Exception as exception:
-        pass
-    
-    return poly
-
-
 ''' =========================================================== '''
 '''          parse the coordinates of the 4sqr venues           '''
 ''' =========================================================== '''
-
-'''def get_venues_coordinates(city, outfolder):
-
-    print ('Parsing venue coordinates...')
-
-    venues_coordinates = {}
-
-    for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat')):
-        #if ind == 10: break
-        fields = line.strip().split('\t')
-        venues = [fff.split(',') for fff in fields[1:]]
-
-        for v in venues:
-            venues_coordinates[v[0]] = (float(v[1]), float(v[2]))
-
-    return venues_coordinates
-
-'''
-
 
 def get_venues_coordinates(city, outfolder):
 
@@ -126,51 +59,6 @@ def get_venues_coordinates(city, outfolder):
 ''' =========================================================== '''
 '''              get the venues within ward-s                   '''
 ''' =========================================================== '''
-
-def get_ward_venues_old(cityshape, venues_coordinates, bbox, city):
-
-    t1 = time.time()
-    print ('Converting (lat, long) to ward-s...')
-    
-    ward_venues  = {}
-    ward_polygons = {}
-
-    nnn = len(venues_coordinates)
-
-
-
-    for ind, (v, c) in enumerate(venues_coordinates.items()):
-
-
-        lat = float(c[1])
-        lng = float(c[0])
-    
-
-        if check_box(bbox, city, lat, lng):
-
-            ward, polygon = coordinates_to_ward( lat, lng, cityshape )
-
-            if ward != 0:          
-                       
-                if ward not in ward_polygons:
-                    ward_polygons[ward] = polygon    
-                
-                if ward not in ward_venues:
-                    ward_venues[ward] = [v]
-                else:
-                    ward_venues[ward].append(v)
-
-    print ('Coordinates converted to ward-s\t', time.time() - t1)
-
-    return ward_venues, ward_polygons
-
-
-
-
-
-
-
-########################################################################
 
 
 def chunkIt(seq, num):
@@ -217,7 +105,7 @@ def get_wards_paralel(args):
 
 
                 try:
-                    ward, polygon = (query_df.iloc[0]['ward11cd'], query_df.iloc[0]['geometry'])
+                    ward, polygon = (query_df.iloc[0]['GSS_CODE'], query_df.iloc[0]['geometry'])
 
                     bounds  = polygon.bounds
                     lng0    = str(bounds[0])
@@ -320,10 +208,6 @@ def get_edge_weights2(city, outfolder, venues_users, ward_venues):
     return edges_weights2
         
     
-''' =========================================================== '''
-'''        get the lists of nghbnodes fir each node             '''
-''' =========================================================== '''
-
 
     
 
@@ -412,39 +296,6 @@ def get_friendship_ties_within_ward(ward_venues, venues_users, friends_list):
 ''' =========================================================== '''
 
 
-def get_users_ward_old(city, outroot, cityshape):
-    
-    
-    t1 = time.time()
-    print ('Get users ward...')
-
-    eps       = 0.01
-    mins      = 3
-    LIMIT_num = 0
-    infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'
-
-    ward_users = {}
-
-
-
-    for ind, line in enumerate(open(infile)):
-        user, lng, lat = line.strip().split('\t')
-
-
-#        print (ind)
-#        if ind == 100: break
-        
-        ward, polygon = coordinates_to_ward( float(lat), float(lng), cityshape ) 
-        
-        if ward not in ward_users:
-            ward_users[ward] = [user]
-        else:
-            ward_users[ward].append(user)
- 
- 
-    print('users within ward...\t', time.time() - t1)
-
-    return ward_users
 
 
 
