@@ -239,8 +239,10 @@ elif sys.argv[2] == 'home_full':
         #Home.get_db_centroids_weighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
 
         #Home.get_db_centroids_subcatweighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
-        Home.get_db_centroids_morning(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3)
-    
+        #Home.get_db_centroids_morning(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3)
+        Home.get_db_centroids_evening(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3) 
+
+
 ### scp janosovm@cns2.servers.ceu.edu:/mnt/cns_storage3/janosovm/UrbanSuccess/ProcessedData/london/figures/london_COMPARE_centroids_dbscan_mlhomepred.png ../ProcessedData/london/figures/
 
    
