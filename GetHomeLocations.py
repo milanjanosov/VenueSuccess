@@ -445,7 +445,7 @@ def get_users_coordinates_db3(city, outfolder):
 
     minfreq = max(list(cat_freq.values()))
     for cat, freq in cat_freq.items():
-        cat_freq[cat] = int(round(100*freq/minfreq))
+        cat_freq[cat] = int(round(1000*freq/minfreq))
 
 
 
