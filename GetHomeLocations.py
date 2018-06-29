@@ -378,10 +378,10 @@ def get_users_coordinates_db2(city, outfolder):
 
 
 
-def get_db_centroids_weighted(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 0.01, mins = 3):
+def get_db_centroids_catweighted(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 0.01, mins = 3):
       
 
-    fout              = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_weighted_subcat_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat', 'w')
+    fout              = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_weighted_cat_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat', 'w')
     users_coordinates = get_users_coordinates_db2(city, outfolder)    
 
 
@@ -445,7 +445,7 @@ def get_users_coordinates_db3(city, outfolder):
 
     minfreq = max(list(cat_freq.values()))
     for cat, freq in cat_freq.items():
-        cat_freq[cat] = int(round(1000*freq/minfreq))
+        cat_freq[cat] = int(round(100*freq/minfreq))
 
 
 
@@ -504,18 +504,23 @@ def get_db_centroids_subcatweighted(user_sample, city, outfolder, sample, LIMIT_
 
     for ind, (user, i, j) in enumerate(user_sample):
     
-        print(ind, nn)
+        try:
 
-        c     = users_coordinates[user]  
-        x     = np.asarray(users_coordinates[user])  
-        centr = doDBSCAN(x, [], sample, eps, mins, user)  
+            print(ind, nn)
 
-        if len(centr) == 0:
-            centr = get_centroids( list(zip(*c)) )   
-            
-        fout.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
+            c     = users_coordinates[user]  
+            x     = np.asarray(users_coordinates[user])  
+            centr = doDBSCAN(x, [], sample, eps, mins, user)  
 
-    
+            if len(centr) == 0:
+                centr = get_centroids( list(zip(*c)) )   
+                
+            fout.write(user + '\t' + str(centr[0]) + '\t' + str(centr[1]) + '\n')
+        
+        except:
+            pass    
+
+
 
     fout.close()
 

@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from multiprocessing import Process
@@ -228,7 +228,7 @@ elif sys.argv[2] == 'home_full':
 
     LIMIT = 1
 
-
+   
 
     for LIMIT in range(1,20):
 
@@ -243,8 +243,7 @@ elif sys.argv[2] == 'home_full':
 
 ### scp janosovm@cns2.servers.ceu.edu:/mnt/cns_storage3/janosovm/UrbanSuccess/ProcessedData/london/figures/london_COMPARE_centroids_dbscan_mlhomepred.png ../ProcessedData/london/figures/
 
-    
-
+   
     
 
     
