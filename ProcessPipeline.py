@@ -18,6 +18,7 @@ import FilterHomeLocatoins as FilterH
 import OptimizeDBScan as Optimize
 import subprocess
 import MergeLSOAs as LSOA
+import MergeWARDs as WARD
 #import SumNetworks as SNW
 
 
@@ -293,9 +294,11 @@ elif sys.argv[2] == 'networks':
    # call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile, bbox])
     
 
-    #LSOA.lsoa_preproc( city, outroot, bbox )
+#    LSOA.lsoa_preproc( city, outroot, bbox )
+    WARD.ward_preproc( city, outroot, bbox )
 
-    LSOA.get_lsoa_level_networks( city, outroot, bbox )
+
+  #  LSOA.get_lsoa_level_networks( city, outroot, bbox )
     
 
 
