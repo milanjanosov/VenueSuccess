@@ -832,7 +832,7 @@ def get_users_coordinates_db5(city, outfolder):
         time = datetime.datetime.fromtimestamp(float(time)).hour 
 
 
-        if time < 10 and time > 17:
+        if time < 10 or time > 17:
         #if time > 17 and time < 22:
     
             if user not in users_coordinates:
