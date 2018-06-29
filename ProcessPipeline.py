@@ -231,15 +231,15 @@ elif sys.argv[2] == 'home_full':
 
    
 
-    for LIMIT in range(1,20):
+    for LIMIT in range(1,100):
 
         users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
         user_nums.append (len(users))
         print(len(users))
-        #Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
-        #Home.get_db_centroids_weighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+        Home.get_db_centroids_weighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
 
-        #Home.get_db_centroids_subcatweighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+        Home.get_db_centroids_catweighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
         #Home.get_db_centroids_morning(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3)
         #Home.get_db_centroids_evening(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3) 
         Home.get_db_centroids_off_work(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3) 
