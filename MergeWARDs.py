@@ -357,7 +357,7 @@ def get_users_ward(city, outroot, cityshape):
 
 
 
-    num_threads  = 40
+    num_threads  = 2
     users        = list(users_homes.keys())
     users_chunks = chunkIt(users, num_threads)
 
@@ -711,7 +711,7 @@ def ward_preproc(city, outfolder, bbox):
 
     cityshape                   = load_shp(city)
     venues_coordinates          = get_venues_coordinates(city, outfolder)
-    ward_venues, ward_polygons  = get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder)
+  #  ward_venues, ward_polygons  = get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder)
     ward_users                  = get_users_ward(city, outfolder, cityshape)    
 
 
