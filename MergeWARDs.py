@@ -165,8 +165,8 @@ def get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder_):
     fout  = open(outfolder_  + '/venues_info/venues_ward_full.dat', 'w')
     fout.write('venue\tlng\tlat\ward\tlng0\tlat0\tlng1\tlat1\tlength\tarea\n')
     for fn in files:
-        wards.add(line.strip().split('\t')[3])
         for line in open(outfolder + '/' + fn):
+            wards.add(line.strip().split('\t')[3])
             fout.write(line)
     fout.close()
     print('Number of WARDS: ', len(wards))
@@ -712,7 +712,7 @@ def ward_preproc(city, outfolder, bbox):
     cityshape                   = load_shp(city)
     venues_coordinates          = get_venues_coordinates(city, outfolder)
     ward_venues, ward_polygons  = get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder)
-    ward_users                  = get_users_ward(city, outfolder, cityshape)    
+  #  ward_users                  = get_users_ward(city, outfolder, cityshape)    
 
 
 ''' =========================================================== '''
