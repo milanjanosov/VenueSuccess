@@ -491,17 +491,47 @@ def transform_gephi_to_backbone(outfolder, outname):
 
 
     real_table = pd.read_csv(fnout, sep = "\t")
+    table_df   = backboning.disparity_filter(real_table, undirected = True)
+    table_nc   = backboning.noise_corrected(real_table, undirected = True)
 
-    print 'Do the NC backboning'
-    table_nc = backboning.noise_corrected(real_table, undirected = True)
-    bb_neffke = backboning.thresholding(table_nc, 4)
 
-    print 'Do  the DF backboning'
-    table_df      = backboning.disparity_filter(real_table, undirected = True)
-    bb_vespignani = backboning.thresholding(table_df, 0.66)
 
-    fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + outname + '_edges.dat', 'w')
-    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + outname + '_edges.dat', 'w')
+
+    ffout = open(outfolder + 'networks/gephi/COMPARE_DF_thresholds_' + outname + '.dat', 'w')
+
+    for df_threshold in [0.0, 0.7, 0.75, 0.8, 0.85, 0.9, 0.92, 0.94, 0.95, 0.96]:
+
+        print 'DF thresholding', df_threshold
+
+        bb_vespignani = backboning.thresholding(table_df, df_threshold)
+
+        df_edgenum = len(bb_vespignani['src'])
+        df_nodenum = len(set( list(bb_vespignani['src']) + list(bb_vespignani['trg'])))
+   
+        ffout.write(str(df_threshold) + '\t' + str(df_edgenum) + '\t' + str(df_nodenum) + '\n')
+
+    ffout.close()
+
+
+
+    ffout = open(outfolder + 'networks/gephi/COMPARE_NC_thresholds_' + outname + '.dat', 'w')
+
+    for nc_threshold in [0, 1, 4, 8, 10, 15, 20, 30, 50, 100]:
+
+        print 'NC thresholding', nc_threshold
+
+        bb_neffke = backboning.thresholding(table_nc, nc_threshold)
+
+        nc_edgenum = len(bb_neffke['src'])
+        nc_nodenum = len(set( list(bb_neffke['src']) + list(bb_neffke['trg'])))
+    
+        ffout.write(str(nc_threshold) + '\t' + str(nc_edgenum) + '\t' + str(nc_nodenum) + '\n')
+
+    ffout.close()
+
+    
+    '''fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
+    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + str( df_threshold ) + '_' + outname + '_edges.dat', 'w')
 
 
     print "Writing the NC Backbone"
@@ -509,7 +539,7 @@ def transform_gephi_to_backbone(outfolder, outname):
 
     print "Writing DF Backbone"
     bb_vespignani.to_csv(fout_df, sep = '\t', index = False)   
-
+    '''
 
 
 
@@ -947,7 +977,7 @@ def get_weight_distr(outfolder, outname):
 
     weights = []
 
-    for line in open(outfolder + 'networks/gephi/' + outname + '_edges.dat'):
+    '''for line in open(outfolder + 'networks/gephi/' + outname + '_edges.dat'):
         if 'Source' not in line:
             w = float(line.strip().split('\t')[3])
             weights.append(w)
@@ -958,17 +988,22 @@ def get_weight_distr(outfolder, outname):
     for w in weights:
         fout.write(str(w) + '\n')
     fout.close()
+    '''
 
 
+    for w in open(outroot + 'figures/figures/weight_distribution_' + outname + '.dat'):
+        weights.append(float(w.strip()))
+   
 
-    '''plt.title('Weight distribution of ' + outname)
+
+    plt.title('Weight distribution of ' + outname)
     plt.hist(weights, bins = 30, alpha = 0.8)
 
     #plt.xscale('log')
     plt.yscale('log')
     plt.savefig(outroot + 'figures/network_data/weight_distribution_' + outname + '.png')
     #plt.show()
-    '''
+    
 
 
 
@@ -1026,13 +1061,13 @@ if __name__ == '__main__':
             #get_network_stats(G_users,   city, outroot, '_users_similarity')  
             #print 'Calc centrality measures...'
             #calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
+            #get_weight_distr(outroot, city + '_users_similarity')
 
+            transform_gephi_to_backbone(outroot, city + '_users_similarity')
 
-#            transform_gephi_to_backbone(outroot, city + '_users_similarity')
+            
 
-            get_weight_distr(outroot, city + '_users_similarity')
-
-           # G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
+#            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
            # calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
 
  #           G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
@@ -1052,12 +1087,14 @@ if __name__ == '__main__':
             get_network_stats(G_venues,  city, outroot, '_venues_similarity')
             print 'Calc centrality measures...'
             calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
-            
+            get_weight_distr(outroot, city + '_venues_similarity')
+
+
             '''     
 #            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
 
 
-            get_weight_distr(outroot, city + '_venues_similarity')
+            
 
             #G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile)
             #calc_network_centralities(G_venues_NC,   outroot, city, infile, 'venues_similarity_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
