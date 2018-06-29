@@ -753,14 +753,14 @@ def get_users_coordinates_db4(city, outfolder):
 
 
 
-def get_db_centroids_morning(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 0.01, mins = 3):
+def get_db_centroids_evening(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 0.01, mins = 3):
       
 
     fout              = open(outfolder + '/user_homes/centroids/' + city + '_user_homes_6pm_10pm_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat', 'w')
     users_coordinates = get_users_coordinates_db4(city, outfolder)    
 
 
-    print('Start doing MORNING - eps = ' + str(eps) + ' ...')
+    print('Start doing EVENING - eps = ' + str(eps) + ' ...')
 
     nn = len(user_sample)
 
