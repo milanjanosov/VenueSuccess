@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from multiprocessing import Process
@@ -139,10 +139,10 @@ if sys.argv[2] == 'preproc':
 
 
 
-    ParseJsons.merge_venue_categories_stuff( city, inroot, outroot)
+#    ParseJsons.merge_venue_categories_stuff( city, inroot, outroot)
 
 
-
+    ParseJsons.get_category_stat( city, inroot, outroot)
 
 
 
@@ -208,7 +208,8 @@ elif sys.argv[2] == 'home_sample':
 elif sys.argv[2] == 'home_full':
 
 
-    t1 = time.time()
+    user_nums = []
+   # t1 = time.time()
     '''
     Pros = [] 
     for LIMIT in range(0,20):  
@@ -223,31 +224,39 @@ elif sys.argv[2] == 'home_full':
    
            
      # this has to be run only once after that loop above
-    user_nums = []
+    
+
+    LIMIT = 1
 
 
-    for LIMIT in range(20):
+
+    for LIMIT in range(1,4):
 
         users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
         user_nums.append (len(users))
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+        print(len(users))
+        #Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+    #    Home.get_db_centroids_weighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+
+        Home.get_db_centroids_subcatweighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
 
 
-    FilterH.copy_filtered(city, outroot, bbox)
-      
 ### scp janosovm@cns2.servers.ceu.edu:/mnt/cns_storage3/janosovm/UrbanSuccess/ProcessedData/london/figures/london_COMPARE_centroids_dbscan_mlhomepred.png ../ProcessedData/london/figures/
 
-
-
-    for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
-    ''' this compares the different methods '''
     
+
+    
+
+    
+
+    FilterH.copy_filtered(city, outroot, bbox)
+    for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
+
     Compare.plot_final_results(city, outroot, user_nums)
 
 
-
-    t2 = time.time()
-    print ('Full home clustering with plots: ', t2 - t1)   
+    #t2 = time.time()
+    #print ('Full home clustering with plots: ', t2 - t1)   
 
 
 
