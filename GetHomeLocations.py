@@ -258,6 +258,28 @@ def doDBSCAN(X, ax, sample, eps, mins, user):
 
 
 
+
+
+def get_users_coordinates_db(city, outfolder):
+
+    users_coordinates = {}
+
+    for line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):  # bristol
+        if 'userid' not in line:
+            fields = line.strip().split('\t')
+            user   = fields[0]
+            if len(fields[1:]) > 0:
+                users_coordinates[fields[0]] = [tuple([float(fff.split(',')[1]), float(fff.split(',')[2])]) for fff in fields[1:]]
+            
+             
+    return users_coordinates
+
+
+
+
+
+
+
 def get_db_centroids(user_sample, city, outfolder, sample, LIMIT_num = 0, eps = 0.02, mins = 3):
       
 
