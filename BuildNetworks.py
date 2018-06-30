@@ -496,7 +496,7 @@ def transform_gephi_to_backbone(outfolder, outname):
 
 
 
-
+    '''
     ffout = open(outfolder + 'networks/gephi/COMPARE_DF_thresholds_' + outname + '.dat', 'w')
 
     for df_threshold in [0.0, 0.7, 0.75, 0.8, 0.85, 0.9, 0.92, 0.94, 0.95, 0.96]:
@@ -511,12 +511,14 @@ def transform_gephi_to_backbone(outfolder, outname):
         ffout.write(str(df_threshold) + '\t' + str(df_edgenum) + '\t' + str(df_nodenum) + '\n')
 
     ffout.close()
-
+    '''
 
 
     ffout = open(outfolder + 'networks/gephi/COMPARE_NC_thresholds_' + outname + '.dat', 'w')
 
-    for nc_threshold in [0, 1, 4, 8, 10, 15, 20, 30, 50, 100]:
+ #   for nc_threshold in [0, 1, 4, 8, 10, 15, 20, 30, 50, 100, 150, 200, 250]:
+    for nc_threshold in [125, 200, 250, 300, 400]:
+
 
         print 'NC thresholding', nc_threshold
 
@@ -530,6 +532,11 @@ def transform_gephi_to_backbone(outfolder, outname):
     ffout.close()
 
     
+
+
+
+
+
     '''fout_nc = open(outfolder + 'networks/gephi/NC_BACKBONE_' + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
     fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + str( df_threshold ) + '_' + outname + '_edges.dat', 'w')
 
@@ -1091,7 +1098,7 @@ if __name__ == '__main__':
 
 
             '''     
-#            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
+            transform_gephi_to_backbone(outroot, city + '_venues_similarity')
 
 
             
