@@ -254,6 +254,8 @@ elif sys.argv[2] == 'home_full':
     
 
    # FilterH.copy_filtered(city, outroot, bbox)
+    Compare.get_groundtruth_length_cnt(outroot, city)
+
     NumUss = [Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT) for LIMIT in range(20)]
     
     

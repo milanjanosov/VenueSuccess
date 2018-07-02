@@ -10,11 +10,58 @@ import numpy as np
 '''         parse the users coordinates from var inputs          '''
 '''  ----------------------------------------------------------  '''
 
-def get_users_homes(fn, city, outfolder, LIMIT_num, num = 3):
-    
+
+def get_groundtruth_length_cnt(outfolder, city):
 
 
     unique    = outfolder + 'user_info/'  + city + '_groundtruth_home_locations_unique.dat'
+    full      = outfolder + '/user_info/' + city + '_user_venues_full.dat'
+
+
+    fout  = open(outfolder + '/user_info/' + city + '_groundtruth_careerlength.dat', 'w')
+
+
+    users          = set([line.strip().split('\t')[0] for line in open(unique)])
+
+
+    for ind, line in enumerate(open(full)):
+        
+        #if ind == 1000: break
+        fields = line.strip().split('\t')
+        user = fields[0]
+        NNN = len(fields[1:])
+        
+        if user in users:# and NNN == LIMIT_num:
+            fout.write(user + '\t' + str(NNN) + '\n')
+
+
+    fout.close()
+
+
+
+
+def read_groundtruth_length(outfolder, city, LIMIT_num):
+
+    
+
+    fout  = outfolder + '/user_info/' + city + '_groundtruth_careerlength.dat'
+    users_len_home = set()
+
+    for line in open(fout):
+        user, NNN = line.strip().split('\t')
+        NNN = int(NNN)
+
+        if NNN == LIMIT_num:
+            users_len_home.add(user)
+
+    return users_len_home
+
+
+
+def get_users_homes(fn, city, outfolder, LIMIT_num, num = 3):
+    
+
+    '''unique    = outfolder + 'user_info/'  + city + '_groundtruth_home_locations_unique.dat'
     full      = outfolder + '/user_info/' + city + '_user_venues_full.dat'
 
 
@@ -32,7 +79,11 @@ def get_users_homes(fn, city, outfolder, LIMIT_num, num = 3):
         if user in users and NNN == LIMIT_num:
             users_len_home[user] = NNN
 
+    '''
 
+
+
+    users_len_home = read_groundtruth_length(outfolder, city, LIMIT_num)
 
 
 
