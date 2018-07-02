@@ -162,6 +162,8 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
     all_users = set([line.strip().split('\t')[0] for line in open(infile)])
 
+    print infile
+    print len(all_users)
 
     # write the friendhip nw w geo contraints
     fout        = open(outfolder + '/user_info/' + city  + '_users_geo_friends.lgl', 'w')
@@ -172,10 +174,16 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
         data = str(myfile.read()).strip().split('#')
 
 
+
+
     for ind, d in enumerate(data):
- 
+
+     
         users = d.split('\n')
         user  = users[0].replace(' ', '')
+    
+
+ 
 
         if user in all_users:
 
@@ -197,6 +205,7 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
     G_geo   = Graph.Read_Lgl(outfolder + '/user_info/' + city  + '_users_geo_friends.lgl', names = True, weights = False, directed = False) 
 
+
     
     # get the coordinates
     users_location = {}
@@ -209,6 +218,8 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
     # add and calc distances
     G_geo.vs['location'] = [users_location[g['name']] for g in G_geo.vs()]
     add_distances_to_edges(G_geo)
+
+    print 'AAAA   ', len(G_geo.es())
 
     print 'Friendship network done.'
     
@@ -480,8 +491,8 @@ def transform_gephi_to_backbone(outfolder, outname):
     print 'Start reading the edge list...'
 
     for ind, line in enumerate(open( fnin )):
-        if ind % 1000 == 0: 
-            print ind
+        #if ind % 1000 == 0: 
+        #    print ind
 #        if ind == 10 : break
         if 'Source' not in line:
             src, trg, aa, nij, bb = line.strip().split('\t')
@@ -516,7 +527,7 @@ def transform_gephi_to_backbone(outfolder, outname):
 
     ffout = open(outfolder + 'networks/gephi/COMPARE_NC_thresholds_' + outname + '.dat', 'w')
 
-    for nc_threshold in [0, 1, 4, 8, 10, 15, 20, 30, 50, 100, 150, 200, 250]:
+    for nc_threshold in [-2, 0, 1, 4, 8, 10, 20, 50, 100, 200, 400]:#, 1, 4, 8, 10, 15, 20, 30, 50, 100, 150, 200, 250]:
  #   for nc_threshold in [125, 200, 250, 300, 400]:
 
 
@@ -526,6 +537,9 @@ def transform_gephi_to_backbone(outfolder, outname):
 
         nc_edgenum = len(bb_neffke['src'])
         nc_nodenum = len(set( list(bb_neffke['src']) + list(bb_neffke['trg'])))
+        dens       =  nc_edgenum / (nc_nodenum**2/2.0)
+
+        print nc_edgenum, nc_nodenum, dens
     
         ffout.write(str(nc_threshold) + '\t' + str(nc_edgenum) + '\t' + str(nc_nodenum) + '\n')
 
@@ -1045,7 +1059,7 @@ if __name__ == '__main__':
             print 'Create friendship network' 
             G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
 
-            print 'Creating gephi files...'
+            '''print 'Creating gephi files...'
            # get_gephi_new(G_friends, outroot, city + '_friendship')     
        
             print 'Calc centrality measures...'
@@ -1053,7 +1067,7 @@ if __name__ == '__main__':
 
             print 'Creating network stats...'
             get_network_stats(G_friends, city, outroot, '_friendship')
-     
+            '''
 
 
         elif sys.argv[2] == 'user':

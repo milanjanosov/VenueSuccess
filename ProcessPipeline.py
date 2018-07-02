@@ -200,7 +200,7 @@ elif sys.argv[2] == 'home_sample':
 
 
     t2 = time.time()
-
+    
     print ('Sample home clustering with plots: ', t2 - t1)   
 
 
@@ -229,16 +229,16 @@ elif sys.argv[2] == 'home_full':
      # this has to be run only once after that loop above
     
 
-    LIMIT = 1
+    '''LIMIT = 1
 
    
 
-    '''for LIMIT in range(1,10 ):
+    for LIMIT in range(1,10 ):
 
         users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
         user_nums.append (len(users))
         print(LIMIT)
-        Home.get_db_centroids(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
+        
         Home.get_db_centroids_catweighted(users, city, outroot, sample = False, LIMIT_num = LIMIT,eps = 0.01, mins = 3)
         #Home.get_db_centroids_morning(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3)
         #Home.get_db_centroids_evening(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3) 
@@ -249,19 +249,21 @@ elif sys.argv[2] == 'home_full':
 ### scp janosovm@cns2.servers.ceu.edu:/mnt/cns_storage3/janosovm/UrbanSuccess/ProcessedData/london/figures/london_COMPARE_centroids_dbscan_mlhomepred.png ../ProcessedData/london/figures/
 
    
+    LIMIT = 0
+
+    users = Home.get_users_centroids( city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
+
+    print('UUU', len(users))
+
+    Home.get_db_centroids(users,      city, outroot, sample = False, LIMIT_num = LIMIT,  eps = 0.01, mins = 3)
     
 
     
 
-   # FilterH.copy_filtered(city, outroot, bbox)
-    Compare.get_groundtruth_length_cnt(outroot, city)
-
-    NumUss = [Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT) for LIMIT in range(20)]
-    
-    
-    Compare.plot_final_results(city, outroot, NumUss)
-
-
+    FilterH.copy_filtered(city, outroot, bbox)
+    #Compare.get_groundtruth_length_cnt(outroot, city)
+    #NumUss = [Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT) for LIMIT in range(20)]  
+    #Compare.plot_final_results(city, outroot, NumUss)
     #t2 = time.time()
     #print ('Full home clustering with plots: ', t2 - t1)   
 
