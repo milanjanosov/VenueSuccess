@@ -1130,7 +1130,7 @@ if __name__ == '__main__':
 
             for nc_threshold in [1000, 500, 250, 100, 25, 10, 1]:
 
-                #transform_gephi_to_backbone(outroot, city + '_venues_similarity', nc_threshold)
+                transform_gephi_to_backbone(outroot, city + '_venues_similarity', nc_threshold)
 
                 G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile, thresh = str(nc_threshold))
                 calc_network_centralities(G_venues_NC, outroot, city, infile, 'venues_similarity_' + 'NC' ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
