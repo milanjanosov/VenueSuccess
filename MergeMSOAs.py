@@ -187,7 +187,7 @@ def get_msoas_paralel(args):
                 try:
                     msoa, polygon = (query_df.iloc[0]['MSOA_CODE'], query_df.iloc[0]['geometry'])
 
-                    print (lat, lng, msoa)
+                   # print (lat, lng, msoa)
 
                     bounds  = polygon.bounds
                     lng0    = str(bounds[0])
