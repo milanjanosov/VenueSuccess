@@ -82,9 +82,6 @@ def get_homes_from_methods(city, outfolder, LIMIT_num):
         method      = fn.split('homes_')[1].replace('_' + str(LIMIT_num) + '.dat' ,'').split('_filtered')[0]
         users_homes = get_users_homes(fn, city, outfolder, LIMIT_num)
 
-      
-        print (len(users_homes))
-
   
         for user, home in users_homes.items():
 

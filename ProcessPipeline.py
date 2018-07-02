@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from multiprocessing import Process
@@ -254,7 +254,7 @@ elif sys.argv[2] == 'home_full':
     
 
     FilterH.copy_filtered(city, outroot, bbox)
-    NumUss = [Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT) for LIMIT in range(50)]
+    NumUss = [Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT) for LIMIT in range(20)]
     
     
     Compare.plot_final_results(city, outroot, NumUss)
