@@ -1116,6 +1116,7 @@ if __name__ == '__main__':
         elif sys.argv[2] == 'venues':
 
             
+            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             '''print 'Create venues network' 
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
