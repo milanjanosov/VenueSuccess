@@ -10,17 +10,44 @@ import numpy as np
 '''         parse the users coordinates from var inputs          '''
 '''  ----------------------------------------------------------  '''
 
-def get_users_homes(fn, city, outfolder, num = 3):
+def get_users_homes(fn, city, outfolder, LIMIT_num, num = 3):
     
+
+
+    unique    = outfolder + 'user_info/'  + city + '_groundtruth_home_locations_unique.dat'
+    full      = outfolder + '/user_info/' + city + '_user_venues_full.dat'
+
+
+    users          = set([line.strip().split('\t')[0] for line in open(unique)])
+    users_len_home = {}
+
+
+    for ind, line in enumerate(open(full)):
+        
+        #if ind == 1000: break
+        fields = line.strip().split('\t')
+        user = fields[0]
+        NNN = len(fields[1:])
+        
+        if user in users and NNN == LIMIT_num:
+            users_len_home[user] = NNN
+
+
+
+
+
     users_coordinates = {}
 
     for line in open(outfolder + fn):
+
+
         if num == 4:
             user, lng, lat, venue = line.strip().split('\t')
         else:
             user, lng, lat = line.strip().split('\t')
 
-        users_coordinates[user] = (float(lng), float(lat))
+        if user in users_len_home:
+            users_coordinates[user] = (float(lng), float(lat))
         
     return users_coordinates
 
@@ -31,9 +58,10 @@ def get_users_homes(fn, city, outfolder, num = 3):
 '''         parse the users known home locations                 '''
 '''  ----------------------------------------------------------  '''
 
-def get_groundtruth_homes(city, outfolder):
+def get_groundtruth_homes(city, outfolder, LIMIT_num):
 
-    return get_users_homes( 'user_info/' + city + '_groundtruth_home_locations_unique.dat', city, outfolder, 4)
+
+    return get_users_homes( 'user_info/' + city + '_groundtruth_home_locations_unique.dat', city, outfolder, LIMIT_num, 4)
 
 
 
@@ -52,9 +80,10 @@ def get_homes_from_methods(city, outfolder, LIMIT_num):
 
 
         method      = fn.split('homes_')[1].replace('_' + str(LIMIT_num) + '.dat' ,'').split('_filtered')[0]
-        users_homes = get_users_homes(fn, city, outfolder)
+        users_homes = get_users_homes(fn, city, outfolder, LIMIT_num)
 
       
+        print (len(users_homes))
 
   
         for user, home in users_homes.items():
@@ -87,13 +116,10 @@ def get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfol
 
                 dist =  mpu.haversine_distance((home[1], home[0]), (home_[1], home_[0])) 
 
-
-
                 homedistances_users_methods[user][method] =  mpu.haversine_distance((home[1], home[0]), (home_[1], home_[0])) 
 
 
-
-    return pd.DataFrame.from_dict(homedistances_users_methods, orient = 'index'), len(homedistances_users_methods)
+    return pd.DataFrame.from_dict(homedistances_users_methods, orient = 'index')
 
 
  
@@ -103,10 +129,9 @@ def get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfol
 
 def get_final_comp_results(city, outfolder, LIMIT_num):
 
-    groundtruth_homes                 = get_groundtruth_homes(city, outfolder)   
-    methods_homes                     = get_homes_from_methods(city, outfolder, LIMIT_num)
-    distance_from_groundtruth, NumUs  = get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfolder)
-
+    groundtruth_homes         = get_groundtruth_homes(city, outfolder, LIMIT_num)   
+    methods_homes             = get_homes_from_methods(city, outfolder, LIMIT_num)
+    distance_from_groundtruth = get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfolder)
 
 
 
@@ -121,7 +146,7 @@ def get_final_comp_results(city, outfolder, LIMIT_num):
 
     df_res.to_csv(outfolder + '/user_homes/comparison/' + city + '_CENTROID_COMPARISON_RES_' + str(LIMIT_num) + '.csv', sep = ',', float_format='%.3f')
 
-    return NumUs
+    return len(groundtruth_homes)
 
 
 
