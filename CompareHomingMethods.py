@@ -79,8 +79,6 @@ def get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfol
     homedistances_users_methods = {}
 
 
-    print(len(groundtruth_homes))
-
     for user, home in groundtruth_homes.items():
         if user in methods_homes:
             for method, home_ in methods_homes[user].items():
@@ -93,7 +91,9 @@ def get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfol
 
                 homedistances_users_methods[user][method] =  mpu.haversine_distance((home[1], home[0]), (home_[1], home_[0])) 
 
-    return pd.DataFrame.from_dict(homedistances_users_methods, orient = 'index')
+
+
+    return pd.DataFrame.from_dict(homedistances_users_methods, orient = 'index'), len(homedistances_users_methods)
 
 
  
@@ -103,20 +103,25 @@ def get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfol
 
 def get_final_comp_results(city, outfolder, LIMIT_num):
 
-    groundtruth_homes         = get_groundtruth_homes(city, outfolder)   
-    methods_homes             = get_homes_from_methods(city, outfolder, LIMIT_num)
-    distance_from_groundtruth = get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfolder)
+    groundtruth_homes                 = get_groundtruth_homes(city, outfolder)   
+    methods_homes                     = get_homes_from_methods(city, outfolder, LIMIT_num)
+    distance_from_groundtruth, NumUs  = get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfolder)
+
+
+
+
 
     df_res = pd.DataFrame()
     df_res['Averages'] = distance_from_groundtruth.mean(axis=0)
 
-    #print ('RES  ', df_res)
+
+  
 
     #df_res['Stdevs']   = distance_from_groundtruth.std(axis=0)
 
     df_res.to_csv(outfolder + '/user_homes/comparison/' + city + '_CENTROID_COMPARISON_RES_' + str(LIMIT_num) + '.csv', sep = ',', float_format='%.3f')
 
-
+    return NumUs
 
 
 
@@ -128,6 +133,9 @@ def plot_final_results(city, outfolder, user_nums):
 
 
     print ('Plot final ML stuff...')
+
+
+    print (user_nums)
 
 
     ''' put the centroid methods on the plot '''
@@ -195,6 +203,7 @@ def plot_final_results(city, outfolder, user_nums):
 
     for m, s in methods_series_dbscan.items():
         s.sort(key=lambda tup: tup[0])     
+
         ind, avg = zip(*s)
         ax[0].plot(ind, avg, 'o-', label = m)
 
@@ -311,10 +320,10 @@ def plot_final_results(city, outfolder, user_nums):
 
 
 
-    plt.savefig(outfolder   + '/figures/' + city + '_COMPARE_centroids_dbscan_mlhomepred.png')
+#    plt.savefig(outfolder   + '/figures/' + city + '_COMPARE_centroids_dbscan_mlhomepred.png')
     print ('Figure saved.')
     #plt.close()
- #   plt.show() 
+    plt.show() 
 
 
 

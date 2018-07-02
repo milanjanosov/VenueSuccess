@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from multiprocessing import Process
@@ -209,6 +209,8 @@ elif sys.argv[2] == 'home_sample':
 elif sys.argv[2] == 'home_full':
 
 
+    print('HOME FULL')
+
     user_nums = []
    # t1 = time.time()
     '''
@@ -231,7 +233,7 @@ elif sys.argv[2] == 'home_full':
 
    
 
-    for LIMIT in range(1,100):
+    '''for LIMIT in range(1,10 ):
 
         users = Home.get_users_centroids(           city, outroot, sample = False, LIMIT_num = LIMIT,              plot = False)
         user_nums.append (len(users))
@@ -241,7 +243,7 @@ elif sys.argv[2] == 'home_full':
         #Home.get_db_centroids_morning(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3)
         #Home.get_db_centroids_evening(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3) 
         Home.get_db_centroids_off_work(users, city, outroot, sample = False, LIMIT_num = LIMIT, eps = 0.01, mins = 3) 
-
+    '''
 
 
 ### scp janosovm@cns2.servers.ceu.edu:/mnt/cns_storage3/janosovm/UrbanSuccess/ProcessedData/london/figures/london_COMPARE_centroids_dbscan_mlhomepred.png ../ProcessedData/london/figures/
@@ -252,9 +254,10 @@ elif sys.argv[2] == 'home_full':
     
 
     FilterH.copy_filtered(city, outroot, bbox)
-    for LIMIT in range(20):   Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT)
-
-    Compare.plot_final_results(city, outroot, user_nums)
+    NumUss = [Compare.get_final_comp_results(city, outroot, LIMIT_num = LIMIT) for LIMIT in range(20)]
+    
+    
+    Compare.plot_final_results(city, outroot, NumUss)
 
 
     #t2 = time.time()
