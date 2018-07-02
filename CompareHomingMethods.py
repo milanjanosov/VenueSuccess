@@ -126,11 +126,15 @@ def get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfol
 
 def get_final_comp_results(city, outfolder, LIMIT_num):
 
+    print(LIMIT_num, ' ....')
+
     groundtruth_homes         = get_groundtruth_homes(city, outfolder, LIMIT_num)   
     methods_homes             = get_homes_from_methods(city, outfolder, LIMIT_num)
     distance_from_groundtruth = get_distance_from_groundtruth(methods_homes, groundtruth_homes, city, outfolder)
 
 
+
+   
 
 
     df_res = pd.DataFrame()
