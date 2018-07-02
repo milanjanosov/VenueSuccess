@@ -18,6 +18,7 @@ import FilterHomeLocatoins as FilterH
 import OptimizeDBScan as Optimize
 import subprocess
 import MergeLSOAs as LSOA
+import MergeMSOAs as MSOA
 import MergeWARDs as WARD
 #import SumNetworks as SNW
 
@@ -127,41 +128,27 @@ if sys.argv[2] == 'preproc':
     ''' ===================   ParseJsons.py   ===================== '''
     ''' =========================================================== '''
 
-    t1 = time.time()
-
-
+    t1 = time.time() 
     users_homes   = {}
-
- #   unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
-
-##    users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
+#    unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
+#    users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
 #    users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
 #    users_tips    = ParseJsons.get_tips_locations_and_users(    unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
 
 
 
     ParseJsons.merge_venue_categories_stuff( city, inroot, outroot)
-
-
     ParseJsons.get_category_stat( city, inroot, outroot)
 
 
-
-
-
-### ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_photos.keys()))
-
- #   ParseJsons.get_users_coordinates(users_homes, local_users, unknown_users, users_likes, users_tips, users_photos, city, outroot, bbox)
- #   ParseJsons.get_users_distance_distr_from_home(city, outroot) 
+###  ParseJsons.write_home_locations( users_homes, city, outroot,  len(users_photos.keys()))
+#    ParseJsons.get_users_coordinates(users_homes, local_users, unknown_users, users_likes, users_tips, users_photos, city, outroot, bbox)
+#    ParseJsons.get_users_distance_distr_from_home(city, outroot) 
 #    ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
-
 #    ParseJsons. get_users_friends(local_users, city, inroot, outroot)
-
 #    ParseJsons.venues_distance_mtx(bbox, city, outroot)
 #    ParseJsons.get_venues_users(city, outroot)       
-
-
- #   ParseJsons.get_venues_stat(city, outroot)
+#    ParseJsons.get_venues_stat(city, outroot)
 
     t2 = time.time()
 
@@ -300,7 +287,8 @@ elif sys.argv[2] == 'networks':
     
 
 #    LSOA.lsoa_preproc( city, outroot, bbox )
-    WARD.ward_preproc( city, outroot, bbox )
+    MSOA.msoa_preproc( city, outroot, bbox )
+#    WARD.ward_preproc( city, outroot, bbox )
 
 
   #  LSOA.get_lsoa_level_networks( city, outroot, bbox )
