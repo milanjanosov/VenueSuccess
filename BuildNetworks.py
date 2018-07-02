@@ -219,7 +219,7 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
     G_geo.vs['location'] = [users_location[g['name']] for g in G_geo.vs()]
     add_distances_to_edges(G_geo)
 
-    print 'AAAA   ', len(G_geo.es())
+    print 'AAAA   ', len(G_geo.vs()), len(G_geo.es())
 
     print 'Friendship network done.'
     
