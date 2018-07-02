@@ -491,7 +491,7 @@ def transform_gephi_to_backbone(outfolder, outname):
 
 
     real_table = pd.read_csv(fnout, sep = "\t")
-    table_df   = backboning.disparity_filter(real_table, undirected = True)
+    #table_df   = backboning.disparity_filter(real_table, undirected = True)
     table_nc   = backboning.noise_corrected(real_table, undirected = True)
 
 
@@ -516,8 +516,8 @@ def transform_gephi_to_backbone(outfolder, outname):
 
     ffout = open(outfolder + 'networks/gephi/COMPARE_NC_thresholds_' + outname + '.dat', 'w')
 
- #   for nc_threshold in [0, 1, 4, 8, 10, 15, 20, 30, 50, 100, 150, 200, 250]:
-    for nc_threshold in [125, 200, 250, 300, 400]:
+    for nc_threshold in [0, 1, 4, 8, 10, 15, 20, 30, 50, 100, 150, 200, 250]:
+ #   for nc_threshold in [125, 200, 250, 300, 400]:
 
 
         print 'NC thresholding', nc_threshold
