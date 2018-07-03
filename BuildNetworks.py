@@ -18,15 +18,7 @@ sys.path.append("..")
 import ParseInput
 
 
-'''   venues.json -> ebben nincs benne minden liked, photos, ... location a jelek szerinti   '''
 
-''' SCALING
-
--  filename  = outfolder + '/user_info/' + city  + '_users_friends_sample.lgl' 
-- 'break'
-
-
-'''
 
 
 
@@ -1117,16 +1109,16 @@ if __name__ == '__main__':
 
             
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
-            '''print 'Create venues network' 
+            print 'Create venues network' 
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
             get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
-            print 'Creating network stats...'
+            #print 'Creating network stats...'
           #  get_network_stats(G_venues,  city, outroot, '_venues_similarity')
-            print 'Calc centrality measures...'
+            #print 'Calc centrality measures...'
           #  calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
           #  get_weight_distr(outroot, city + '_venues_similarity')
-            '''
+            
 
 
             for nc_threshold in [1000, 500, 250, 100, 25, 10, 1]:
