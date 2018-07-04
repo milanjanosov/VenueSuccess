@@ -87,7 +87,7 @@ for ind, (v, users) in enumerate(venues_users.items()):
 
     keys_geo = df_friend_geo.keys()
     users = [int(u) for u in users if int(u) in users_nw]
-    user_level_values = df_friend_geo.loc[users][key].tolist()
+    
 
     venues_features[v] = {}
     
@@ -96,7 +96,7 @@ for ind, (v, users) in enumerate(venues_users.items()):
     for key in keys_geo:
 
 
-    
+        user_level_values = df_friend_geo.loc[users][key].tolist()
 
 
         if len(user_level_values) > 0:
