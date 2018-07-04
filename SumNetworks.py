@@ -39,8 +39,8 @@ venues_sim         = outroot + '/networks/' + city + '_venues_similarity_NC_' + 
 relevant_venues    = set([line.strip().split('\t')[0] for line in open(outroot + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
 
 
-df_friend_geo   =  pd.read_csv(users_friend_geo,  sep = ',', index_col=0) 
-df_venue_sim    =  pd.read_csv(venues_sim,        sep = ',', index_col=0) 
+df_friend_geo   =  pd.read_csv(users_friend_geo,  sep = ',', index_col=0).fillna(0.0) 
+df_venue_sim    =  pd.read_csv(venues_sim,        sep = ',', index_col=0).fillna(0.0) 
 
 
 
