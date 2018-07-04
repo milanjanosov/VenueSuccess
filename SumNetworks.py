@@ -2,6 +2,27 @@ import os
 import pandas as pd
 import scipy.stats as stat
 import numpy as np
+from multiprocessing import Process
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 city      = 'london'
@@ -61,31 +82,31 @@ for ind, (v, users) in enumerate(venues_users.items()):
 
     #sif ind == 50: break
 
-    if 2 == 2:
+    #if 2 == 2:
 
 
-        keys_geo = df_friend_geo.keys()
+    keys_geo = df_friend_geo.keys()
+    users = [int(u) for u in users if int(u) in users_nw]
+    user_level_values = df_friend_geo.loc[users][key].tolist()
+
+    venues_features[v] = {}
+    
+    print ind,'/', nnn   
+
+    for key in keys_geo:
 
 
-        venues_features[v] = {}
-        
-        print ind,'/', nnn   
-
-        for key in keys_geo:
+    
 
 
-        
-            users = [int(u) for u in users if int(u) in users_nw]
-            user_level_values = df_friend_geo.loc[users][key].tolist()
-
-            if len(user_level_values) > 0:
-                venues_features[v][key + '_avg']     = np.mean(user_level_values)
-                venues_features[v][key + '_std']     = np.std(user_level_values)
-                venues_features[v][key + '_entropy'] = stat.entropy(np.asarray(user_level_values))
-            else:
-                venues_features[v][key + '_avg']     = 0
-                venues_features[v][key + '_std']     = 0
-                venues_features[v][key + '_entropy'] = 0
+        if len(user_level_values) > 0:
+            venues_features[v][key + '_avg']     = np.mean(user_level_values)
+            venues_features[v][key + '_std']     = np.std(user_level_values)
+            venues_features[v][key + '_entropy'] = stat.entropy(np.asarray(user_level_values))
+        else:
+            venues_features[v][key + '_avg']     = 0
+            venues_features[v][key + '_std']     = 0
+            venues_features[v][key + '_entropy'] = 0
 
 
     
