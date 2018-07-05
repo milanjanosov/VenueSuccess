@@ -1,0 +1,12 @@
+# Barcelona - North Latitude: 41.469576 South Latitude: 41.320004 East Longitude: 2.228010 West Longitude: 2.069526
+# Greater London - 51.7279  51.2542 0.2980 -0.5466
+# Bangalore - North Latitude: 13.1488 South Latitude: 12.8333 East Longitude: 77.7880 West Longitude: 77.4556
+# New York North Latitude: 40.917577 South Latitude: 40.477399 East Longitude: -73.700272 West Longitude: -74.259090
+# Bristol North Latitude: 51.544433 South Latitude: 51.392545 East Longitude: -2.450902 West Longitude: -2.730516
+# Antwerp North Latitude: 51.377430 South Latitude: 51.143340 East Longitude: 4.497840 West Longitude: 4.217600
+# Cambridge North Latitude: 52.237855 South Latitude: 52.159829 East Longitude: 0.191927 West Longitude: 0.048047
+# Turin North Latitude: 45.140201 South Latitude: 45.006777 East Longitude: 7.773363 West Longitude: 7.577850
+# Rome North Latitude: 42.050546 South Latitude: 41.769596 East Longitude: 12.730289 West Longitude: 12.341707
+# Amsterdam North Latitude: 52.431157 South Latitude: 52.318274 East Longitude: 5.068390 West Longitude: 4.728856
+# Dubai North Latitude: 25.358561 South Latitude: 24.792136 East Longitude: 55.565039 West Longitude: 54.890454
+# Boston North Latitude: 42.400820 South Latitude: 42.227880 East Longitude: -70.749455 West Longitude: -71.191113
