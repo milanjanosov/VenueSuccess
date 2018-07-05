@@ -287,8 +287,8 @@ elif sys.argv[2] == 'networks':
     
 
 #    LSOA.lsoa_preproc( city, outroot, bbox )
-    MSOA.msoa_preproc( city, outroot, bbox )
-#    WARD.ward_preproc( city, outroot, bbox )
+ #   MSOA.msoa_preproc( city, outroot, bbox )
+    WARD.ward_preproc( city, outroot, bbox )
 
 
   #  LSOA.get_lsoa_level_networks( city, outroot, bbox )
