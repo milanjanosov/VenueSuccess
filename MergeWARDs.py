@@ -100,8 +100,8 @@ def get_wards_paralel(args):
         lat = float(coord[1])
         lng = float(coord[0])
 
-        if 2 == 2:
-        #if check_box(bbox, city, lat, lng):
+        #if 2 == 2:
+        if check_box(bbox, city, lat, lng):
 
             pnt      = Point(lng, lat)        
             query_df = cityshape[cityshape.contains(pnt)]
