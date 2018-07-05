@@ -714,7 +714,7 @@ def ward_preproc(city, outfolder, bbox):
 
     cityshape                   = load_shp(city)
     venues_coordinates          = get_venues_coordinates(city, outfolder)
-  #  ward_venues, ward_polygons  = get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder)
+    ward_venues, ward_polygons  = get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder)
  #   ward_users                  = get_users_ward(city, outfolder, cityshape)    
 
 
