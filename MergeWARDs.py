@@ -8,6 +8,8 @@ from multiprocessing import Process
 from geopandas.geoseries import Point
 
 
+
+
 ''' =========================================================== '''
 '''             load the shapefile of UK                        '''
 ''' =========================================================== '''
@@ -37,7 +39,8 @@ def get_venues_coordinates(city, outfolder):
 
     venues_coordinates = {}
 
-    for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat')):
+#    for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat')):
+    for ind, line in enumerate(open(outfolder + '/user_info/' + city + '_user_venues_full.dat')):
 
         #if ind == 5000: break
         if ind % 5000 == 0:
@@ -104,21 +107,21 @@ def get_wards_paralel(args):
             if query_df.shape[0] == 1:
 
 
-                try:
-                    ward, polygon = (query_df.iloc[0]['GSS_CODE'], query_df.iloc[0]['geometry'])
+                #try:
+                ward, polygon = (query_df.iloc[0]['GSS_CODE'], query_df.iloc[0]['geometry'])
 
-                    bounds  = polygon.bounds
-                    lng0    = str(bounds[0])
-                    lat0    = str(bounds[1])
-                    lng1    = str(bounds[2])
-                    lat1    = str(bounds[3])
-                    length  = str(polygon.length)
-                    area    = str(polygon.area)
+                bounds  = polygon.bounds
+                lng0    = str(bounds[0])
+                lat0    = str(bounds[1])
+                lng1    = str(bounds[2])
+                lat1    = str(bounds[3])
+                length  = str(polygon.length)
+                area    = str(polygon.area)
 
-                    fout.write ('\t'.join([venue, str(lng), str(lat), ward, lng0, lat0, lng1, lat1, length, area]) + '\n')
+                fout.write ('\t'.join([venue, str(lng), str(lat), ward, lng0, lat0, lng1, lat1, length, area]) + '\n')
 
-                except:
-                    pass
+                #except:
+                #    pass
 
     fout.close()
 
@@ -712,7 +715,7 @@ def ward_preproc(city, outfolder, bbox):
     cityshape                   = load_shp(city)
     venues_coordinates          = get_venues_coordinates(city, outfolder)
   #  ward_venues, ward_polygons  = get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder)
-    ward_users                  = get_users_ward(city, outfolder, cityshape)    
+ #   ward_users                  = get_users_ward(city, outfolder, cityshape)    
 
 
 ''' =========================================================== '''
