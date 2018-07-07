@@ -283,14 +283,14 @@ elif sys.argv[2] == 'networks':
     infile    = outroot + '/user_homes/centroids/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '.dat'
    
 
-    print(bbox)
+ 
 
    # call_python_version("2.7", "BuildNetworks", "do_all_the_networks", [city, outroot, infile, bbox])
     
 
 #    LSOA.lsoa_preproc( city, outroot, bbox )
  #   MSOA.msoa_preproc( city, outroot, bbox )
-    #WARD.ward_preproc( city, outroot, bbox )
+    WARD.ward_preproc( city, outroot, bbox )
 
 
   #  LSOA.get_lsoa_level_networks( city, outroot, bbox )

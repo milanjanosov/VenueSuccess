@@ -3,9 +3,10 @@ import geopandas as gpd
 import numpy as np
 import time 
 import os
-from ParseJsons import check_box
+#from ParseJsons import check_box
 from multiprocessing import Process
 from geopandas.geoseries import Point
+
 
 
 
@@ -13,6 +14,22 @@ from geopandas.geoseries import Point
 ''' =========================================================== '''
 '''             load the shapefile of UK                        '''
 ''' =========================================================== '''
+
+
+
+def check_box(boundingbox, city, lat, lng):
+
+    isin = True
+
+
+
+
+    if (lat < min(boundingbox[0:2]) or lat > max(boundingbox[0:2])) or (lng < min(boundingbox[2:]) or lng > max(boundingbox[2:])):
+        isin = False
+    
+    return isin
+
+
 
 
 def load_shp(city):
@@ -101,6 +118,10 @@ def get_wards_paralel(args):
         lng = float(coord[0])
 
         #if 2 == 2:
+
+
+        print (lat, lng, '\t', bbox, check_box(bbox, city, lat, lng))
+
         if check_box(bbox, city, lat, lng):
 
             pnt      = Point(lng, lat)        
@@ -140,7 +161,7 @@ def get_ward_venues(cityshape, venues_coordinates, bbox, city, outfolder_):
 
 
 
-    num_threads  = 40
+    num_threads  = 1
     venues       = list(venues_coordinates.keys())
     venue_chunks = chunkIt(venues, num_threads)
 
@@ -361,7 +382,7 @@ def get_users_ward(city, outroot, cityshape):
 
 
 
-    num_threads  = 2
+    num_threads  = 40
     users        = list(users_homes.keys())
     users_chunks = chunkIt(users, num_threads)
 
@@ -613,18 +634,6 @@ def get_venues_features(ward_polygons,ward_local_friendships, ward_users, ward_v
     
 
 
-
-
-
-
-import pandas as pd
-import geopandas as gpd
-import numpy as np
-import time 
-import os
-from ParseJsons import check_box
-from multiprocessing import Process
-from geopandas.geoseries import Point
 
 
 
