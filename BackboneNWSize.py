@@ -26,4 +26,4 @@ for fn in files:
 
     nnodes = len(set(n))
 
-    print threshold, '\t', nnodes, '\t', nnedges
+    print threshold, '\t', nnodes, '\t', nedges
