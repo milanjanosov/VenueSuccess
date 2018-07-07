@@ -4,7 +4,7 @@ city       = 'london'
 outfolder  = '../ProcessedData/' + city + '/'
 outname    = '_venues_similarity'
 foutfolder = outfolder + 'networks/gephi/'  #backboneformat_' + outname + '.dat'
-files      = [foutfolder + '/' + fff for fff in os.listdir(foutfolder) if '_NC' in fff]
+files      = [foutfolder + '/' + fff for fff in os.listdir(foutfolder) if 'NC_B' in fff]
 
 
 #files = ['NC_BACKBONE_250_london_venues_similarity_edges.dat']
