@@ -1108,11 +1108,11 @@ if __name__ == '__main__':
         elif sys.argv[2] == 'venues':
 
             
-            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+           # G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Create venues network' 
-            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+           # G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
-            get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
+           # get_gephi_new(G_venues,  outroot, city + '_venues_similarity')
             #print 'Creating network stats...'
           #  get_network_stats(G_venues,  city, outroot, '_venues_similarity')
             #print 'Calc centrality measures...'
@@ -1121,7 +1121,7 @@ if __name__ == '__main__':
             
 
 
-            for nc_threshold in [1000, 500, 250, 100, 25, 10, 1]:
+            for nc_threshold in [3000, 2000, 1500]:#1000, 500, 250, 100, 25, 10, 1]:
 
                 transform_gephi_to_backbone(outroot, city + '_venues_similarity', nc_threshold)
 
