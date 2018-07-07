@@ -12,7 +12,7 @@ files      = [foutfolder + '/' + fff for fff in os.listdir(foutfolder) if 'NC_B'
 
 for fn in files:
 
-    threshold = fn, fn.split('_')[2]
+    threshold = fn.split('_')[2]
 
     nedges = 0
     nnodes = 0
