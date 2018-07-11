@@ -80,7 +80,7 @@ nnn = len(venues_users)
 for ind, (v, users) in enumerate(venues_users.items()):
 
 
-    #sif ind == 50: break
+    #if ind == 50: break
 
     #if 2 == 2:
 
@@ -100,13 +100,13 @@ for ind, (v, users) in enumerate(venues_users.items()):
 
 
         if len(user_level_values) > 0:
-            venues_features[v][key + '_avg']     = np.mean(user_level_values)
-            venues_features[v][key + '_std']     = np.std(user_level_values)
-            venues_features[v][key + '_entropy'] = stat.entropy(np.asarray(user_level_values))
+            venues_features[v]['u_' + key + '_avg']     = np.mean(user_level_values)
+            venues_features[v]['u_' + key + '_std']     = np.std(user_level_values)
+            venues_features[v]['u_' + key + '_entropy'] = stat.entropy(np.asarray(user_level_values))
         else:
-            venues_features[v][key + '_avg']     = 0
-            venues_features[v][key + '_std']     = 0
-            venues_features[v][key + '_entropy'] = 0
+            venues_features[v]['u_' + key + '_avg']     = 0
+            venues_features[v]['u_' + key + '_std']     = 0
+            venues_features[v]['u_' + key + '_entropy'] = 0
 
 
     
@@ -115,7 +115,19 @@ for ind, (v, users) in enumerate(venues_users.items()):
 
 filename = outroot + '/networks/' + city + '_COMBINED_networkmeasures.csv'
 df = pd.DataFrame.from_dict(venues_features, orient = 'index')
-df.to_csv(filename, na_rep='nan')
+
+
+
+
+df_venue_sim = df_venue_sim.rename(index=str, columns = {vv : 'v_' + vv for vv in df_venue_sim.keys()})
+
+
+
+
+finaldf = df.join(df_venue_sim)
+
+
+finaldf.to_csv(filename, na_rep='nan')
 
 
 
