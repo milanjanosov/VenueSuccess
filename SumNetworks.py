@@ -107,7 +107,7 @@ for ind, (v, users) in enumerate(venues_users.items()):
         if len(user_level_values) > 0:
             venues_features[v]['u_' + key + '_avg']     = np.mean(user_level_values)
             venues_features[v]['u_' + key + '_std']     = np.std(user_level_values)
-            venues_features[v]['u_' + key + '_entropy'] = stat.entropy(np.asarray(user_level_values))
+            venues_features[v]['u_' + key + '_entropy'] = stat.entropy(np.asarray(user_level_values), base = len(user_level_values))
         else:
             venues_features[v]['u_' + key + '_avg']     = 0
             venues_features[v]['u_' + key + '_std']     = 0
