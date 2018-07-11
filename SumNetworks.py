@@ -98,6 +98,9 @@ for ind, (v, users) in enumerate(venues_users.items()):
 
         user_level_values = df_friend_geo.loc[users][key].tolist()
 
+        nmn = len(np.asarray(user_level_values))
+        user_level_values = [ijk/nmn for ijk in user_level_values]
+
 
         if len(user_level_values) > 0:
             venues_features[v]['u_' + key + '_avg']     = np.mean(user_level_values)
