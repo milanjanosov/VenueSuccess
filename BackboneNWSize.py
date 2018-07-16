@@ -1,13 +1,24 @@
 import os
 
+
+tipus = 'venues'
+
 city       = 'london'
 outfolder  = '../ProcessedData/' + city + '/'
-outname    = '_venues_similarity'
+outname    = '_' + tipus + '_similarity'
 foutfolder = outfolder + 'networks/gephi/'  #backboneformat_' + outname + '.dat'
 files      = [foutfolder + '/' + fff for fff in os.listdir(foutfolder) if 'NC_B' in fff]
 
 
-#files = ['NC_BACKBONE_250_london_venues_similarity_edges.dat']
+
+
+edges_o = len([line for line in open(outfolder  + 'networks/gephi/bristol_users_similarity_edges.dat')])
+nodes_o =  len([line for line in open(outfolder + 'networks/gephi/bristol_users_similarity_nodes.dat')])
+
+
+print 'original\t', nodes_o, '\t', edges_o
+
+
 
 
 for fn in files:
@@ -27,3 +38,8 @@ for fn in files:
     nnodes = len(set(n))
 
     print threshold, '\t', nnodes, '\t', nedges
+
+
+
+
+
