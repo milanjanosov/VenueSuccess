@@ -12,8 +12,8 @@ files      = [foutfolder + '/' + fff for fff in os.listdir(foutfolder) if 'NC_B'
 
 
 
-edges_o = len([line for line in open(outfolder  + 'networks/gephi/' + city + '_users_similarity_edges.dat')])
-nodes_o =  len([line for line in open(outfolder + 'networks/gephi/' + city + '_users_similarity_nodes.dat')])
+edges_o = len([line for line in open(outfolder  + 'networks/gephi/' + city + '_' + tipus + '_similarity_edges.dat')])
+nodes_o =  len([line for line in open(outfolder + 'networks/gephi/' + city + '_' + tipus + '_similarity_nodes.dat')])
 
 
 print 'original\t', nodes_o, '\t', edges_o
