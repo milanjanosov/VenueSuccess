@@ -556,13 +556,13 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
 
 
 
-def create_igraphnw_from_backbone(outfolder, inname, tipus, infile):
+def create_igraphnw_from_backbone(outfolder, inname, tipus, infile, thresh = ''):
 
 
     print 'Creating backbone igraph network ' + tipus
 
-    ininfile = outfolder + 'networks/gephi/' + tipus + '_BACKBONE_' + inname + '_edges.dat'
-    outfile  = outfolder + 'networks/gephi/' + tipus + '_IGRAPH_'   + inname + '_edges.dat'
+    ininfile = outfolder + 'networks/gephi/' + tipus + '_BACKBONE_' + thresh + '_' + inname + '_edges.dat'
+    outfile  = outfolder + 'networks/gephi/' + tipus + '_IGRAPH_'   + thresh + '_' + inname + '_edges.dat'
 
 
     print outfile
@@ -596,9 +596,7 @@ def create_igraphnw_from_backbone(outfolder, inname, tipus, infile):
 
     add_distances_to_edges(G)
     
-    #for e in G.es():
-     #   print G.vs[e.source]['name'], G.vs[e.target]['name'], e['distances']
-  
+    print 'Igraph transf\t', tipus, 'threshold: ', thresh, '  ', '  nodes:', len(G.vs()), '   edges:', len(G.es())
 
     return G
 
@@ -1085,22 +1083,25 @@ if __name__ == '__main__':
 
 
             #print 'Create users network' 
-            #G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
             #print 'Creating gephi files...'
-            #get_gephi_new(G_users,   outroot, city + '_users_similarity') 
+            get_gephi_new(G_users,   outroot, city + '_users_similarity') 
             #print 'Creating network stats...'
             #get_network_stats(G_users,   city, outroot, '_users_similarity')  
             #print 'Calc centrality measures...'
             #calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
             #get_weight_distr(outroot, city + '_users_similarity')
 
-            transform_gephi_to_backbone(outroot, city + '_users_similarity')
-        
-#            G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile)
-#            calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False)
+            for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
-#            G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
-#            calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
+                transform_gephi_to_backbone(outroot, city + '_users_similarity', nc_threshold)        
+                G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile,  thresh = str(nc_threshold))
+                calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
+
+
+
+    #            G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
+    #            calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
 
 
 
