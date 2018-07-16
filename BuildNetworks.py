@@ -16,7 +16,8 @@ sys.path.append("./backboning")
 import backboning
 sys.path.append("..")
 import ParseInput
-
+from shapely.geometry import shape
+from pyproj import Proj
 
 
 
@@ -702,27 +703,21 @@ def triangle_size(G, node, neighbors):
 ### https://stackoverflow.com/questions/4681737/how-to-calculate-the-area-of-a-polygon-on-the-earths-surface-using-python square meters 
 def geo_size_of_ego(G, node, neighbors):
 
-    ''' THIS GUARD HAS TO GO '''    
-    try:
 
+    lat, lon = zip(*[G.vs[neighbor]['location'] for neighbor in neighbors if 'nan' not in str(G.vs[neighbor]['location'])])
 
-        lat, lon = zip(*[G.vs[neighbor]['location'] for neighbor in neighbors if 'nan' not in str(G.vs[neighbor]['location'])])
+    if len(lat) > 2:
 
-        if len(lat) > 2:
+            pa   = Proj("+proj=aea +lat_1=37.0 +lat_2=41.0 +lat_0=39.0 +lon_0=-106.55")
+            x, y = pa(lon, lat)
+            cop  = {"type": "Polygon", "coordinates": [zip(x, y)]}
+  
+            return shape(cop).area
 
-                pa   = Proj("+proj=aea +lat_1=37.0 +lat_2=41.0 +lat_0=39.0 +lon_0=-106.55")
-                x, y = pa(lon, lat)
-                cop  = {"type": "Polygon", "coordinates": [zip(x, y)]}
-                
-                return shape(cop).area
+    else:
 
-        else:
-    
-            return  99999999999.9
+        return  0.0
 
-    except:
-        return  99999999999.9
-        pass
 
 
 def geo_stdev_of_ego(G, node, neighbors):
@@ -855,7 +850,7 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
         t1 = time.time()
         constraint_geo     = G.constraint(                    weights='distances')
         print 'constraint_geo: ', time.time() - t1  , '\n\n'
-
+        
 
 
     if weighted: 
@@ -1083,9 +1078,9 @@ if __name__ == '__main__':
 
 
             #print 'Create users network' 
-            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+#            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
             #print 'Creating gephi files...'
-            get_gephi_new(G_users,   outroot, city + '_users_similarity') 
+#            get_gephi_new(G_users,   outroot, city + '_users_similarity') 
             #print 'Creating network stats...'
             #get_network_stats(G_users,   city, outroot, '_users_similarity')  
             #print 'Calc centrality measures...'
