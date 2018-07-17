@@ -18,7 +18,7 @@ nodes_o =  len([line for line in open(outfolder + 'networks/gephi/' + city + '_'
 
 
 print 'Filtering\t#nodes\t#edges\trelnodeloss\tedgedens'
-print 'original\t', nodes_o, '\t', edges_o
+print 'original\t', nodes_o, '\t', edges_o, '\t0', round(100*edges_o / float(nodes_o**2/2.0), 2)
 
 
 
