@@ -1,9 +1,10 @@
 import os
+import sys
+
+city  = sys.argv[1]
+tipus = sys.argv[2]
 
 
-tipus = 'venues'
-
-city       = 'london'
 outfolder  = '../ProcessedData/' + city + '/'
 outname    = '_' + tipus + '_similarity'
 foutfolder = outfolder + 'networks/gephi/'  #backboneformat_' + outname + '.dat'
@@ -16,7 +17,9 @@ edges_o = len([line for line in open(outfolder  + 'networks/gephi/' + city + '_'
 nodes_o =  len([line for line in open(outfolder + 'networks/gephi/' + city + '_' + tipus + '_similarity_nodes.dat')])
 
 
+print 'Filtering\t#nodes\t#edges\trelnodeloss\tedgedens'
 print 'original\t', nodes_o, '\t', edges_o
+
 
 
 
@@ -37,7 +40,7 @@ for fn in files:
 
     nnodes = len(set(n))
 
-    print threshold, '\t', nnodes, '\t', nedges
+    print threshold, '\t', nnodes, '\t', nedges, '\t', round(100*nnodes / float(nodes_o), 2), '\t', round(100*nedges / float(nnodes**2/2.0), 2)
 
 
 
