@@ -8,7 +8,7 @@ tipus = sys.argv[2]
 outfolder  = '../ProcessedData/' + city + '/'
 outname    = '_' + tipus + '_similarity'
 foutfolder = outfolder + 'networks/gephi/'  #backboneformat_' + outname + '.dat'
-files      = [foutfolder + '/' + fff for fff in os.listdir(foutfolder) if 'NC_B' in fff]
+files      = [foutfolder + '/' + fff for fff in os.listdir(foutfolder) if 'NC_B' in fff and tipus in fff]
 
 
 
