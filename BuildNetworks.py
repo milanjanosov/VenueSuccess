@@ -1120,6 +1120,7 @@ if __name__ == '__main__':
        #     for nc_threshold in [3000, 2000, 1500]:#1000, 500, 250, 100, 25, 10, 1]:
             for nc_threshold in [5000]:#1000, 500, 250, 100, 25, 10, 1]:
 
+                print 'THRESHILD :  ', nc_threshold
                 transform_gephi_to_backbone(outroot, city + '_venues_similarity', nc_threshold)
 
                 G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile, thresh = str(nc_threshold))
@@ -1130,7 +1131,7 @@ if __name__ == '__main__':
             
 
 
-## source /opt/virtualenv-python2.7/bin/activate
+##  
 
 
 
