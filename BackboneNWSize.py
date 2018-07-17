@@ -18,7 +18,7 @@ nodes_o =  len([line for line in open(outfolder + 'networks/gephi/' + city + '_'
 
 
 print 'Filtering\t#nodes\t#edges\trelnodeloss\tedgedens'
-print 'original\t', nodes_o, '\t', edges_o, '\t0', round(100*edges_o / float(nodes_o**2/2.0), 2)
+print 'original\t', nodes_o, '\t', edges_o, '\t0', round(100*edges_o / float(nodes_o**2/2.0), 4)
 
 
 
@@ -40,7 +40,7 @@ for fn in files:
 
     nnodes = len(set(n))
 
-    print threshold, '\t', nnodes, '\t', nedges, '\t', round(100*nnodes / float(nodes_o), 2), '\t', round(100*nedges / float(nnodes**2/2.0), 2)
+    print threshold, '\t', nnodes, '\t', nedges, '\t', round(100*nnodes / float(nodes_o), 2), '\t', round(100*nedges / float(nnodes**2/2.0), 4)
 
 
 
