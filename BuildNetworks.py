@@ -1059,16 +1059,17 @@ if __name__ == '__main__':
 
         if sys.argv[2] == 'friend':
 
-            print 'Create friendship network' 
+        
+            print 'FRIENDS:  Create friendship network' 
             G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
 
-            print 'Creating gephi files...'
+            print 'FRIENDS:  Creating gephi files...'
             get_gephi_new(G_friends, outroot, city + '_friendship')     
        
-            print 'Calc centrality measures...'
+            print 'FRIENDS:  Calc centrality measures...'
             calc_network_centralities(G_friends, outroot, city, infile, 'friend',       geo = True,  weighted = False, venue = False)
 
-            print 'Creating network stats...'
+            print 'FRIENDS:  Creating network stats...'
             get_network_stats(G_friends, city, outroot, '_friendship')
             
 
@@ -1086,6 +1087,7 @@ if __name__ == '__main__':
             #print 'Calc centrality measures...'
             #calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
             #get_weight_distr(outroot, city + '_users_similarity')
+                print 'USERS  THRESHOLD :  ', nc_threshold
 
             for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
@@ -1120,7 +1122,7 @@ if __name__ == '__main__':
             for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
             #for nc_threshold in [500, 1000]:#1000, 500, 250, 100, 25, 10, 1]:
 
-                print 'THRESHILD :  ', nc_threshold
+                print 'VENUES  THRESHOLD :  ', nc_threshold
                 transform_gephi_to_backbone(outroot, city + '_venues_similarity', nc_threshold)
 
                 G_venues_NC = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'NC', infile, thresh = str(nc_threshold))
