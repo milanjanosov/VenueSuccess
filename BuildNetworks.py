@@ -1117,8 +1117,8 @@ if __name__ == '__main__':
             
 
 
-       #     for nc_threshold in [3000, 2000, 1500]:#1000, 500, 250, 100, 25, 10, 1]:
-            for nc_threshold in [500, 1000]:#1000, 500, 250, 100, 25, 10, 1]:
+            for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
+            #for nc_threshold in [500, 1000]:#1000, 500, 250, 100, 25, 10, 1]:
 
                 print 'THRESHILD :  ', nc_threshold
                 transform_gephi_to_backbone(outroot, city + '_venues_similarity', nc_threshold)
