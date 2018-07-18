@@ -150,7 +150,7 @@ def get_users_venue_coordinates(outfolder, users_location):
 
     for ind, line in enumerate(open(outfolder+ 'user_info/london_FINAL_user_coordinates_raw_locals_filtered.dat')):
 
-        if ind == 10: break
+        #if ind == 10: break
             
         fields      = line.strip().split('\t')
         user        = fields[0]
@@ -175,7 +175,7 @@ def get_users_geostretch_feats(users_venue_coordinates, users_location):
 
     for ind, (user, venues) in enumerate(users_venue_coordinates.items()):
 
-        if ind == 10: break
+        #if ind == 10: break
         #print user, users_location[user], venues
         
         userlng, userlat = users_location[user]  
@@ -222,7 +222,7 @@ def get_features_of_venues_from_users(venues_users, users_geostretch_feats):
 
     for ind, (ven, users) in enumerate(venues_users.items()):
         
-        if ind == 100: break
+        #if ind == 100: break
             
 
         'social_stretch'
