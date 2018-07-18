@@ -1087,10 +1087,11 @@ if __name__ == '__main__':
             #print 'Calc centrality measures...'
             #calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
             #get_weight_distr(outroot, city + '_users_similarity')
-            print 'USERS  THRESHOLD :  ', nc_threshold
+
 
             for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
+                print 'USERS  THRESHOLD :  ', nc_threshold
                 transform_gephi_to_backbone(outroot, city + '_users_similarity', nc_threshold)        
                 G_users_NC = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'NC', infile,  thresh = str(nc_threshold))
                 calc_network_centralities(G_users_NC,   outroot, city, infile, 'users_sim_geo_' + 'NC' ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
@@ -1131,7 +1132,7 @@ if __name__ == '__main__':
             
 
 
-##  
+##   source /opt/virtualenv-python2.7/bin/activate
 
 
 
