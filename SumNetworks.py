@@ -15,9 +15,9 @@ outroot   = '../ProcessedData/' + city
 
 threshold = 5000
 
-for threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
+#for threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
-
+if 2 == 2:
 
     users_friend_geo   = outroot + '/networks/' + city + '_friend__networkmeasures.csv'
     venues_sim         = outroot + '/networks/' + city + '_venues_similarity_NC_' + str(threshold) + '_networkmeasures.csv'
@@ -86,6 +86,9 @@ for threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
                 user_level_values = df.loc[users][key].tolist()
                 nmn = len(np.asarray(user_level_values))
                 user_level_values = [ijk/nmn for ijk in user_level_values]
+
+                if 'geo_size_of_ego' in key:
+                    user_level_values = [u / 1000000.0 for u in user_level_values]
 
 
                 if len(user_level_values) > 0:
