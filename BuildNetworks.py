@@ -1087,7 +1087,7 @@ if __name__ == '__main__':
             #print 'Calc centrality measures...'
             #calc_network_centralities(G_users,   outroot, city, infile, 'users_sim_geo',   geo = True,  weighted = True,  venue = False)
             #get_weight_distr(outroot, city + '_users_similarity')
-                print 'USERS  THRESHOLD :  ', nc_threshold
+            print 'USERS  THRESHOLD :  ', nc_threshold
 
             for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
@@ -1116,8 +1116,6 @@ if __name__ == '__main__':
             #print 'Calc centrality measures...'
           #  calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
           #  get_weight_distr(outroot, city + '_venues_similarity')
-            
-
 
             for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
             #for nc_threshold in [500, 1000]:#1000, 500, 250, 100, 25, 10, 1]:
