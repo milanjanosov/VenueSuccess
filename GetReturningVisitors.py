@@ -15,7 +15,7 @@ venues_users_l = {}
 print 'Number of distinct users...'
 for ind, line in enumerate( open(outroot + 'venues_photod_categories_times.dat') ) :
 
-    if ind == 10: break
+    #if ind == 10: break
     user, venue, a, b, c = line.strip().split('\t')
     
     if venue in relevant_venues:    
@@ -43,7 +43,7 @@ venues_regulars_l = {}
 print 'Number of regular users...'
 for ind, (venue_user, cnt) in enumerate(records_cnt.items()):
 
-    if ind == 10: break
+    #if ind == 10: break
     if venue in relevant_venues:    
         print venue
         if cnt > 1 :   
