@@ -14,8 +14,9 @@ outroot   = '../ProcessedData/' + city
 
 
 threshold = 5000
+#for threshold in [5000, 3000, 2000, 1500, 1000]:#, 500, 100]:
 
-for threshold in [5000, 3000, 2000, 1500, 1000]:#, 500, 100]:
+for threshold in [3000, 2000, 1500, 1000]:#, 500, 100]:
 
 #if 2 == 2:
 
