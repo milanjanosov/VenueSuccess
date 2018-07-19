@@ -5,7 +5,7 @@ from collections import Counter
 city = 'london'
 outroot   = '../ProcessedData/' + city + '/venues_info/'
 
-relevant_venues = list(set([line.strip().split('\t')[0] for line in open(outroot + '/venues_ward_full.dat') if 'venue' not in line]))
+#relevant_venues = list(set([line.strip().split('\t')[0] for line in open(outroot + '/venues_ward_full.dat') if 'venue' not in line]))
 
 
 
@@ -18,12 +18,12 @@ for ind, line in enumerate( open(outroot + 'venues_photod_categories_times.dat')
     #if ind == 10: break
     user, venue, a, b, c = line.strip().split('\t')
     
-    if venue in relevant_venues:    
-        if venue not in venues_users_l:
-            venues_users_l[venue] = [user]
-        else:
-            venues_users_l[venue].append(user)
-        
+    #if venue in relevant_venues:    
+    if venue not in venues_users_l:
+        venues_users_l[venue] = [user]
+    else:
+        venues_users_l[venue].append(user)
+    
 venues_users = {}
 for v, u in venues_users_l.items():
     venues_users[v] = len(set(u))
@@ -44,14 +44,14 @@ print 'Number of regular users...'
 for ind, (venue_user, cnt) in enumerate(records_cnt.items()):
 
     #if ind == 10: break
-    if venue in relevant_venues:    
-        print venue
-        if cnt > 1 :   
-            user, venue = venue_user.split('_')
-            if venue not in venues_regulars_l:
-                venues_regulars_l[venue] = [user]
-            else:
-                venues_regulars_l[venue].append(user)
+    #if venue in relevant_venues:    
+
+    if cnt > 1 :   
+        user, venue = venue_user.split('_')
+        if venue not in venues_regulars_l:
+            venues_regulars_l[venue] = [user]
+        else:
+            venues_regulars_l[venue].append(user)
             
 venues_regulars = {}
 for v, u in venues_regulars_l.items():
