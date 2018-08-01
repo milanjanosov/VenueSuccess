@@ -17,7 +17,7 @@ def get_venues_money(city, outfolder):
 
     for ind, fn in enumerate(files):
 
-        if ind == 100: break
+        #if ind == 100: break
         print 'html parsing:   ', ind, '/', nnn
 
 
@@ -74,7 +74,7 @@ def get_users_venues_money(outfolder, city):
 
         print 'aggregating users money profile    ', ind
 
-        if ind == 100: break
+        #if ind == 100: break
 
         fields = line.strip().split('\t')
         user   = fields[0]
@@ -112,7 +112,7 @@ def get_venues_users_moneys(outfolder, city):
     # get the users money lists
     users_moneys = {}
     for ind, line in enumerate(open(outfolder + '/venues_info/' + city + '_venues_users_moneys.dat')):
-        if ind == 100: break
+        #if ind == 100: break
         fields = line.strip().split('\t')
         user   = fields[0]
         moneys = [float(fff) for fff in fields[1:]]
@@ -122,7 +122,7 @@ def get_venues_users_moneys(outfolder, city):
     # get the venues users
     venues_users = {}
     for ind, line in enumerate(open(outfolder + '/venues_info/london_venues_users.dat')):
-        if ind == 100: break
+        #if ind == 100: break
         fields = line.strip().split('\t')
         venue = fields[0]
         users = fields[1:] 
@@ -149,7 +149,7 @@ def get_venues_users_moneys(outfolder, city):
 
         print 'aggregating venues money profile    ', ind
 
-        if ind == 100: break
+        #if ind == 100: break
 
         if venue in venues_users_moneys:
             umoneys = venues_users_moneys[venue]
