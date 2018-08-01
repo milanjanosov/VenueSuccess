@@ -67,6 +67,7 @@ def get_users_venues_money(outfolder, city):
     venues_moneys = dict(zip(dfvenues.index, dfvenues.money))
 
 
+
     users_moneys = {}
 
     for ind, line in enumerate(open(outfolder + 'user_info/london_user_venues_full_locals_filtered.dat')):
@@ -74,19 +75,17 @@ def get_users_venues_money(outfolder, city):
 
         print 'aggregating users money profile    ', ind
 
-        #if ind == 100: break
+        #if ind == 1000: break
 
         fields = line.strip().split('\t')
         user   = fields[0]
         venues = [fff.split(',')[0] for fff in fields[1:]]
 
-          
-
-
+         
         for venue in venues:
-            if venue in venues_moneys:
-            
+            if venue in venues_moneys:           
                 money = venues_moneys[venue]
+
                 if 'na' != money:
 
                     money = float(money)
@@ -95,14 +94,14 @@ def get_users_venues_money(outfolder, city):
                         users_moneys[user] = [money]
                     else:
                         users_moneys[user].append(money)
-
+                
 
 
     fout = open(outfolder + '/venues_info/' + city + '_venues_users_moneys.dat', 'w')
     for user, m in users_moneys.items():
         fout.write( user + '\t' + '\t'.join([str(mm) for mm in m]) + '\n')
     fout.close()
-
+    
 
     
 
@@ -112,6 +111,7 @@ def get_venues_users_moneys(outfolder, city):
     # get the users money lists
     users_moneys = {}
     for ind, line in enumerate(open(outfolder + '/venues_info/' + city + '_venues_users_moneys.dat')):
+        print 'Read money    ', ind
         #if ind == 100: break
         fields = line.strip().split('\t')
         user   = fields[0]
@@ -121,17 +121,28 @@ def get_venues_users_moneys(outfolder, city):
 
     # get the venues users
     venues_users = {}
+
+    relevant_venues = set([line.strip().split('\t')[0] for line in open(outfolder + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
+
     for ind, line in enumerate(open(outfolder + '/venues_info/london_venues_users.dat')):
+        print 'Read venues    ', ind
         #if ind == 100: break
         fields = line.strip().split('\t')
         venue = fields[0]
-        users = fields[1:] 
-        venues_users[venue] = users
 
+        if venue in relevant_venues:
+
+            users = fields[1:] 
+            venues_users[venue] = users
+
+    print len(venues_users)
 
     # get the money lists for the venues
     venues_users_moneys = {}
-    for venue, users in venues_users.items():
+    for ind, (venue, users) in enumerate(venues_users.items()):
+
+        print 'Finalize, venues...    ', ind
+
         for user in users:
             if user in users_moneys:
                 moneys = users_moneys[user]
@@ -200,7 +211,7 @@ city        = 'london'
 outfolder   = '../ProcessedData/' + city + '/'
 
 
-get_venues_money(city, outfolder)
+#get_venues_money(city, outfolder)
 get_users_venues_money(outfolder, city)
 get_venues_users_moneys(outfolder, city)
 
