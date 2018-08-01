@@ -75,7 +75,7 @@ def get_users_venues_money(outfolder, city):
 
         print 'aggregating users money profile    ', ind
 
-        #if ind == 1000: break
+        #if ind == 10000: break
 
         fields = line.strip().split('\t')
         user   = fields[0]
@@ -112,11 +112,20 @@ def get_venues_users_moneys(outfolder, city):
     users_moneys = {}
     for ind, line in enumerate(open(outfolder + '/venues_info/' + city + '_venues_users_moneys.dat')):
         print 'Read money    ', ind
-        #if ind == 100: break
+        #if ind == 1000: break
         fields = line.strip().split('\t')
         user   = fields[0]
         moneys = [float(fff) for fff in fields[1:]]
-        users_moneys[user] = moneys
+
+       
+        users_moneys[user] = {}
+
+        for m in moneys:
+            if m not in users_moneys[user]:
+                users_moneys[user][m]  = 1
+            else:
+                users_moneys[user][m] += 1 
+
 
 
     # get the venues users
@@ -137,19 +146,33 @@ def get_venues_users_moneys(outfolder, city):
 
     print len(venues_users)
 
+    print 'AA', len(venues_users), '\n\n\n'
+
+
+
     # get the money lists for the venues
     venues_users_moneys = {}
     for ind, (venue, users) in enumerate(venues_users.items()):
+
+        venues_users_moneys[venue] = {}
+
+
+        if ind == 1000: break
 
         print 'Finalize, venues...    ', ind
 
         for user in users:
             if user in users_moneys:
-                moneys = users_moneys[user]
-                if venue not in venues_users_moneys:
-                    venues_users_moneys[venue] = moneys
-                else:
-                    venues_users_moneys[venue] += moneys
+
+                
+
+                for moneyvalue, moneycount in users_moneys[user].items():
+
+                    if moneyvalue not in venues_users_moneys[venue]:
+                        venues_users_moneys[venue][moneyvalue]  = moneycount
+                    else:
+                        venues_users_moneys[venue][moneyvalue] += moneycount
+
 
 
     # venues money_stats as features
@@ -205,14 +228,14 @@ def get_venues_users_moneys(outfolder, city):
 
     df.to_csv(outfile, na_rep='nan')#, header = True)
 
-
+   
 
 city        = 'london'
 outfolder   = '../ProcessedData/' + city + '/'
 
 
 #get_venues_money(city, outfolder)
-get_users_venues_money(outfolder, city)
+#get_users_venues_money(outfolder, city)
 get_venues_users_moneys(outfolder, city)
 
 
@@ -220,3 +243,4 @@ get_venues_users_moneys(outfolder, city)
 
 
 
+ 
