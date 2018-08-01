@@ -192,7 +192,7 @@ def get_venues_users_moneys(outfolder, city):
 
             print umoneys
 
-            N  = sum(umoneys.values())
+            N  = float(sum(umoneys.values()))
 
 
             c1, c2, c3, c4 = (0,0,0,0)
@@ -212,9 +212,14 @@ def get_venues_users_moneys(outfolder, city):
 
             valvalval = [1 for i in range(c1)] + [2 for i in range(c2)] + [3 for i in range(c3)] + [4 for i in range(c4)] 
     
+            print valvalval
+            print np.mean(valvalval)
+            print np.std(valvalval) 
+            print stat.entropy(np.asarray(valvalval), base = len(valvalval))
 
-            venues_money_stats[venue]['m_4_avg'] = np.mean(valvalval)
-            venues_money_stats[venue]['m_4_std'] = np.std(valvalval) 
+            venues_money_stats[venue]['m_avg']     = np.mean(valvalval)
+            venues_money_stats[venue]['m_std']     = np.std(valvalval) 
+            venues_money_stats[venue]['m_entropy'] = np.std(valvalval) 
 
         else:
 
@@ -225,10 +230,10 @@ def get_venues_users_moneys(outfolder, city):
             venues_money_stats[venue]['m_3_fraction'] = 0
             venues_money_stats[venue]['m_4_fraction'] = 0
 
-            venues_money_stats[venue]['m_4_avg'] = 0
-            venues_money_stats[venue]['m_4_std'] = 0
+            venues_money_stats[venue]['m_avg']     = 0
+            venues_money_stats[venue]['m_std']     = 0
+            venues_money_stats[venue]['m_entropy'] = 0
         
-
 
 
 
