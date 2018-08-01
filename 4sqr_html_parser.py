@@ -3,6 +3,7 @@ import gzip
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
+import scipy.stats as stat
 
 
 
@@ -157,7 +158,7 @@ def get_venues_users_moneys(outfolder, city):
         venues_users_moneys[venue] = {}
 
 
-        if ind == 1000: break
+        #if ind == 1000: break
 
         print 'Finalize, venues...    ', ind
 
@@ -185,24 +186,35 @@ def get_venues_users_moneys(outfolder, city):
 
         #if ind == 100: break
 
-        if venue in venues_users_moneys:
+        if venue in venues_users_moneys and len(venues_users_moneys[venue]) > 0:
             umoneys = venues_users_moneys[venue]
 
-            N  = float(len(umoneys))
-            c1 = umoneys.count(1) / N
-            c2 = umoneys.count(2) / N
-            c3 = umoneys.count(3) / N
-            c4 = umoneys.count(4) / N
+
+            print umoneys
+
+            N  = sum(umoneys.values())
+
+
+            c1, c2, c3, c4 = (0,0,0,0)
+
+
+            if 1 in umoneys: c1 = umoneys[1]  #umoneys.count(1) / N
+            if 2 in umoneys: c2 = umoneys[2]  #umoneys.count(2) / N
+            if 3 in umoneys: c3 = umoneys[3]  #umoneys.count(3) / N
+            if 4 in umoneys: c4 = umoneys[4]  #umoneys.count(4) / N
 
             if venue not in venues_money_stats: venues_money_stats[venue] = {}
 
-            venues_money_stats[venue]['m_1_fraction'] = c1
-            venues_money_stats[venue]['m_2_fraction'] = c2
-            venues_money_stats[venue]['m_3_fraction'] = c3
-            venues_money_stats[venue]['m_4_fraction'] = c4
+            venues_money_stats[venue]['m_1_fraction'] = c1 / N
+            venues_money_stats[venue]['m_2_fraction'] = c2 / N
+            venues_money_stats[venue]['m_3_fraction'] = c3 / N
+            venues_money_stats[venue]['m_4_fraction'] = c4 / N
 
-            venues_money_stats[venue]['m_4_avg'] = np.mean(umoneys)
-            venues_money_stats[venue]['m_4_std'] = np.std(umoneys) 
+            valvalval = [1 for i in range(c1)] + [2 for i in range(c2)] + [3 for i in range(c3)] + [4 for i in range(c4)] 
+    
+
+            venues_money_stats[venue]['m_4_avg'] = np.mean(valvalval)
+            venues_money_stats[venue]['m_4_std'] = np.std(valvalval) 
 
         else:
 
