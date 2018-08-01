@@ -18,7 +18,7 @@ def get_venues_money(city, outfolder):
     for ind, fn in enumerate(files):
 
         if ind == 100: break
-        print (ind, '/', nnn)
+        print 'html parsing:   ', ind, '/', nnn
 
 
         if 'dat.gz' == fn.split('.', 1)[-1] :
@@ -70,6 +70,9 @@ def get_users_venues_money(outfolder, city):
     users_moneys = {}
 
     for ind, line in enumerate(open(outfolder + 'user_info/london_user_venues_full_locals_filtered.dat')):
+
+
+        print 'aggregating users money profile    ', ind
 
         if ind == 100: break
 
@@ -142,7 +145,10 @@ def get_venues_users_moneys(outfolder, city):
     venues_money_stats = {}
 
     for ind, venue in enumerate(venues_users):
-#
+
+
+        print 'aggregating venues money profile    ', ind
+
         if ind == 100: break
 
         if venue in venues_users_moneys:
