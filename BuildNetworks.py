@@ -1020,9 +1020,9 @@ if __name__ == '__main__':
 
 
             print 'Create users network' 
-       # #    G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
-        #    get_gephi_new(G_users, outroot, city + '_users_sim')     
-        #    calc_network_centralities(G_users, outroot, city, infile, 'users_sim' ,   geo = True,  weighted = True,  venue = False, thresh = '')
+            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+            get_gephi_new(G_users, outroot, city + '_users_sim')     
+        #   calc_network_centralities(G_users, outroot, city, infile, 'users_sim' ,   geo = True,  weighted = True,  venue = False, thresh = '')
 
             
 
@@ -1055,9 +1055,9 @@ if __name__ == '__main__':
             
 
             print 'Create venues network' 
-    #        G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
-    #        print 'Creating gephi files...'
-     #       get_gephi_new(G_venues,  outroot, city + '_venues_sim')
+            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+            print 'Creating gephi files...'
+            get_gephi_new(G_venues,  outroot, city + '_venues_sim')
 
 
             #print 'Creating network stats...'
