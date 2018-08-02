@@ -220,6 +220,8 @@ def get_venues_users_moneys(outfolder, city):
             venues_money_stats[venue]['m_avg']     = np.mean(valvalval)
             venues_money_stats[venue]['m_std']     = np.std(valvalval) 
             venues_money_stats[venue]['m_entropy'] = stat.entropy(valvalval, base = len(valvalval)) 
+            venues_money_stats[venue]['m_dollars'] = len(valvalval)
+
 
         else:
 
@@ -233,7 +235,7 @@ def get_venues_users_moneys(outfolder, city):
             venues_money_stats[venue]['m_avg']     = 0
             venues_money_stats[venue]['m_std']     = 0
             venues_money_stats[venue]['m_entropy'] = 0
-        
+            venues_money_stats[venue]['m_dollars'] = 0
 
 
 
