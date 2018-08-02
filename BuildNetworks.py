@@ -1027,7 +1027,7 @@ if __name__ == '__main__':
             
 
             #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
-            for nc_threshold in [100, 300]:
+            for nc_threshold in [5000, 1000]:
                 print 'USERS  THRESHOLD :  ', nc_threshold
 
                 transform_gephi_to_backbone(outroot, city + '_users_sim', nc_threshold)        
@@ -1067,7 +1067,7 @@ if __name__ == '__main__':
           #  get_weight_distr(outroot, city + '_venues_similarity')
 
             #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
-            for nc_threshold in [250]:#1000, 500, 250, 100, 25, 10, 1]:
+            for nc_threshold in [5000,1000]:#1000, 500, 250, 100, 25, 10, 1]:
 
                 print 'VENUES  THRESHOLD :  ', nc_threshold
                 transform_gephi_to_backbone(outroot, city + '_venues_sim', nc_threshold)
