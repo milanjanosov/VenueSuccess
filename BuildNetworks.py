@@ -63,14 +63,12 @@ def add_distances_to_edges(G, avg_dist):
         exp_dist.append(      math.exp( - 1.0 * dist / avg_dist) )
 
 
-    G.es['distances']      = inv_distances
+    G.es['distances']      = distances
     G.es['inv_distances']  = inv_distances
     G.es['grav_distances'] = grav_dist
     G.es['exp_distances']  = exp_dist
 
-
-
-
+ 
 
 def get_network_stats(G, city, outfolder, infile):
 
@@ -129,13 +127,13 @@ def get_gephi_new(G, outfolder, outname):
 
        
     f = open( outfolder + 'networks/gephi/' + outname + '_edges.dat', 'w')
-    f.write('Source' + '\t' + 'Target' + '\t' + 'distances'  + '\t' + 'inv_distances' + '\t' + 'grav_distances' + '\t' + 'exp_distances' + '\t' + 'Weight' + '\t' + 'Type' + '\n')      
+    f.write('Source' + '\t' + 'Target' + '\t' + 'distances'  + '\t' + 'inv_distances' + '\t' + 'grav_distances' + '\t' + 'exp_distances' + '\t' + 'Weight_J' + '\t' + 'Weight_A' + '\t' + 'Type' + '\n')      
     for e in G.es():
 
         try:
-            f.write(G.vs[e.target]['name']+'\t'+G.vs[e.source]['name']+'\t'+str(e['distances'])+'\t'+str(e['inv_distances'])+'\t'+str(e['grav_distances'])+'\t'+str(e['exp_distances'])+'\t'+str(e['weight'])+ '\tundirected' + '\n')
+            f.write(G.vs[e.target]['name']+'\t'+G.vs[e.source]['name']+'\t'+str(e['distances'])+'\t'+str(e['inv_distances'])+'\t'+str(e['grav_distances'])+'\t'+str(e['exp_distances'])+'\t'+str(e['weight'])+'\t'+str(e['weight_a'])+ '\tundirected' + '\n')
         except:
-            f.write(G.vs[e.target]['name']+'\t'+G.vs[e.source]['name']+'\t'+str(e['distances'])+'\t'+str(e['inv_distances'])+'\t'+str(e['grav_distances'])+'\t'+str(e['exp_distances'])+'\t'+str(1)+'\tundirected' + '\n')
+            f.write(G.vs[e.target]['name']+'\t'+G.vs[e.source]['name']+'\t'+str(e['distances'])+'\t'+str(e['inv_distances'])+'\t'+str(e['grav_distances'])+'\t'+str(e['exp_distances'])+'\t'+str(1)+'\t'+str(1)+'\tundirected' + '\n')
             pass
 
 
@@ -197,17 +195,21 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
 
     G_geo   = Graph.Read_Lgl(outfolder + '/user_info/' + city  + '_users_geo_friends.lgl', names = True, weights = False, directed = False) 
+    G_geo.vs['location'] = [users_location[g['name']] for g in G_geo.vs()]
+    
 
+    nnn    = len(users_location)
 
+    movavg = 0
+    ijk    = 0
 
-    nnn = len(users_location)
-    pairdists = []
-
-    for ind, (user1, coord1) in enumerate(users_location.items()):
-        print 'Getting friendship network distances...  ', ind, '/', nnn
-        for user2, coord2 in users_location.items():
-            pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
-   
+    for user1 in G_geo.vs():
+        coord1 = user1['location']
+        for user2 in G_geo.vs():
+            coord2   = user2['location']
+            pairdist = mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0]))
+            movavg   = movavg + ( pairdist - movavg ) / float( (ijk + 1) )
+            ijk     += 1
 
 
     
@@ -216,23 +218,19 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
         os.makedirs(folderout)
 
     fffout = open(folderout + '/users_friendship_avg_distance.dat', 'w')
-    fffout.write(str(np.mean(pairdists)) + '\t' + str(np.std(pairdists)) + '\n')
+    fffout.write(str(movavg) + '\n')
     fffout.close()
 
-    fffout = open(folderout + '/users_friendship_distances.dat', 'w')
-    fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
-    fffout.close()
-
-
-    avg_dist = np.mean(pairdists)
-
+    #fffout = open(folderout + '/users_friendship_distances.dat', 'w')
+    #fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
+    #fffout.close()
 
 
 
 
     # add and calc distances
-    G_geo.vs['location'] = [users_location[g['name']] for g in G_geo.vs()]
-    add_distances_to_edges(G_geo, avg_dist)
+
+    add_distances_to_edges(G_geo, movavg)
 
     print 'Friendship network done.'
     
@@ -246,63 +244,39 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 ''' =========================================================== '''
 
 
-def chunkIt(seq, num):
-    avg = len(seq) / float(num)
-    out = []
-    last = 0.0
-
-    while last < len(seq):
-        out.append(seq[int(last):int(last + avg)])
-        last += avg
-
-    return out
-
-
-
-def get_users_edges(args):
-
-
-    users       = args[0]
-    users0      = args[1]
-    thread_id   = args[2]
-    num_threads = args[3]
-    edges       = args[4]
-    weights     = args[5]
-    all_users   = args[6]
-    users_venues = args[7]
-    
-
-    nnn = len(users0)
-
-    for ind, user1 in enumerate(users0):
-
-        #if ind == 3: break
-
-        print thread_id, '/', num_threads, '\t', ind, '/', nnn, '\t numedges:  ', len(edges)
-
-        for user2 in users:
-
-            if user1 != user2:
-
-                all_users.append(user1)
-                all_users.append(user2)
-                w = len(users_venues[user1].intersection(users_venues[user2]))
-
-
-
-
-                if w > 0 and 'user' not in user1 and 'user' not in user2:               
-                    edges.append((user1, user2))
-                    weights.append(w)
-
-      
-
-
 
 
 
 
 def get_user_user_similarity_network_igraph(city, outfolder, infile):
+
+
+    T1 = time.time()
+
+
+
+
+    # parse the data
+    filename     = outfolder + 'user_info/' + city  + '_users_venues.dat'  
+    venues_users = {}
+
+    for ind, line in enumerate(open(filename)):
+        fields = line.strip().split('\t')
+        user   = fields[0]
+        venues = fields[1:]
+
+        for venue in venues:
+
+            if venue not in venues_users:
+                venues_users[venue] = [user]
+            else:
+                venues_users[venue].append(user)
+            
+
+
+
+
+
 
 
 
@@ -311,7 +285,6 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
     # get the coordinates
     users_location = {}
-
     for line in open(infile):
         user, lng, lat = line.strip().split('\t')
         users_location[user] = (float(lng), float(lat))
@@ -333,44 +306,53 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
 
     # buld the network
-    edges     = []
-    weights   = []
-    all_users = set()
-    pairdists = []
-      
+    edges       = []
+    weights     = []
+    weights_a   = []
+    all_users   = set()
+    movavg      = 0  
 
 
     nnn = len(users)
+    ijk = 0
+
 
     for ind, user1 in enumerate(users):
 
         #if ind == 3: break
 
         print ind, '/', nnn
+        all_users.add(user1)
+
+        coord1 = users_location[user1]
 
         for user2 in users:
 
             if user1 != user2:
 
-                all_users.add(user1)
                 all_users.add(user2)
-                w = len(users_venues[user1].intersection(users_venues[user2]))
 
-                norm1 = len(users_venues[user1])
-                norm2 = len(users_venues[user2])
 
-                w = float(w) / (norm1 + norm2)
-
-                coord1 = users_location[user1]
                 coord2 = users_location[user2]
+                tau    = list(users_venues[user1].intersection(users_venues[user2]))
+                w      = len(tau)
 
-                pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
+                pairdist = mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0]))
 
 
 
-                if w > 0 and 'user' not in user1 and 'user' not in user2:               
+                movavg   = movavg + ( pairdist - movavg ) / float( (ijk + 1) )
+                ijk      += 1
+
+                if len(tau) > 0 and 'user' not in user1 and 'user' not in user2:      
+
+                    norm   = len(users_venues[user1].union(users_venues[user2]))
+                    w      = float(w) / norm
+                    w_a    = sum([ 1.0/(math.log(len(venues_users[u.split(',')[0]]))) for u in tau])
+
                     edges.append((user1, user2))
                     weights.append(w)
+                    weights_a.append(w)
 
 
 
@@ -380,30 +362,30 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
     if not os.path.exists(folderout):
         os.makedirs(folderout)
 
-    fffout = open(folderout + '/users_sim_avg_distance.dat', 'w')
-    fffout.write(str(np.mean(pairdists)) + '\t' + str(np.std(pairdists)) + '\n')
+    fffout = open(folderout  + '/users_sim_avg_distance.dat', 'w')
+    fffout.write(str(movavg) + '\n')
     fffout.close()
 
-    fffout = open(folderout + '/users_sim_distances.dat', 'w')
-    fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
-    fffout.close()
-
-
-    avg_dist = np.mean(pairdists)
-
+    #fffout = open(folderout + '/users_sim_distances.dat', 'w')
+    #fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
+    #fffout.close()
 
 
 
     G = Graph()
     G.add_vertices(list([u for u in all_users]))
     G.add_edges(edges)
-    locations        = [users_location[g['name']] for g in G.vs()] 
-    G.es['weight']   = weights   
-    G.vs['location'] = locations
-    add_distances_to_edges(G, avg_dist)
+    locations         = [users_location[g['name']] for g in G.vs()] 
+    G.es['weight']    = weights   
+    G.es['weight_a']  = weights_a 
+    G.vs['location']  = locations
+
+ 
+    add_distances_to_edges(G, movavg)
  
     print 'Users\'s similarity network done.'
-    
+    print time.time() - T1    
+
     return G
    
     
@@ -416,6 +398,7 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
 
 
+    T1 = time.time()
     print 'Start creating the venues\'s similarity network...'
 
     # parse the data
@@ -439,6 +422,32 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
         vv += venues
 
     
+
+
+    ### get users venues
+    users_venfn    = outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'  
+    users_venues   = {}
+    users          = []
+    users_location = {}
+
+    for line in open(infile):
+        user, lng, lat = line.strip().split('\t')
+        users_location[user] = (float(lng), float(lat))
+
+    for line in open(users_venfn):
+        fields = line.strip().split('\t')
+        user   = fields[0]
+        if user in users_location:
+            venues = set(fields[1:])
+            users_venues[user] = venues
+            users.append(user)
+
+
+
+
+
+
+
     ### get venues locations
     venues_location = {}
     for  line in open(outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
@@ -459,8 +468,10 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     
     edges      = []
     weights    = []
+    weights_a  = []
     all_venues = set()
     pairdists  = []
+    movavg     = 0
 
     venueslist = venues_location.keys() 
     nnn = len(venueslist)
@@ -470,29 +481,43 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
 
         print ind, '/', nnn
 
+
+        #if ind == 10: break
+
+        all_venues.add(venue1)
+
+        coord1 = venues_location[venue1]
+
+
         for venue2 in venueslist:
 
- 
             if venue1 != venue2:
 
-                all_venues.add(venue1)
                 all_venues.add(venue2)
     
-                norm1 = len(venues_users[venue1])
-                norm2 = len(venues_users[venue2])
 
-                w = float(len(set(venues_users[venue1]).intersection(set(venues_users[venue2])))) / ( norm1 + norm2 )
-           
-                coord1 = venues_location[venue1]
-                coord2 = venues_location[venue2]
+                coord2  = venues_location[venue2]
+                tau     = set(venues_users[venue1]).intersection(set(venues_users[venue2]))
+                w       = float(len(tau))
+      
 
-                pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
+                pairdist = mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0]))
+                movavg   = movavg + ( pairdist - movavg ) / float( (ind + 1) )
+
+                print movavg
+
+                #pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
 
 
-                if w > 0:
+                if len(tau) > 0:
+
+                    norm    = len(  set(venues_users[venue1]).union(set(venues_users[venue2] )) )
+                    w       = w/norm
+                    w_a     = sum([ 1.0/(math.log(len(users_venues[u]))) for u in tau if u in users_venues])
+
                     edges.append((venue1, venue2))
                     weights.append(w)
-
+                    weights_a.append(w_a)
 
       
 
@@ -501,20 +526,11 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     if not os.path.exists(folderout):
         os.makedirs(folderout)
 
-    fffout = open(folderout + '/users_sim_avg_distance.dat', 'w')
-    fffout.write(str(np.mean(pairdists)) + '\t' + str(np.std(pairdists)) + '\n')
+    fffout = open(folderout + '/users_venue_avg_distance.dat', 'w')
+    fffout.write(str(movavg) + '\n')
     fffout.close()
 
-    fffout = open(folderout + '/users_sim_distances.dat', 'w')
-    fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
-    fffout.close()
-
-
-    avg_dist = np.mean(pairdists)
-
-
-
-
+    print movavg
 
        
 
@@ -525,12 +541,14 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     G.add_vertices(all_venues)
     G.add_edges(edges)
     G.es['weight']   = weights
+    G.es['weight_a'] = weights_a
     G.vs['location'] = [venues_location[g['name']] for g in G.vs()]  
-    add_distances_to_edges(G, avg_dist)
+    print movavg
+    add_distances_to_edges(G, movavg)
     
 
     print 'Venue\'s similarity network done.'
-
+    print time.time() - T1    
     return G
 
 
