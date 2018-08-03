@@ -33,8 +33,9 @@ from pyproj import Proj
 
 
 
-def add_distances_to_edges(G):
+def add_distances_to_edges(G, avg_dist):
 
+    distances     = []
     inv_distances = []
     exp_dist      = []
     grav_dist     = []
@@ -56,11 +57,13 @@ def add_distances_to_edges(G):
         if dist == 0: dist = 0.0000000000000000000001
 
 
+        distances.append(     dist       )
         inv_distances.append( dist**(-1) )
         grav_dist.append(     dist**(-2) )
-        exp_dist.append(      math.exp( - 1.0 * dist) )
+        exp_dist.append(      math.exp( - 1.0 * dist / avg_dist) )
 
 
+    G.es['distances']      = inv_distances
     G.es['inv_distances']  = inv_distances
     G.es['grav_distances'] = grav_dist
     G.es['exp_distances']  = exp_dist
@@ -75,22 +78,17 @@ def get_network_stats(G, city, outfolder, infile):
 
     f, ax = plt.subplots(1, 3, figsize=(20, 5))
 
-
-
     N    = G.degree_distribution().n
     mean = round(G.degree_distribution().mean, 2)
     sd   = round(G.degree_distribution().sd, 2)
     xs, ys = zip(*[(left, count) for left, _, count in  G.degree_distribution().bins()])
 
  
-
     ax[0].bar(xs, ys)
     ax[0].set_title('Degree distribution, N = ' + str(N) + ', mean = ' + str(mean) + ', std = ' + str(sd) )
     ax[0].set_xlabel('Node degree')
     ax[0].set_ylabel('Degree distribution')
-   # ax[0].set_xscale('log')
     ax[0].set_yscale('log')
-
 
 
     distances = G.es['distances']
@@ -102,7 +100,6 @@ def get_network_stats(G, city, outfolder, infile):
 
 
     try:    
-
         weights = G.es['weight']
         ax[2].hist(G.es['weight'], bins = 50)
         ax[2].set_yscale('log')
@@ -132,15 +129,13 @@ def get_gephi_new(G, outfolder, outname):
 
        
     f = open( outfolder + 'networks/gephi/' + outname + '_edges.dat', 'w')
-    f.write('Source' + '\t' + 'Target' + '\t' + 'inv_distances' + '\t' + 'grav_distances' + '\t' + 'exp_distances' + '\t' + 'Weight' + '\t' + 'Type' + '\n')      
+    f.write('Source' + '\t' + 'Target' + '\t' + 'distances'  + '\t' + 'inv_distances' + '\t' + 'grav_distances' + '\t' + 'exp_distances' + '\t' + 'Weight' + '\t' + 'Type' + '\n')      
     for e in G.es():
 
-        
-
         try:
-            f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['inv_distances']) + '\t' + str(e['grav_distances']) + '\t' + str(e['exp_distances']) + '\t' + str(e['weight'])+ '\tundirected' + '\n')
+            f.write(G.vs[e.target]['name']+'\t'+G.vs[e.source]['name']+'\t'+str(e['distances'])+'\t'+str(e['inv_distances'])+'\t'+str(e['grav_distances'])+'\t'+str(e['exp_distances'])+'\t'+str(e['weight'])+ '\tundirected' + '\n')
         except:
-            f.write( G.vs[e.target]['name'] + '\t' + G.vs[e.source]['name'] + '\t' + str(e['inv_distances']) + '\t' + str(e['grav_distances']) + '\t' + str(e['exp_distances']) + '\t' + str(1)          + '\tundirected' + '\n')
+            f.write(G.vs[e.target]['name']+'\t'+G.vs[e.source]['name']+'\t'+str(e['distances'])+'\t'+str(e['inv_distances'])+'\t'+str(e['grav_distances'])+'\t'+str(e['exp_distances'])+'\t'+str(1)+'\tundirected' + '\n')
             pass
 
 
@@ -161,35 +156,30 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
 
     print 'Start creating the friendship network...'
 
-    # read the full friendshipnw
     filename  = outfolder + '/user_info/' + city  + '_users_friends.lgl' 
-    #filename  = outfolder + '/user_info/' + city  + '_users_friends_sample.lgl' '''
-
     all_users = set([line.strip().split('\t')[0] for line in open(infile)])
-
-    print infile
-    print len(all_users)
-
-    # write the friendhip nw w geo contraints
     fout        = open(outfolder + '/user_info/' + city  + '_users_geo_friends.lgl', 'w')
     users_nghbs = {}
 
-   
+
+    # get the coordinates
+    users_location = {}
+    for line in open(infile):
+        user, lng, lat       = line.strip().split('\t')
+        if user in all_users:
+            users_location[user] = (float(lng), float(lat))    
+
+
+
     with open (filename, "r") as myfile:
         data = str(myfile.read()).strip().split('#')
 
 
-
-
     for ind, d in enumerate(data):
-
      
         users = d.split('\n')
         user  = users[0].replace(' ', '')
     
-
- 
-
         if user in all_users:
 
             nghbs = [uuu for uuu in users[1:] if uuu in all_users]
@@ -198,8 +188,6 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
                 users_nghbs[user] = nghbs
          
  
-
-
     for user, friends in users_nghbs.items():
         if len(friends) > 1:
             fout.write('#' + user + '\n')
@@ -211,20 +199,40 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
     G_geo   = Graph.Read_Lgl(outfolder + '/user_info/' + city  + '_users_geo_friends.lgl', names = True, weights = False, directed = False) 
 
 
-    
-    # get the coordinates
-    users_location = {}
 
-    for line in open(infile):
-        user, lng, lat       = line.strip().split('\t')
-        users_location[user] = (float(lng), float(lat))    
+    nnn = len(users_location)
+    pairdists = []
+
+    for ind, (user1, coord1) in enumerate(users_location.items()):
+        print 'Getting friendship network distances...  ', ind, '/', nnn
+        for user2, coord2 in users_location.items():
+            pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
+   
+
+
+    
+    folderout = outfolder + 'networks/gephi/distances/'
+    if not os.path.exists(folderout):
+        os.makedirs(folderout)
+
+    fffout = open(folderout + '/users_friendship_avg_distance.dat', 'w')
+    fffout.write(str(np.mean(pairdists)) + '\t' + str(np.std(pairdists)) + '\n')
+    fffout.close()
+
+    fffout = open(folderout + '/users_friendship_distances.dat', 'w')
+    fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
+    fffout.close()
+
+
+    avg_dist = np.mean(pairdists)
+
+
+
 
 
     # add and calc distances
     G_geo.vs['location'] = [users_location[g['name']] for g in G_geo.vs()]
-    add_distances_to_edges(G_geo)
-
-    print 'AAAA   ', len(G_geo.vs()), len(G_geo.es())
+    add_distances_to_edges(G_geo, avg_dist)
 
     print 'Friendship network done.'
     
@@ -287,7 +295,8 @@ def get_users_edges(args):
                     edges.append((user1, user2))
                     weights.append(w)
 
-                    #print '\t', edges[0], len(edges)
+      
+
 
 
 
@@ -315,24 +324,20 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
 
     for line in open(users_venfn):
-
         fields = line.strip().split('\t')
         user   = fields[0]
-
         if user in users_location:
-
             venues = set(fields[1:])
-
             users_venues[user] = venues
             users.append(user)
 
 
     # buld the network
-
-
     edges     = []
     weights   = []
     all_users = set()
+    pairdists = []
+      
 
 
     nnn = len(users)
@@ -356,6 +361,12 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
                 w = float(w) / (norm1 + norm2)
 
+                coord1 = users_location[user1]
+                coord2 = users_location[user2]
+
+                pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
+
+
 
                 if w > 0 and 'user' not in user1 and 'user' not in user2:               
                     edges.append((user1, user2))
@@ -365,16 +376,31 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
 
 
+    folderout = outfolder + 'networks/gephi/distances/'
+    if not os.path.exists(folderout):
+        os.makedirs(folderout)
 
-    #141616 1932
+    fffout = open(folderout + '/users_sim_avg_distance.dat', 'w')
+    fffout.write(str(np.mean(pairdists)) + '\t' + str(np.std(pairdists)) + '\n')
+    fffout.close()
+
+    fffout = open(folderout + '/users_sim_distances.dat', 'w')
+    fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
+    fffout.close()
+
+
+    avg_dist = np.mean(pairdists)
+
+
+
+
     G = Graph()
-
     G.add_vertices(list([u for u in all_users]))
     G.add_edges(edges)
-    G.es['weight'] = weights
-    locations      = [users_location[g['name']] for g in G.vs()]  #[users_location[user] if user in users_location else 'nan'     for user in all_user] 
+    locations        = [users_location[g['name']] for g in G.vs()] 
+    G.es['weight']   = weights   
     G.vs['location'] = locations
-    add_distances_to_edges(G)
+    add_distances_to_edges(G, avg_dist)
  
     print 'Users\'s similarity network done.'
     
@@ -401,8 +427,6 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
         fields = line.strip().split('\t')
         user   = fields[0]
         venues = fields[1:]
-
-
 
         for venue in venues:
 
@@ -436,7 +460,7 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     edges      = []
     weights    = []
     all_venues = set()
-
+    pairdists  = []
 
     venueslist = venues_location.keys() 
     nnn = len(venueslist)
@@ -453,20 +477,46 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
 
                 all_venues.add(venue1)
                 all_venues.add(venue2)
-
-        
+    
                 norm1 = len(venues_users[venue1])
-                norm2 = len(venues_users[venue1])
-
+                norm2 = len(venues_users[venue2])
 
                 w = float(len(set(venues_users[venue1]).intersection(set(venues_users[venue2])))) / ( norm1 + norm2 )
            
+                coord1 = venues_location[venue1]
+                coord2 = venues_location[venue2]
+
+                pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
+
+
                 if w > 0:
                     edges.append((venue1, venue2))
                     weights.append(w)
 
 
-             
+      
+
+
+    folderout = outfolder + 'networks/gephi/distances/'
+    if not os.path.exists(folderout):
+        os.makedirs(folderout)
+
+    fffout = open(folderout + '/users_sim_avg_distance.dat', 'w')
+    fffout.write(str(np.mean(pairdists)) + '\t' + str(np.std(pairdists)) + '\n')
+    fffout.close()
+
+    fffout = open(folderout + '/users_sim_distances.dat', 'w')
+    fffout.write( '\n'.join([str(d) for d in pairdists]) + '\n' )
+    fffout.close()
+
+
+    avg_dist = np.mean(pairdists)
+
+
+
+
+
+       
 
     all_venues = list(all_venues)
     locations  = [venues_location[venue] if venue in venues_location else 'nan' for venue in all_venues] 
@@ -476,7 +526,7 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     G.add_edges(edges)
     G.es['weight']   = weights
     G.vs['location'] = [venues_location[g['name']] for g in G.vs()]  
-    add_distances_to_edges(G)
+    add_distances_to_edges(G, avg_dist)
     
 
     print 'Venue\'s similarity network done.'
@@ -582,15 +632,11 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
     bb_neffke_exp  = backboning.thresholding(table_nc_exp, nc_threshold)
     bb_neffke_w    = backboning.thresholding(table_nc_w, nc_threshold)
 
-
     #nc_edgenum = len(bb_neffke['src'])
     # = len(set( list(bb_neffke['src']) + list(bb_neffke['trg'])))
     #dens       =  nc_edgenum / (nc_nodenum**2/2.0)
     #print "Writing the NC Backbone with threshold  ", nc_threshold, ', node number ', nc_nodenum, '  and density ', dens Q
   
-
-
-
     fout_nc_inv  = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_inv_'  + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
     fout_nc_grav = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_grav_' + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
     fout_nc_exp  = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_exp_'  + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
@@ -961,6 +1007,45 @@ def get_weight_distr(outfolder, outname):
 
 
 
+
+def get_distances_between_nodes(outfolder, outname, city):
+
+    nodefile = outfolder + 'networks/gephi/' + city + '_' + outname + '_nodes.dat'
+      
+
+    folderout = outfolder + 'networks/gephi/distances/'
+    if not os.path.exists(folderout):
+        os.makedirs(folderout)
+
+    users_coordinates = {}
+    distances = []
+
+    for line in open(nodefile):  
+        if 'lon' not in line:   
+            user, u, lon, lat = line.strip().split('\t')
+            users_coordinates[user] = (float(lon), float(lat))
+
+
+    nnn = len(users_coordinates)
+
+    for ind, (u1, coord1) in enumerate(users_coordinates.items()):
+
+        print 'Getting distances...    ', outname, '   ',  ind, '/', nnn
+
+        for u2, coord2 in users_coordinates.items():
+            distances.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
+
+
+    fout = open(folderout + city + '_' + outname + '_avg_distance.dat', 'w')
+    fout.write(str(np.mean(distances)) + '\t' + str(np.std(distances)) + '\n')
+
+    fout.close()
+
+    fout = open(folderout + city + '_' + outname + '_distances.dat', 'w')
+    fout.write( '\n'.join([str(d) for d in distances]) + '\n' )
+    fout.close()
+
+
 if __name__ == '__main__': 
 
 
@@ -979,6 +1064,16 @@ if __name__ == '__main__':
     
 
 
+
+    
+
+
+
+
+
+
+
+
     inputs = ParseInput.get_inputs()
     bbox   = inputs[city]
     #do_all_the_networks(city, outroot, infile, bbox)
@@ -994,26 +1089,18 @@ if __name__ == '__main__':
             G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
 
             #print 'FRIENDS:  Creating gephi files...'
-            get_gephi_new(G_friends, outroot, city + '_friendship')     
+            get_gephi_new(G_friends, outroot, city + '_friendship')   
+
+
+            #print 'Get avg distances...'
+           # get_distances_between_nodes(outroot, 'friendship', city)      
        
             #print 'FRIENDS:  Calc centrality measures...'
-            calc_network_centralities(G_friends, outroot, city, infile, 'friend',       geo = True,  weighted = False, venue = False)
+#            calc_network_centralities(G_friends, outroot, city, infile, 'friend',       geo = True,  weighted = False, venue = False)
 
             #print 'FRIENDS:  Creating network stats...'
             #get_network_stats(G_friends, city, outroot, '_friendship')
             
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         elif sys.argv[2] == 'user':
@@ -1022,11 +1109,12 @@ if __name__ == '__main__':
             print 'Create users network' 
             G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
             get_gephi_new(G_users, outroot, city + '_users_sim')     
+          #  get_distances_between_nodes(outroot, 'users_sim', city)
         #   calc_network_centralities(G_users, outroot, city, infile, 'users_sim' ,   geo = True,  weighted = True,  venue = False, thresh = '')
 
             
 
-            #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
+            '''#for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
             for nc_threshold in [5000, 1000]:
                 print 'USERS  THRESHOLD :  ', nc_threshold
 
@@ -1042,7 +1130,7 @@ if __name__ == '__main__':
                 calc_network_centralities(G_users_NC_grav,  outroot, city, infile, 'users_sim_' + 'NC_grav' ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_users_NC_exp,   outroot, city, infile, 'users_sim_' + 'NC_exp'  ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_users_NC_w,     outroot, city, infile, 'users_sim_' + 'NC_w'    ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
-
+            '''
 
     #            G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
     #            calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
@@ -1058,7 +1146,7 @@ if __name__ == '__main__':
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
             get_gephi_new(G_venues,  outroot, city + '_venues_sim')
-
+            #get_distances_between_nodes(outroot, 'venues_sim', city)
 
             #print 'Creating network stats...'
           #  get_network_stats(G_venues,  city, outroot, '_venues_similarity')
@@ -1066,7 +1154,7 @@ if __name__ == '__main__':
           #  calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
           #  get_weight_distr(outroot, city + '_venues_similarity')
 
-            #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
+            '''#for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
             for nc_threshold in [5000,1000]:#1000, 500, 250, 100, 25, 10, 1]:
 
                 print 'VENUES  THRESHOLD :  ', nc_threshold
@@ -1085,7 +1173,17 @@ if __name__ == '__main__':
 
                 #G_venues_DF = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'DF', infile)
                 #calc_network_centralities(G_venues_DF,   outroot, city, infile, 'venues_similarity_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
-            
+            '''
+
+
+
+      
+
+        
+
+
+
+
 
 
 ##   source /opt/virtualenv-python2.7/bin/activate
