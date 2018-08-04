@@ -1172,9 +1172,9 @@ if __name__ == '__main__':
             
 
             print 'Create venues network' 
-#            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
-#            get_gephi_new(G_venues,  outroot, city + '_venues_sim')
+            get_gephi_new(G_venues,  outroot, city + '_venues_sim')
 
             #get_distances_between_nodes(outroot, 'venues_sim', city)
             #print 'Creating network stats...'
