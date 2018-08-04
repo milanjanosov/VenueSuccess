@@ -1134,8 +1134,8 @@ if __name__ == '__main__':
 
 
             print 'Create users network' 
-            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
-            get_gephi_new(G_users, outroot, city + '_users_sim')      
+ #           G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+ #           get_gephi_new(G_users, outroot, city + '_users_sim')      
             #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
             for nc_threshold in [5000, 1000, 500]:
@@ -1172,9 +1172,9 @@ if __name__ == '__main__':
             
 
             print 'Create venues network' 
-            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+#            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
-            get_gephi_new(G_venues,  outroot, city + '_venues_sim')
+#            get_gephi_new(G_venues,  outroot, city + '_venues_sim')
 
             #get_distances_between_nodes(outroot, 'venues_sim', city)
             #print 'Creating network stats...'
@@ -1184,7 +1184,7 @@ if __name__ == '__main__':
             #get_weight_distr(outroot, city + '_venues_similarity')
 
             #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
-            for nc_threshold in [5000,1000]:#1000, 500, 250, 100, 25, 10, 1]:
+            for nc_threshold in [5000,1000,500]:#1000, 500, 250, 100, 25, 10, 1]:
 
                 print 'VENUES  THRESHOLD :  ', nc_threshold
                 transform_gephi_to_backbone(outroot, city + '_venues_sim', nc_threshold)
