@@ -217,7 +217,7 @@ def get_user_user_friendship_network_igraph(city, outfolder, infile):
     if not os.path.exists(folderout):
         os.makedirs(folderout)
 
-    fffout = open(folderout + '/users_friendship_avg_distance.dat', 'w')
+    fffout = open(folderout + '/friendship_avg_distance.dat', 'w')
     fffout.write(str(movavg) + '\n')
     fffout.close()
 
@@ -482,8 +482,6 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
         print ind, '/', nnn
 
 
-        #if ind == 10: break
-
         all_venues.add(venue1)
 
         coord1 = venues_location[venue1]
@@ -495,18 +493,11 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
 
                 all_venues.add(venue2)
     
-
-                coord2  = venues_location[venue2]
-                tau     = set(venues_users[venue1]).intersection(set(venues_users[venue2]))
-                w       = float(len(tau))
-      
-
+                coord2   = venues_location[venue2]
+                tau      = set(venues_users[venue1]).intersection(set(venues_users[venue2]))
+                w        = float(len(tau))
                 pairdist = mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0]))
                 movavg   = movavg + ( pairdist - movavg ) / float( (ind + 1) )
-
-                print movavg
-
-                #pairdists.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
 
 
                 if len(tau) > 0:
@@ -526,13 +517,10 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     if not os.path.exists(folderout):
         os.makedirs(folderout)
 
-    fffout = open(folderout + '/users_venue_avg_distance.dat', 'w')
+    fffout = open(folderout + '/venues_sim_avg_distance.dat', 'w')
     fffout.write(str(movavg) + '\n')
     fffout.close()
 
-    print movavg
-
-       
 
     all_venues = list(all_venues)
     locations  = [venues_location[venue] if venue in venues_location else 'nan' for venue in all_venues] 
@@ -543,10 +531,9 @@ def get_venue_venue_similarity_network_igraph(city, outfolder, infile, bbox):
     G.es['weight']   = weights
     G.es['weight_a'] = weights_a
     G.vs['location'] = [venues_location[g['name']] for g in G.vs()]  
-    print movavg
     add_distances_to_edges(G, movavg)
     
-
+    print movavg
     print 'Venue\'s similarity network done.'
     print time.time() - T1    
     return G
@@ -570,11 +557,11 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
     if not os.path.exists(outfolder + 'networks/gephi/backbone'):
         os.makedirs(outfolder + 'networks/gephi/backbone')
 
-    fnout_inv  = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'inv_distances_.dat'
-    fnout_grav = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'grav_distances_.dat'
-    fnout_exp  = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'exp_distances_.dat'
-    fnout_w    = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'weight_.dat'
-
+    fnout_inv  = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'inv_distances.dat'
+    fnout_grav = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'grav_distances.dat'
+    fnout_exp  = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'exp_distances.dat'
+    fnout_w    = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'weight.dat'
+    fnout_wa   = outfolder + 'networks/gephi/backbone/backboneformat_' + outname + 'weight_a.dat'
 
 
     fout_inv = open(fnout_inv, 'w')
@@ -589,7 +576,8 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
     fout_w = open(fnout_w, 'w')
     fout_w.write('src\ttrg\tnij\n')
 
-
+    fout_wa = open(fnout_wa, 'w')
+    fout_wa.write('src\ttrg\tnij\n')
 
 
 
@@ -603,24 +591,27 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
        
         if 'Source' not in line:
        
-            src, trg, inv_distances, grav_distances, exp_distances, weight, typee = line.strip().split('\t')
+            src, trg, distances, inv_distances, grav_distances, exp_distances, weight, weight_a, typee = line.strip().split('\t')
 
             fout_inv.write(  src + '\t' + trg + '\t' + str(float(inv_distances))  + '\n')
             fout_grav.write( src + '\t' + trg + '\t' + str(float(grav_distances)) + '\n')
             fout_exp.write(  src + '\t' + trg + '\t' + str(float(exp_distances))  + '\n')
             fout_w.write(    src + '\t' + trg + '\t' + str(float(weight))         + '\n')
+            fout_wa.write(   src + '\t' + trg + '\t' + str(float(weight_a))       + '\n')
+
 
     fout_inv.close()
     fout_grav.close()
     fout_exp.close()
     fout_w.close()
-
+    fout_wa.close()
 
 
     real_table_inv  = pd.read_csv(fnout_inv,  sep = "\t")
     real_table_grav = pd.read_csv(fnout_grav, sep = "\t")
     real_table_exp  = pd.read_csv(fnout_exp,  sep = "\t")
     real_table_w    = pd.read_csv(fnout_w,    sep = "\t")
+    real_table_wa   = pd.read_csv(fnout_wa,   sep = "\t")
 
 
     #table_df   = backboning.disparity_filter(real_table, undirected = True)
@@ -628,6 +619,7 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
     table_nc_grav = backboning.noise_corrected(real_table_grav, undirected = True)
     table_nc_exp  = backboning.noise_corrected(real_table_exp,  undirected = True)
     table_nc_w    = backboning.noise_corrected(real_table_w,    undirected = True)
+    table_nc_wa   = backboning.noise_corrected(real_table_wa,   undirected = True)
 
 
     '''
@@ -645,10 +637,11 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
     '''
 
 
-    bb_neffke_inv  = backboning.thresholding(table_nc_inv, nc_threshold)
+    bb_neffke_inv  = backboning.thresholding(table_nc_inv,  nc_threshold)
     bb_neffke_grav = backboning.thresholding(table_nc_grav, nc_threshold)
-    bb_neffke_exp  = backboning.thresholding(table_nc_exp, nc_threshold)
-    bb_neffke_w    = backboning.thresholding(table_nc_w, nc_threshold)
+    bb_neffke_exp  = backboning.thresholding(table_nc_exp,  nc_threshold)
+    bb_neffke_w    = backboning.thresholding(table_nc_w,    nc_threshold)
+    bb_neffke_wa   = backboning.thresholding(table_nc_wa,   nc_threshold)
 
     #nc_edgenum = len(bb_neffke['src'])
     # = len(set( list(bb_neffke['src']) + list(bb_neffke['trg'])))
@@ -659,12 +652,13 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
     fout_nc_grav = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_grav_' + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
     fout_nc_exp  = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_exp_'  + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
     fout_nc_w    = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_w_'    + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
+    fout_nc_wa   = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_wa_'   + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
 
     bb_neffke_inv.to_csv(fout_nc_inv,   sep = '\t', index = False)
     bb_neffke_grav.to_csv(fout_nc_grav, sep = '\t', index = False)
     bb_neffke_exp.to_csv(fout_nc_exp,   sep = '\t', index = False)
     bb_neffke_w.to_csv(fout_nc_w,       sep = '\t', index = False)
-    
+    bb_neffke_w.to_csv(fout_nc_wa,      sep = '\t', index = False)
 
 
 
@@ -706,7 +700,14 @@ def create_igraphnw_from_backbone(outfolder, inname, tipus, infile, dist_type, t
             G.delete_vertices(v.index)
 
 
-    add_distances_to_edges(G)
+
+    avgdist = [float(line.strip()) for line in open(outfolder + 'networks/gephi/distances/' + inname.split('_',1)[1] + '_avg_distance.dat')][0]
+
+
+  
+
+    add_distances_to_edges(G, avgdist)
+
     
     print 'Igraph transf\t', tipus, 'threshold: ', thresh, '  ', '  nodes:', len(G.vs()), '   edges:', len(G.es())
 
@@ -762,7 +763,8 @@ def create_igraphnw_from_backbone_for_venues(outfolder, inname, tipus, dist_type
 
     print 'Igraph transf\t', tipus, 'threshold: ', thresh, '  ', '  nodes:', len(G.vs()), '   edges:', len(G.es())
 
-    add_distances_to_edges(G)
+    avgdist = [float(line.strip()) for line in open(outfolder + 'networks/gephi/distances/' + inname.split('_',1)[1] + '_avg_distance.dat')][0]
+    add_distances_to_edges(G, avgdist)
 
 
     return G
@@ -784,30 +786,30 @@ def create_igraphnw_from_backbone_for_venues(outfolder, inname, tipus, dist_type
 
 
 ### 1/nneighbours \sum neighbors_distances
-def social_stretch(G, node, neighbors):
+def social_stretch(G, node, neighbors, dist_type):
 
-    return sum([G.es[G.get_eid(node.index, neighbor)]['distances'] for neighbor in neighbors if node.index != neighbor]) / (float(len(neighbors)))
+    return sum([G.es[G.get_eid(node.index, neighbor)][dist_type] for neighbor in neighbors if node.index != neighbor]) / (float(len(neighbors)))
   
 
 ### see if 3 nodes are triangle, if yes, then avg length within triangle
-def triangle_size(G, node, neighbors):
-
-    triangle_edges = []
-
-    for n1 in neighbors:
-        for n2 in neighbors:
-
-            if n1 != n2:
-
-                try:
-                    triangle_edges.append(G.es[G.get_eid(n1, n2)]['distances'])
-                except:     
-                    pass
-
-    if len(triangle_edges) > 0:
-        return np.mean(triangle_edges)
-    else:
-        return 99999999999.9
+#def triangle_size(G, node, neighbors, dist_type):
+#
+#    triangle_edges = []
+#
+#    for n1 in neighbors:
+#        for n2 in neighbors:
+#
+#            if n1 != n2:
+#
+#                try:
+#                    triangle_edges.append(G.es[G.get_eid(n1, n2)][dist_type])
+#                except:     
+#                    pass
+#
+#    if len(triangle_edges) > 0:
+#        return np.mean(triangle_edges)
+#    else:
+#        return 99999999999.9
 
 
 ### the size of the polygon of the users friends-neighbors
@@ -823,7 +825,7 @@ def geo_size_of_ego(G, node, neighbors):
             x, y = pa(lon, lat)
             cop  = {"type": "Polygon", "coordinates": [zip(x, y)]}
   
-            return shape(cop).area #/ 1000000.0
+            return shape(cop).area / 1000000.0
 
     else:
 
@@ -831,9 +833,9 @@ def geo_size_of_ego(G, node, neighbors):
 
 
 
-def geo_stdev_of_ego(G, node, neighbors):
+def geo_stdev_of_ego(G, node, neighbors, dist_type):
 
-    return np.std([G.es[G.get_eid(node.index, neighbor)]['distances'] for neighbor in neighbors if node.index != neighbor]) / (float(len(neighbors)))
+    return np.std([G.es[G.get_eid(node.index, neighbor)][dist_type] for neighbor in neighbors if node.index != neighbor]) / (float(len(neighbors)))
   
 
 def jaccard(a, b):
@@ -841,30 +843,28 @@ def jaccard(a, b):
     return float(len(c)) / (len(a) + len(b) - len(c))
 
 
-def get_venue_homogenity(G, city, outfolder):
-
-    
-    users_venues = {} 
-
-    for line in open( outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
-        fields                  = (line.strip().split('\t'))
-        users_venues[fields[0]] = set([ vv.split(',')[0] for vv in fields[1:]])
-
-    
-    venues_homogenity = {}
-    for line in open(outfolder + '/venues_info/' + city + '_venues_users.dat'):
-        fields = (line.strip().split('\t'))
-        venue  = fields[0]
-        users  = fields[1:] 
-
-        for u1 in users:
-            for u2 in users:
-                sim_u1_u2 = jaccard(users_venues[u1], users_venues[u2])
-
-        venues_homogenity[venue] = np.mean([jaccard(users_venues[u1], users_venues[u2]) for u1 in users for u2 in users])
-
-
-    return [venues_homogenity[g['name']] for g in G.vs()]
+#def get_venue_homogenity(G, city, outfolder):
+#    
+#    users_venues = {} 
+#
+#    for line in open( outfolder + '/user_info/' + city + '_user_venues_full_locals_filtered.dat'):
+#        fields                  = (line.strip().split('\t'))
+#        users_venues[fields[0]] = set([ vv.split(',')[0] for vv in fields[1:]])
+#
+#    
+#    venues_homogenity = {}
+#    for line in open(outfolder + '/venues_info/' + city + '_venues_users.dat'):
+#        fields = (line.strip().split('\t'))
+#        venue  = fields[0]
+#        users  = fields[1:] 
+#
+#        for u1 in users:
+#            for u2 in users:
+#                sim_u1_u2 = jaccard(users_venues[u1], users_venues[u2])
+#
+#        venues_homogenity[venue] = np.mean([jaccard(users_venues[u1], users_venues[u2]) for u1 in users for u2 in users if u1 in users_venues and u2 in users_venues])
+#
+#    return [venues_homogenity[g['name']] for g in G.vs()]
 
 
 
@@ -947,6 +947,33 @@ def populate_node_attributes(vertice_attributes, G, dist_type, degrees, neighbor
 
 
 
+def add_geo_measures(vertice_attributes, G, neighborhoods, dist_type, outfolder, tipus):
+
+
+    t1 = time.time()
+
+    dist_type_= dist_type
+    if len(dist_type) > 0:
+        dist_type_ = '_' + dist_type
+    
+
+    for i in range(len(G.degree())):
+
+        node      = G.vs[i]
+        name      = node['name']
+        neighbors = neighborhoods[i]
+
+
+        vertice_attributes[name]['geo_stdev_of_ego'   +  dist_type_]  =  geo_stdev_of_ego(G, node, neighbors, dist_type)
+        vertice_attributes[name]['geo_social_stretch' +  dist_type_]  =  social_stretch(G,   node, neighbors, dist_type)
+
+
+        if 'geo_size_of_ego' not in vertice_attributes[name]:
+            vertice_attributes[name]['geo_size_of_ego'] =  geo_size_of_ego(G, node, neighbors)
+
+
+    print tipus + '  geo measures - ' +  dist_type_, '\t', round(time.time() - t1,2), ' seconds' 
+
 
 
 
@@ -958,25 +985,21 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
     all_users          = set([line.strip().split('\t')[0] for line in open(infile)])
 
 
-
-
-    t1 = time.time()
+    t1                 = time.time()
     degrees            = G.degree() 
+    neighborhoods      = G.neighborhood(vertices=None, order=1)  
     neighborhood_sizes = G.neighborhood_size(vertices=None, order=1)  
-
-    print '\nCentralities, threshold: ', thresh
-    print 'Degrees: ', time.time() - t1
-
 
 
     
+    print '\nCentralities, threshold: ', thresh
+    print 'Degrees: ', time.time() - t1
 
     betweennesses, closenesses, clusterings, strengthes, pageranks, eigenvectors, constraint  = get_distance_measures_network(G, None, tipus)
     populate_node_attributes(vertice_attributes, G, '',               degrees, neighborhood_sizes,  betweennesses,      closenesses,      clusterings,      strengthes,      pageranks,      eigenvectors,      constraint)
 
  
     if geo: 
-
         betweennesses_inv,  closenesses_inv,  clusterings_inv,  strengthes_inv,  pageranks_inv,  eigenvectors_inv,  constraint_inv  = get_distance_measures_network(G, 'inv_distances',  tipus)
         betweennesses_grav, closenesses_grav, clusterings_grav, strengthes_grav, pageranks_grav, eigenvectors_grav, constraint_grav = get_distance_measures_network(G, 'grav_distances', tipus)
         betweennesses_exp,  closenesses_exp,  clusterings_exp,  strengthes_exp,  pageranks_exp,  eigenvectors_exp,  constraint_exp  = get_distance_measures_network(G, 'exp_distances',  tipus)
@@ -984,12 +1007,33 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
         populate_node_attributes(vertice_attributes, G, 'inv_distances',  degrees, neighborhood_sizes,  betweennesses_inv,  closenesses_inv,  clusterings_inv,  strengthes_inv,  pageranks_inv,  eigenvectors_inv,  constraint_inv)
         populate_node_attributes(vertice_attributes, G, 'grav_distances', degrees, neighborhood_sizes,  betweennesses_grav, closenesses_grav, clusterings_grav, strengthes_grav, pageranks_grav, eigenvectors_grav, constraint_grav)
         populate_node_attributes(vertice_attributes, G, 'exp_distances',  degrees, neighborhood_sizes,  betweennesses_exp,  closenesses_exp,  clusterings_exp,  strengthes_exp,  pageranks_exp,  eigenvectors_exp,  constraint_exp)
+        
 
+        add_geo_measures(vertice_attributes, G, neighborhoods, 'distances',      outfolder, tipus)
+        add_geo_measures(vertice_attributes, G, neighborhoods, 'inv_distances',  outfolder, tipus)
+        add_geo_measures(vertice_attributes, G, neighborhoods, 'grav_distances', outfolder, tipus)
+        add_geo_measures(vertice_attributes, G, neighborhoods, 'exp_distances',  outfolder, tipus)
 
-
+    
     if weighted: 
-        betweennesses_w,    closenesses_w,    clusterings_w,    strengthes_w,    pageranks_w,     eigenvectors_w,   constraint_w    = get_distance_measures_network(G, 'weight', tipus)
-        populate_node_attributes(vertice_attributes, G, 'w',  degrees, neighborhood_sizes,  betweennesses_w,    closenesses_w,    clusterings_w,    strengthes_w,    pageranks_w,    eigenvectors_w,    constraint_w)
+
+
+        if '_w' in tipus:
+            betweennesses_w, closenesses_w, clusterings_w, strengthes_w, pageranks_w, eigenvectors_w, constraint_w  = get_distance_measures_network(G, 'weight', tipus)
+
+            www = 'w'
+            if '_wa' in tipus:
+                www = 'wa'
+
+            populate_node_attributes(vertice_attributes, G, www,  degrees, neighborhood_sizes, betweennesses_w, closenesses_w, clusterings_w, strengthes_w, pageranks_w, eigenvectors_w, constraint_w)
+
+        else:
+
+            betweennesses_w,   closenesses_w,   clusterings_w,   strengthes_w,   pageranks_w,   eigenvectors_w,  constraint_w   = get_distance_measures_network(G, 'weight', tipus)
+            betweennesses_wa,  closenesses_wa,  clusterings_wa,  strengthes_wa,  pageranks_wa,  eigenvectors_wa, constraint_wa  = get_distance_measures_network(G, 'weight_a', tipus)
+
+            populate_node_attributes(vertice_attributes, G, 'w',   degrees, neighborhood_sizes, betweennesses_w,  closenesses_w,  clusterings_w,  strengthes_w,  pageranks_w,  eigenvectors_w,  constraint_w)
+            populate_node_attributes(vertice_attributes, G, 'wa',  degrees, neighborhood_sizes, betweennesses_wa, closenesses_wa, clusterings_wa, strengthes_wa, pageranks_wa, eigenvectors_wa, constraint_wa)
 
 
 
@@ -997,8 +1041,14 @@ def calc_network_centralities(G, outfolder, city, infile, tipus, geo, weighted, 
     df.to_csv(filename, na_rep='nan')
 
     
-
     return 0
+
+
+
+
+
+
+
 
 
 
@@ -1025,43 +1075,6 @@ def get_weight_distr(outfolder, outname):
 
 
 
-
-def get_distances_between_nodes(outfolder, outname, city):
-
-    nodefile = outfolder + 'networks/gephi/' + city + '_' + outname + '_nodes.dat'
-      
-
-    folderout = outfolder + 'networks/gephi/distances/'
-    if not os.path.exists(folderout):
-        os.makedirs(folderout)
-
-    users_coordinates = {}
-    distances = []
-
-    for line in open(nodefile):  
-        if 'lon' not in line:   
-            user, u, lon, lat = line.strip().split('\t')
-            users_coordinates[user] = (float(lon), float(lat))
-
-
-    nnn = len(users_coordinates)
-
-    for ind, (u1, coord1) in enumerate(users_coordinates.items()):
-
-        print 'Getting distances...    ', outname, '   ',  ind, '/', nnn
-
-        for u2, coord2 in users_coordinates.items():
-            distances.append(mpu.haversine_distance((coord1[1], coord1[0]), (coord2[1], coord2[0])))
-
-
-    fout = open(folderout + city + '_' + outname + '_avg_distance.dat', 'w')
-    fout.write(str(np.mean(distances)) + '\t' + str(np.std(distances)) + '\n')
-
-    fout.close()
-
-    fout = open(folderout + city + '_' + outname + '_distances.dat', 'w')
-    fout.write( '\n'.join([str(d) for d in distances]) + '\n' )
-    fout.close()
 
 
 if __name__ == '__main__': 
@@ -1106,18 +1119,14 @@ if __name__ == '__main__':
             print 'FRIENDS:  Create friendship network' 
             G_friends = get_user_user_friendship_network_igraph(city, outroot, infile)    
 
-            #print 'FRIENDS:  Creating gephi files...'
+            print 'FRIENDS:  Creating gephi files...'
             get_gephi_new(G_friends, outroot, city + '_friendship')   
 
+            print 'FRIENDS:  Calc centrality measures...'
+            calc_network_centralities(G_friends, outroot, city, infile, 'friend',       geo = True,  weighted = False, venue = False)
 
-            #print 'Get avg distances...'
-           # get_distances_between_nodes(outroot, 'friendship', city)      
-       
-            #print 'FRIENDS:  Calc centrality measures...'
-#            calc_network_centralities(G_friends, outroot, city, infile, 'friend',       geo = True,  weighted = False, venue = False)
-
-            #print 'FRIENDS:  Creating network stats...'
-            #get_network_stats(G_friends, city, outroot, '_friendship')
+            print 'FRIENDS:  Creating network stats...'
+            get_network_stats(G_friends, city, outroot, '_friendship')
             
 
 
@@ -1126,32 +1135,34 @@ if __name__ == '__main__':
 
             print 'Create users network' 
             G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
-            get_gephi_new(G_users, outroot, city + '_users_sim')     
-          #  get_distances_between_nodes(outroot, 'users_sim', city)
-        #   calc_network_centralities(G_users, outroot, city, infile, 'users_sim' ,   geo = True,  weighted = True,  venue = False, thresh = '')
+            get_gephi_new(G_users, outroot, city + '_users_sim')      
+            #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
-            
-
-            '''#for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
-            for nc_threshold in [5000, 1000]:
+            for nc_threshold in [5000, 1000, 500]:
                 print 'USERS  THRESHOLD :  ', nc_threshold
 
                 transform_gephi_to_backbone(outroot, city + '_users_sim', nc_threshold)        
+
+                            
+
 
                 G_users_NC_inv  = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'inv',  thresh = str(nc_threshold))
                 G_users_NC_grav = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'grav', thresh = str(nc_threshold))
                 G_users_NC_exp  = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'exp',  thresh = str(nc_threshold))
                 G_users_NC_w    = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'w',    thresh = str(nc_threshold))
+                G_users_NC_wa   = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'wa',   thresh = str(nc_threshold))
+
+    
 
 
-                calc_network_centralities(G_users_NC_inv,   outroot, city, infile, 'users_sim_' + 'NC_inv'  ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_users_NC_grav,  outroot, city, infile, 'users_sim_' + 'NC_grav' ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_users_NC_exp,   outroot, city, infile, 'users_sim_' + 'NC_exp'  ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
+                calc_network_centralities(G_users_NC_inv,   outroot, city, infile, 'users_sim_' + 'NC_inv'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
+                calc_network_centralities(G_users_NC_grav,  outroot, city, infile, 'users_sim_' + 'NC_grav' ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
+                calc_network_centralities(G_users_NC_exp,   outroot, city, infile, 'users_sim_' + 'NC_exp'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_users_NC_w,     outroot, city, infile, 'users_sim_' + 'NC_w'    ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
-            '''
+                calc_network_centralities(G_users_NC_wa,    outroot, city, infile, 'users_sim_' + 'NC_wa'   ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))           
 
-    #            G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
-    #            calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
+                #G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
+                #calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
             
 
 
@@ -1164,15 +1175,15 @@ if __name__ == '__main__':
             G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
             get_gephi_new(G_venues,  outroot, city + '_venues_sim')
+
             #get_distances_between_nodes(outroot, 'venues_sim', city)
-
             #print 'Creating network stats...'
-          #  get_network_stats(G_venues,  city, outroot, '_venues_similarity')
+            #get_network_stats(G_venues,  city, outroot, '_venues_similarity')
             #print 'Calc centrality measures...'
-          #  calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
-          #  get_weight_distr(outroot, city + '_venues_similarity')
+            #calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
+            #get_weight_distr(outroot, city + '_venues_similarity')
 
-            '''#for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
+            #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
             for nc_threshold in [5000,1000]:#1000, 500, 250, 100, 25, 10, 1]:
 
                 print 'VENUES  THRESHOLD :  ', nc_threshold
@@ -1182,16 +1193,17 @@ if __name__ == '__main__':
                 G_venues_NC_grav = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'grav', infile, thresh = str(nc_threshold))
                 G_venues_NC_exp  = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'exp',  infile, thresh = str(nc_threshold))
                 G_venues_NC_w    = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'w',    infile, thresh = str(nc_threshold))
+                G_venues_NC_wa   = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'wa',   infile, thresh = str(nc_threshold))
 
-                calc_network_centralities(G_venues_NC_inv,  outroot, city, infile, 'venues_sim_' + 'NC_inv'  ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_venues_NC_grav, outroot, city, infile, 'venues_sim_' + 'NC_grav' ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_venues_NC_exp,  outroot, city, infile, 'venues_sim_' + 'NC_exp'  ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
+                calc_network_centralities(G_venues_NC_inv,  outroot, city, infile, 'venues_sim_' + 'NC_inv'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
+                calc_network_centralities(G_venues_NC_grav, outroot, city, infile, 'venues_sim_' + 'NC_grav' ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
+                calc_network_centralities(G_venues_NC_exp,  outroot, city, infile, 'venues_sim_' + 'NC_exp'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_venues_NC_w,    outroot, city, infile, 'venues_sim_' + 'NC_w'    ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
-
+                calc_network_centralities(G_venues_NC_wa,   outroot, city, infile, 'venues_sim_' + 'NC_wa'   ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))           
 
                 #G_venues_DF = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'DF', infile)
                 #calc_network_centralities(G_venues_DF,   outroot, city, infile, 'venues_similarity_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
-            '''
+           
 
 
 
