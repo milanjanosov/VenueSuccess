@@ -1134,8 +1134,8 @@ if __name__ == '__main__':
 
 
             print 'Create users network' 
- #           G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
- #           get_gephi_new(G_users, outroot, city + '_users_sim')      
+            G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
+            get_gephi_new(G_users, outroot, city + '_users_sim')      
             #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
             for nc_threshold in [5000, 1000, 500]:
