@@ -233,7 +233,7 @@ if __name__ == "__main__":
 
     print 'junior  ' , len(junior)
     print 'mid     ' , len(mid)
-    print 'senior  ' , len(senior)
+    
 
 
     fout = open(ofolder + '/junior_timeseries_1_5.dat', 'w')
@@ -263,7 +263,7 @@ if __name__ == "__main__":
         fout.close()
 
 
-
+        print 'senior  ' , len(senior)
 
 
 
