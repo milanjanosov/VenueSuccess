@@ -352,7 +352,8 @@ def get_user_user_similarity_network_igraph(city, outfolder, infile):
 
                     edges.append((user1, user2))
                     weights.append(w)
-                    weights_a.append(w)
+                    weights_a.append(w_a)
+
 
 
 
@@ -585,80 +586,50 @@ def transform_gephi_to_backbone(outfolder, outname, nc_threshold):
     print 'Start reading the edge list...'
 
     for ind, line in enumerate(open( fnin )):
-        if ind % 10000 == 0: 
-            print ind
+        #if ind % 10000 == 0: 
+        #    print ind
 #        if ind == 10 : break
        
         if 'Source' not in line:
        
             src, trg, distances, inv_distances, grav_distances, exp_distances, weight, weight_a, typee = line.strip().split('\t')
 
-            fout_inv.write(  src + '\t' + trg + '\t' + str(float(inv_distances))  + '\n')
-            fout_grav.write( src + '\t' + trg + '\t' + str(float(grav_distances)) + '\n')
-            fout_exp.write(  src + '\t' + trg + '\t' + str(float(exp_distances))  + '\n')
+
+
+
             fout_w.write(    src + '\t' + trg + '\t' + str(float(weight))         + '\n')
             fout_wa.write(   src + '\t' + trg + '\t' + str(float(weight_a))       + '\n')
 
 
-    fout_inv.close()
-    fout_grav.close()
-    fout_exp.close()
+
     fout_w.close()
     fout_wa.close()
 
 
-    real_table_inv  = pd.read_csv(fnout_inv,  sep = "\t")
-    real_table_grav = pd.read_csv(fnout_grav, sep = "\t")
-    real_table_exp  = pd.read_csv(fnout_exp,  sep = "\t")
     real_table_w    = pd.read_csv(fnout_w,    sep = "\t")
     real_table_wa   = pd.read_csv(fnout_wa,   sep = "\t")
 
 
     #table_df   = backboning.disparity_filter(real_table, undirected = True)
-    table_nc_inv  = backboning.noise_corrected(real_table_inv,  undirected = True)
-    table_nc_grav = backboning.noise_corrected(real_table_grav, undirected = True)
-    table_nc_exp  = backboning.noise_corrected(real_table_exp,  undirected = True)
+
     table_nc_w    = backboning.noise_corrected(real_table_w,    undirected = True)
     table_nc_wa   = backboning.noise_corrected(real_table_wa,   undirected = True)
 
 
-    '''
-    ffout = open(outfolder + 'networks/gephi/COMPARE_DF_thresholds_' + outname + '.dat', 'w')
-    for df_threshold in [0.0, 0.7, 0.75, 0.8, 0.85, 0.9, 0.92, 0.94, 0.95, 0.96]:
-        print 'DF thresholding', df_threshold
-        bb_vespignani = backboning.thresholding(table_df, df_threshold)
-        df_edgenum = len(bb_vespignani['src'])
-        df_nodenum = len(set( list(bb_vespignani['src']) + list(bb_vespignani['trg'])))
-        ffout.write(str(df_threshold) + '\t' + str(df_edgenum) + '\t' + str(df_nodenum) + '\n')
-    ffout.close()
-    fout_df = open(outfolder + 'networks/gephi/DF_BACKBONE_' + str( df_threshold ) + '_' + outname + '_edges.dat', 'w')
-    print "Writing DF Backbone"
-    bb_vespignani.to_csv(fout_df, sep = '\t', index = False)  
-    '''
+    bb_neffke_w   = backboning.thresholding(table_nc_w,    nc_threshold)
+    bb_neffke_wa  = backboning.thresholding(table_nc_wa,   nc_threshold)
 
 
-    bb_neffke_inv  = backboning.thresholding(table_nc_inv,  nc_threshold)
-    bb_neffke_grav = backboning.thresholding(table_nc_grav, nc_threshold)
-    bb_neffke_exp  = backboning.thresholding(table_nc_exp,  nc_threshold)
-    bb_neffke_w    = backboning.thresholding(table_nc_w,    nc_threshold)
-    bb_neffke_wa   = backboning.thresholding(table_nc_wa,   nc_threshold)
 
-    #nc_edgenum = len(bb_neffke['src'])
-    # = len(set( list(bb_neffke['src']) + list(bb_neffke['trg'])))
-    #dens       =  nc_edgenum / (nc_nodenum**2/2.0)
-    #print "Writing the NC Backbone with threshold  ", nc_threshold, ', node number ', nc_nodenum, '  and density ', dens Q
-  
-    fout_nc_inv  = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_inv_'  + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
-    fout_nc_grav = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_grav_' + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
-    fout_nc_exp  = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_exp_'  + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
     fout_nc_w    = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_w_'    + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
     fout_nc_wa   = open(outfolder + 'networks/gephi/backbone/NC_BACKBONE_wa_'   + str( nc_threshold ) + '_' + outname + '_edges.dat', 'w')
 
-    bb_neffke_inv.to_csv(fout_nc_inv,   sep = '\t', index = False)
-    bb_neffke_grav.to_csv(fout_nc_grav, sep = '\t', index = False)
-    bb_neffke_exp.to_csv(fout_nc_exp,   sep = '\t', index = False)
+
     bb_neffke_w.to_csv(fout_nc_w,       sep = '\t', index = False)
-    bb_neffke_w.to_csv(fout_nc_wa,      sep = '\t', index = False)
+    bb_neffke_wa.to_csv(fout_nc_wa,     sep = '\t', index = False)
+
+
+
 
 
 
@@ -1094,17 +1065,6 @@ if __name__ == '__main__':
     create_folder(outroot + 'figures/network_data')
     
 
-
-
-    
-
-
-
-
-
-
-
-
     inputs = ParseInput.get_inputs()
     bbox   = inputs[city]
     #do_all_the_networks(city, outroot, infile, bbox)
@@ -1132,87 +1092,48 @@ if __name__ == '__main__':
 
         elif sys.argv[2] == 'user':
 
-
             print 'Create users network' 
+
             G_users   = get_user_user_similarity_network_igraph(city, outroot, infile)
             get_gephi_new(G_users, outroot, city + '_users_sim')      
-            #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
 
-            for nc_threshold in [5000, 1000, 500]:
+            for nc_threshold in [5000, 2000, 1000, 500, 100]:
+
                 print 'USERS  THRESHOLD :  ', nc_threshold
-
                 transform_gephi_to_backbone(outroot, city + '_users_sim', nc_threshold)        
 
-                            
-
-
-                G_users_NC_inv  = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'inv',  thresh = str(nc_threshold))
-                G_users_NC_grav = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'grav', thresh = str(nc_threshold))
-                G_users_NC_exp  = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'exp',  thresh = str(nc_threshold))
                 G_users_NC_w    = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'w',    thresh = str(nc_threshold))
                 G_users_NC_wa   = create_igraphnw_from_backbone(outroot, city + '_users_sim', 'NC', infile, 'wa',   thresh = str(nc_threshold))
 
-    
-
-
-                calc_network_centralities(G_users_NC_inv,   outroot, city, infile, 'users_sim_' + 'NC_inv'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_users_NC_grav,  outroot, city, infile, 'users_sim_' + 'NC_grav' ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_users_NC_exp,   outroot, city, infile, 'users_sim_' + 'NC_exp'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_users_NC_w,     outroot, city, infile, 'users_sim_' + 'NC_w'    ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_users_NC_wa,    outroot, city, infile, 'users_sim_' + 'NC_wa'   ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))           
 
-                #G_users_DF = create_igraphnw_from_backbone(outroot, city + '_users_similarity', 'DF', infile)
-                #calc_network_centralities(G_users_DF,   outroot, city, infile, 'users_sim_geo_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
-            
+          
 
 
     
         elif sys.argv[2] == 'venue':
-
-            
-
+           
             print 'Create venues network' 
-          #  G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
+            G_venues  = get_venue_venue_similarity_network_igraph(city, outroot, infile, bbox)
             print 'Creating gephi files...'
-          #  get_gephi_new(G_venues,  outroot, city + '_venues_sim')
-
-            #get_distances_between_nodes(outroot, 'venues_sim', city)
-            #print 'Creating network stats...'
-            #get_network_stats(G_venues,  city, outroot, '_venues_similarity')
-            #print 'Calc centrality measures...'
-            #calc_network_centralities(G_venues,  outroot, city, infile, 'venues_sim_geo',  geo = True,  weighted = True,  venue = True)
-            #get_weight_distr(outroot, city + '_venues_similarity')
-
-            #for nc_threshold in [5000, 3000, 2000, 1500, 1000, 500, 100]:
-            for nc_threshold in [5000]:#1000, 500, 250, 100, 25, 10, 1]:
+            get_gephi_new(G_venues,  outroot, city + '_venues_sim')
+       
+            for nc_threshold in [5000, 2000, 1000, 500, 100]:
 
                 print 'VENUES  THRESHOLD :  ', nc_threshold
                 transform_gephi_to_backbone(outroot, city + '_venues_sim', nc_threshold)
 
-                G_venues_NC_inv  = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'inv',  infile, thresh = str(nc_threshold))
-                G_venues_NC_grav = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'grav', infile, thresh = str(nc_threshold))
-                G_venues_NC_exp  = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'exp',  infile, thresh = str(nc_threshold))
                 G_venues_NC_w    = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'w',    infile, thresh = str(nc_threshold))
                 G_venues_NC_wa   = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_sim', 'NC', 'wa',   infile, thresh = str(nc_threshold))
 
-                calc_network_centralities(G_venues_NC_inv,  outroot, city, infile, 'venues_sim_' + 'NC_inv'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_venues_NC_grav, outroot, city, infile, 'venues_sim_' + 'NC_grav' ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
-                calc_network_centralities(G_venues_NC_exp,  outroot, city, infile, 'venues_sim_' + 'NC_exp'  ,   geo = True,  weighted = False,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_venues_NC_w,    outroot, city, infile, 'venues_sim_' + 'NC_w'    ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))
                 calc_network_centralities(G_venues_NC_wa,   outroot, city, infile, 'venues_sim_' + 'NC_wa'   ,   geo = True,  weighted = True,  venue = False, thresh = str(nc_threshold))           
 
-                #G_venues_DF = create_igraphnw_from_backbone_for_venues(outroot, city + '_venues_similarity', 'DF', infile)
-                #calc_network_centralities(G_venues_DF,   outroot, city, infile, 'venues_similarity_' + 'DF' ,   geo = True,  weighted = True,  venue = False)
-           
-
+     
 
 
       
-
-        
-
-
-
 
 
 
