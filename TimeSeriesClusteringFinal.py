@@ -203,10 +203,18 @@ if __name__ == "__main__":
 
     city       = 'london'
     outfolder  = '../ProcessedData/' + city + '/timeseries/'
-    infile     = outfolder + 'senior_timeseries_9_13.dat'
-    #infile     = outfolder + 'mid_timeseries_4_9.dat'
 
-    cluster_the_ts_curves(infile, outfolder, 'senior_9_13')
+
+    for ijk in [8,7,6,5]:
+
+
+        infile     = outfolder + 'senior_timeseries_' + str(ijk) + '_13.dat'
+        #infile     = outfolder + 'mid_timeseries_4_9.dat'
+        
+        print (infile) 
+
+
+        cluster_the_ts_curves(infile, outfolder, 'senior_' + str(ijk) + '_13')
 
 
 
