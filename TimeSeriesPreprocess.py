@@ -253,6 +253,8 @@ if __name__ == "__main__":
     for ijk in [8,7,6,5]:
 
 
+        print 'senior...', ijk
+
         senior = get_stretched_filtered_ts(longest_1m_12_norm, ijk, 13)
 
         fout = open(ofolder + '/senior_timeseries_' + str(ijk) + '_13.dat', 'w')
