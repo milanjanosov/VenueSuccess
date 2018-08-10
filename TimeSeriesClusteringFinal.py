@@ -1,6 +1,9 @@
 from dtaidistance import dtw
 from dtaidistance import clustering
 import numpy as np
+
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import sys
 import os
@@ -10,7 +13,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from scipy.signal import savgol_filter
 from dtaidistance import clustering
-
+import scipy.cluster.hierarchy as hac
 
 
 
@@ -88,18 +91,18 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
         nodes_included = []
         for v in cluster_dict.values():
             nodes_included += v
-            if max(v) > nnn:
-                print ('FAASZ  ', nnn, max(v))
 
 
+
+   
         nc     = len(cluster_dict)  
         nnodes = len(set(nodes_included))
-        
+            
 
-        #for NNN in [6]:
-        #for NNN in [3, 5, 6, 10]:
-        for NNN in [3]:
-    
+            #for NNN in [6]:
+            #for NNN in [3, 5, 6, 10]:
+        for NNN in [10]:
+
             #NNN = 6   # 5 # 6 # 10
 
             figfolder   = outfolder + '/' + maturity + '/figs_clusters/'   + str(NNN)
@@ -111,7 +114,10 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
             if not os.path.exists(vensfolder):   os.makedirs(vensfolder)
 
 
-            cnt = [(c, len(n)) for (c, n) in cluster_dict.items()]
+            MINCSIZE = 100
+            MAXSIZE  = len(series)/2
+
+            cnt = [(c, len(n)) for (c, n) in cluster_dict.items() if len(n) > MINCSIZE and len(n) < MAXSIZE]
             num = min(len(cnt), NNN)
             cnt = sorted(cnt, key=lambda tup: tup[1], reverse = True)[0:num]
 
@@ -146,8 +152,10 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
                         for n in nodes:
 
                             cluster_vens.append( list(series.keys())[int(n)] )
-                            linetotplot = list(series.values())[int(n)]
-                            ax[indicies[ind]].plot(linetotplot, linewidth = 0.4, color = 'grey', alpha = 0.15)
+                            linetotplot  = list(series.values())[int(n)]
+                            xlinetotplot = transform_ts(list(range(len(list(series.values())[int(n)]))), 11)
+
+                            ax[indicies[ind]].plot(xlinetotplot, linetotplot, linewidth = 0.4, color = 'grey', alpha = 0.15)
 
 
 
@@ -164,7 +172,7 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
                         bx     = (bx[1:] + bx[:-1])/2
 
 
-                        fout = open(curvefodler + '/avg_curve_' + str(ind) + '_' + str(biggest) + '.dat', 'w')
+                        fout = open(curvefodler + '/avg_curve_' + str(ind) + '_' + str(biggest) + '_venuesnum=' +  str(len(subseries)) + '.dat', 'w')
                         fout.write('\t'.join([str(b) for b in bx]) + '\n')
                         fout.write('\t'.join([str(b) for b in by]) + '\n')
                         fout.close()
@@ -187,7 +195,7 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
         
 
 
-            
+                
 
 
 if __name__ == "__main__":
@@ -195,10 +203,10 @@ if __name__ == "__main__":
 
     city       = 'london'
     outfolder  = '../ProcessedData/' + city + '/timeseries/'
-    infile     = outfolder + 'senior_timeseries_8_12.dat'
+    infile     = outfolder + 'senior_timeseries_9_13.dat'
     #infile     = outfolder + 'mid_timeseries_4_9.dat'
 
-    cluster_the_ts_curves(infile, outfolder, 'senior_8_12')
+    cluster_the_ts_curves(infile, outfolder, 'senior_9_13')
 
 
 
