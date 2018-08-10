@@ -744,10 +744,64 @@ def venues_distance_mtx(boundingbox, city, outfolder):
 
 
 
+
+'''  ---------------------------------------------------------  '''
+'''            GET USERS AND VENUES AVG DISTANCE LONDONERS      '''
+'''  ---------------------------------------------------------  '''
+
+
+def venues_distance_mtx(boundingbox, city, outfolder):
+
+
+    print(city + ' --  get venues distance matrix...')
+
+    fout = open(outfolder + '/users_info/' + city + '_users_distance_matrix.dat', 'w')
+
+    for line in open(outfolder + '/user_info/' + city + '_user_venues_full.dat'):
+
+        venues = [vvv.split(',') for vvv in (line.strip().split('\t')[1:])]
+
+        for v1 in venues:
+
+            id1  = v1[0]
+            lng1 = float(v1[1])
+            lat1 = float(v1[2])
+    
+            if check_box(boundingbox, city, lat1, lng1):
+
+                for v2 in venues:
+
+                    if v1 != v2:
+
+                        id2 = v2[0]
+                        lng2 = float(v2[1])
+                        lat2 = float(v2[2])
+
+                        if check_box(boundingbox, city, lat2, lng2):
+
+                            fout.write ( id1 + '\t' +  id2 + '\t' + str(mpu.haversine_distance((lat1, lng1), (lat2, lng2))) + '\n')
+
+    fout.close()
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''  ---------------------------------------------------------  '''
 '''  merge and write out all the locations of the users         '''
 '''  ---------------------------------------------------------  '''
-
 
 #check_box(boundingbox, city, lat, lng)
 
@@ -814,6 +868,8 @@ def get_users_coordinates(users_homes, local_users, unknown_users, users_likes, 
 
 
 
+        ''' if its local than drop the non-london palces, otherwise keep all to see where it goes '''
+
         if int(user) in users_homes:
 
             for venue in venues:
@@ -837,6 +893,55 @@ def get_users_coordinates(users_homes, local_users, unknown_users, users_likes, 
     h.close()   
     l.close()
 
+
+
+'''  --------------------------------------------------------------------------------------------------  '''
+'''   filter out the venues of the users based on the users are in london and the venues are in london   '''
+'''  --------------------------------------------------------------------------------------------------  '''
+
+
+def get_final_users_venues_stuff(city, bbox):
+
+    eps       = 0.01
+    mins      = 3
+    LIMIT_num = 0
+    outroot   = '../ProcessedData/' + city + '/'
+    infile    = outroot + '/user_homes/centroids_filtered/' + city + '_user_homes_dbscan_' + str(eps) + '_' + str(mins) + '_' + str(LIMIT_num) + '_filtered.dat'
+
+
+    users = set([line.strip().split('\t')[0]    for line in open(infile)])
+
+
+    files = [#outroot + '/user_info/' + city + '_user_coordinates_raw.dat',
+             #outroot + '/user_info/' + city + '_user_venues_full.dat',   
+             #outroot + '/user_info/' + city + '_user_venues_full_locals_filtered.dat',    
+             ]
+
+
+    for fn in [outroot + '/user_info/' + city + '_user_coordinates_raw_locals_filtered.dat']:
+
+
+        fout = open(fn.replace(city + '_', city + '_FINAL_'), 'w')
+
+        for ind, line in enumerate(open(fn)):
+
+            #if ind == 10: break
+   
+        
+
+            fields = line.strip().split('\t')
+            user   = fields[0]
+    
+            if user in users:     
+                coordinates = [(float(fff.split(', ')[0]), float(fff.split(', ')[1])) for fff in fields[1:]]
+                coordinates = '\t'.join([str(lng) + ', ' + str(lat) for (lng, lat) in coordinates if check_box(bbox, city, lat, lng)])
+
+
+            fout.write(user + '\t' + coordinates + '\n')
+
+        fout.close()
+                
+     
 
 
 '''  ---------------------------------------------------------  '''
@@ -943,6 +1048,47 @@ def get_users_similarity_mtx(city, outfolder):
 
     fout.close()
 
+
+
+
+
+'''  ---------------------------------------------------------  '''
+'''                get venuesusers                              '''
+'''  ---------------------------------------------------------  '''
+
+def get_time_series(city, outfolder):
+
+    print (city + ' -- getting venue time series...')
+
+
+
+
+    venues_series = {}
+    
+    for ind, line in enumerate(open(outfolder + '/venues_info/venues_liked_categories_times.dat')):
+        user, venue, cat, subcat, time = line.strip().split('\t')
+
+        time = float(time)
+
+        if ind % 1000 == 0:
+            print (ind)
+        
+
+        if venue not in venues_series:
+            venues_series[venue] = [time]
+        else:
+            venues_series[venue].append(time)
+        
+
+    fout = open(outfolder + '/venues_info/venues_time_series.dat', 'w')
+    for v, t in venues_series.items():
+
+        if len(t) > 0:
+    
+            fout.write (v + '\t' + '\t'.join([str(tt) for tt in t]) + '\n')
+
+
+    fout.close()
 
 
 
