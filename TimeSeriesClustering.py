@@ -9,11 +9,6 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 import matplotlib.pyplot as plt
 from collections import Counter
 from scipy.signal import savgol_filter
-from dtaidistance import clustering
-
-
-city       = 'london'
-outfolder  = '../ProcessedData/' + city + '/'
 
 
 
@@ -49,7 +44,7 @@ for ind, line in enumerate(open('TIMESERIES_911.DAT')):
 dists = dtw.distance_matrix_fast(series)
 
 
-
+from dtaidistance import clustering
 
 # model1 = clustering.Hierarchical(dtw.distance_matrix_fast, {})
 # Augment Hierarchical object to keep track of the full tree

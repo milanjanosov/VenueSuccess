@@ -222,7 +222,7 @@ if __name__ == "__main__":
     print 'TOT: ', len(longest_1m_12_norm)
     junior = get_stretched_filtered_ts(longest_1m_12_norm, 1, 5)
     mid    = get_stretched_filtered_ts(longest_1m_12_norm, 4, 9)
-    senior = get_stretched_filtered_ts(longest_1m_12_norm, 9, 13)
+
 
     #viz_timeseries(junior, 'Juniors, #curves = ' + str(len(junior)))
     #viz_timeseries(mid,    'Mids,    #curves = ' + str(len(mid)))
@@ -248,10 +248,17 @@ if __name__ == "__main__":
     fout.close()
 
 
-    fout = open(ofolder + '/senior_timeseries_9_13.dat', 'w')
-    for venue, timeseries in senior.items():
-        fout.write( venue + '\t' + '\t'.join([str(fff) for fff in list(timeseries[1])])+ '\n')
-    fout.close()
+
+
+    for ijk in [8,7,6,5]:
+
+
+        senior = get_stretched_filtered_ts(longest_1m_12_norm, ijk, 13)
+
+        fout = open(ofolder + '/senior_timeseries_' + str(ijk) + '_13.dat', 'w')
+        for venue, timeseries in senior.items():
+            fout.write( venue + '\t' + '\t'.join([str(fff) for fff in list(timeseries[1])])+ '\n')
+        fout.close()
 
 
 
