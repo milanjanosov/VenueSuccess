@@ -52,7 +52,7 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
         ts     = fields[1:]
         venues.append(venue)
         #if ind == 500: break
-        series[venue] = savgol_filter(np.asarray([float(fff) for fff in ts  ] ), 7, 3)   
+        series[venue] = savgol_filter(np.asarray([float(fff) for fff in ts  ] ), 5, 3)   
 
 
 
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     outfolder  = '../ProcessedData/' + city + '/timeseries/'
 
 
-    for ijk in [8,7,6,5]:
+    for ijk in [5]:
 
 
         infile     = outfolder + 'senior_timeseries_' + str(ijk) + '_13.dat'
