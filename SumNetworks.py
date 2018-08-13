@@ -72,7 +72,7 @@ for threshold in [5000, 2000, 1000, 500]:#, 500, 100]:
 
     for ind, (v, users) in enumerate(venues_users.items()):
 
-        if ind == 50: break
+       # if ind == 50: break
 
 
         venues_features[v] = {}
