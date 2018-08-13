@@ -16,19 +16,25 @@ outroot   = '../ProcessedData/' + city
 threshold = 5000
 #for threshold in [5000, 3000, 2000, 1500, 1000]:#, 500, 100]:
 
-for threshold in [3000, 2000, 1500, 1000]:#, 500, 100]:
+for threshold in [5000, 2000, 1000, 500]:#, 500, 100]:
 
 #if 2 == 2:
 
     users_friend_geo   = outroot + '/networks/' + city + '_friend__networkmeasures.csv'
-    venues_sim         = outroot + '/networks/' + city + '_venues_similarity_NC_' + str(threshold) + '_networkmeasures.csv'
-    users_sim          = outroot + '/networks/' + city + '_users_sim_geo_NC_'     + str(threshold) + '_networkmeasures.csv'
+    venues_sim_w       = outroot + '/networks/' + city + '_venues_similarity_NC_w_' + str(threshold) + '_networkmeasures.csv'
+    users_sim_w        = outroot + '/networks/' + city + '_users_sim_geo_NC_w_'     + str(threshold) + '_networkmeasures.csv'
+    venues_sim_wa      = outroot + '/networks/' + city + '_venues_similarity_NC_wa_' + str(threshold) + '_networkmeasures.csv'
+    users_sim_wa       = outroot + '/networks/' + city + '_users_sim_geo_NC_wa_'     + str(threshold) + '_networkmeasures.csv'
+
     relevant_venues    = set([line.strip().split('\t')[0] for line in open(outroot + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
 
 
-    df_friend_geo  =  pd.read_csv(users_friend_geo,  sep = ',', index_col=0).fillna(0.0) 
-    df_user_sim    =  pd.read_csv(users_sim,         sep = ',', index_col=0).fillna(0.0) 
-    df_venue_sim   =  pd.read_csv(venues_sim,        sep = ',', index_col=0).fillna(0.0) 
+    df_friend_geo    =  pd.read_csv(users_friend_geo,  sep = ',', index_col=0).fillna(0.0) 
+    df_user_sim_w    =  pd.read_csv(users_sim_w,       sep = ',', index_col=0).fillna(0.0) 
+    df_venue_sim_w   =  pd.read_csv(venues_sim_w,      sep = ',', index_col=0).fillna(0.0) 
+    df_user_sim_wa   =  pd.read_csv(users_sim_wa,      sep = ',', index_col=0).fillna(0.0) 
+    df_venue_sim_wa  =  pd.read_csv(venues_sim_wa,     sep = ',', index_col=0).fillna(0.0) 
+
 
 
     venues_features = {}
@@ -66,13 +72,13 @@ for threshold in [3000, 2000, 1500, 1000]:#, 500, 100]:
 
     for ind, (v, users) in enumerate(venues_users.items()):
 
-        #if ind == 50: break
+        if ind == 50: break
 
 
         venues_features[v] = {}
 
 
-        for (sign, df) in [('u', df_friend_geo), ('us', df_user_sim)]:
+        for (sign, df) in [('u', df_friend_geo), ('us_w', df_user_sim_w), ('us_wa', df_user_sim_wa)]:
 
 
             keys_geo  = df.keys()
@@ -111,10 +117,12 @@ for threshold in [3000, 2000, 1500, 1000]:#, 500, 100]:
     df = pd.DataFrame.from_dict(venues_features, orient = 'index')
 
 
-    df_venue_sim = df_venue_sim.rename(index=str, columns = {vv : 'v_' + vv for vv in df_venue_sim.keys()})
+    df_venue_sim_w  = df_venue_sim_w.rename(index=str,  columns = {vv : 'v_w_'  + vv for vv in df_venue_sim_w.keys()})
+    df_venue_sim_wa = df_venue_sim_wa.rename(index=str, columns = {vv : 'v_wa_' + vv for vv in df_venue_sim_wa.keys()})
 
+    finaldf = df.join(df_venue_sim_w)
+    finaldf = df.join(df_venue_sim_wa)
 
-    finaldf = df.join(df_venue_sim)
 
     finaldf.to_csv(filename, na_rep='nan')
 
