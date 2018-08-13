@@ -22,9 +22,9 @@ for threshold in [5000, 2000, 1000, 500]:#, 500, 100]:
 
     users_friend_geo   = outroot + '/networks/' + city + '_friend__networkmeasures.csv'
     venues_sim_w       = outroot + '/networks/' + city + '_venues_similarity_NC_w_' + str(threshold) + '_networkmeasures.csv'
-    users_sim_w        = outroot + '/networks/' + city + '_users_sim_geo_NC_w_'     + str(threshold) + '_networkmeasures.csv'
+    users_sim_w        = outroot + '/networks/' + city + '_users_sim_NC_w_'     + str(threshold) + '_networkmeasures.csv'
     venues_sim_wa      = outroot + '/networks/' + city + '_venues_similarity_NC_wa_' + str(threshold) + '_networkmeasures.csv'
-    users_sim_wa       = outroot + '/networks/' + city + '_users_sim_geo_NC_wa_'     + str(threshold) + '_networkmeasures.csv'
+    users_sim_wa       = outroot + '/networks/' + city + '_users_sim_NC_wa_'     + str(threshold) + '_networkmeasures.csv'
 
     relevant_venues    = set([line.strip().split('\t')[0] for line in open(outroot + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
 
