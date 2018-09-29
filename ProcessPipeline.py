@@ -147,7 +147,7 @@ if sys.argv[2] == 'preproc':
     ParseJsons.get_users_distance_distr_from_home(city, outroot) 
     ParseJsons.get_users_venues(unknown_users, local_users, users_photos, users_likes, users_tips, city, outroot)
     ParseJsons. get_users_friends(local_users, city, inroot, outroot)
-    ParseJsons.venues_distance_mtx(bbox, city, outroot)
+    #ParseJsons.venues_distance_mtx(bbox, city, outroot)
     ParseJsons.get_venues_users(city, outroot)       
     ParseJsons.get_venues_stat(city, outroot)
 
@@ -156,7 +156,7 @@ if sys.argv[2] == 'preproc':
 
     #ParseJsons.users_distance_mtx(bbox, city, outroot)
 
-    ParseJsons.get_final_users_venues_stuff(city, bbox)
+    #ParseJsons.get_final_users_venues_stuff(city, bbox)
 
 
 
