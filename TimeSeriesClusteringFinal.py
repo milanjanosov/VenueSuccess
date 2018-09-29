@@ -201,7 +201,7 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
 if __name__ == "__main__":
 
 
-    city       = 'london'
+    city       = 'newyork'
     outfolder  = '../ProcessedData/' + city + '/timeseries/'
 
 

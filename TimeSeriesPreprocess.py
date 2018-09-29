@@ -1,4 +1,3 @@
-import os
 import matplotlib
 matplotlib.use('Agg')
 import numpy as np
@@ -193,7 +192,7 @@ def get_stretched_filtered_ts(longest_1m_12, limit_low, limit_up):
 if __name__ == "__main__":
 
 
-    city    = 'london'
+    city    = 'newyork'
     infile  = '../ProcessedData/' + city + '/venues_info/venues_time_series.dat'
     ofolder =  '../ProcessedData/' + city + '/timeseries'
 
