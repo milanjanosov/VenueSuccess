@@ -71,6 +71,8 @@ def get_venues_times(infile, relevant_venues, month = 1, length = 1000):
 
         if venue in relevant_venues:
 
+
+
             times  = sorted([ round_unix_date(float(fff), month*30*24*60*60) for fff in fields[1:]])
             x, y = zip(* sorted([(k, v) for k, v in dict(Counter(times)).items()], key=lambda tup: tup[0]))       
             if len(x) > length:
@@ -193,7 +195,7 @@ def get_stretched_filtered_ts(longest_1m_12, limit_low, limit_up):
 if __name__ == "__main__":
 
 
-    city    = 'newyork'
+    city    = 'new york'
     infile  = '../ProcessedData/' + city + '/venues_info/venues_time_series.dat'
     ofolder =  '../ProcessedData/' + city + '/timeseries'
 
@@ -203,7 +205,7 @@ if __name__ == "__main__":
 
     #relevant_venues = set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
 
-    relevant_venues = [line.strip().split('\1')[0] for line in open(infile)]
+    relevant_venues = [line.strip().split('\t')[0] for line in open(infile)]
     print 'relevant venues:  ', len(relevant_venues), '\n'
 
 
@@ -266,9 +268,6 @@ if __name__ == "__main__":
 
 
         print 'senior  ' , len(senior)
-
-
-
 
 
 
