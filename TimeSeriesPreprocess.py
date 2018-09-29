@@ -201,7 +201,9 @@ if __name__ == "__main__":
         os.makedirs(ofolder)
     
 
-    relevant_venues = set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
+    #relevant_venues = set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
+
+    relevant_venues = [line.strip().split('\1')[0] for line in open(infile)]
     print 'relevant venues:  ', len(relevant_venues), '\n'
 
 
