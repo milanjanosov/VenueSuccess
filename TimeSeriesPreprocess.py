@@ -254,8 +254,8 @@ if __name__ == "__main__":
 
 
 
-    for ijk in [8,7,6,5]:
 
+    for ijk in [8,7,6,5,4]:
 
         print 'senior...', ijk
 
