@@ -205,7 +205,7 @@ if __name__ == "__main__":
     outfolder  = '../ProcessedData/' + city + '/timeseries/'
 
 
-    for ijk in [5]:
+    for ijk in [5,6,7,8]:
 
 
         infile     = outfolder + 'senior_timeseries_' + str(ijk) + '_13.dat'
