@@ -203,9 +203,16 @@ if __name__ == "__main__":
         os.makedirs(ofolder)
     
 
-    #relevant_venues = set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
 
-    relevant_venues = [line.strip().split('\t')[0] for line in open(infile)]
+    
+
+    #relevant_venues = set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
+    #relevant_venues =[line.strip().split('\t')[0] for line in open(infile)]
+    relevant_venues = list(set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/' + city + '_venues_locations.dat')]))
+
+
+
+
     print 'relevant venues:  ', len(relevant_venues), '\n'
 
 
@@ -253,8 +260,6 @@ if __name__ == "__main__":
 
 
 
-
-
     for ijk in [8,7,6,5,4]:
 
         print 'senior...', ijk
@@ -268,7 +273,6 @@ if __name__ == "__main__":
 
 
         print 'senior  ' , len(senior)
-
 
 
 
