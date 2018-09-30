@@ -129,7 +129,7 @@ if sys.argv[2] == 'preproc':
     ''' =========================================================== '''
 
     t1 = time.time() 
-    users_homes   = {}
+    '''users_homes   = {}
     unknown_users, local_users, nonlocal_users = ParseJsons.get_local_users(city, inroot, outroot)
     users_likes   = ParseJsons.get_users_like_location(         unknown_users, local_users, city, bbox, inroot, outroot, users_homes) 
     users_photos  = ParseJsons.get_photos_locations_and_users(  unknown_users, local_users, city, bbox, inroot, outroot, users_homes)
@@ -153,6 +153,8 @@ if sys.argv[2] == 'preproc':
 
       
     ParseJsons.get_time_series(city, outroot)
+    '''
+    ParseJsons.get_venues_information(city, bbox, inroot, outroot)   
 
     #ParseJsons.users_distance_mtx(bbox, city, outroot)
 
