@@ -55,7 +55,7 @@ def cluster_the_ts_curves(infile, outfolder, maturity, smoothing):
 
         if smoothing == 'smooth':
             series[venue] = savgol_filter(np.asarray([float(fff) for fff in ts  ] ), 5, 3)  
-        elif smooting == 'notsmooth':
+        elif smoothing == 'notsmooth':
              series[venue] = np.asarray([float(fff) for fff in ts  ] )
         else:
             print ('FUCK OFF')
