@@ -111,9 +111,9 @@ def cluster_the_ts_curves(infile, outfolder, maturity, smoothing):
 
             #NNN = 6   # 5 # 6 # 10
 
-            figfolder   = outfolder + '/' + maturity + '/figs_clusters/'   + str(NNN)
-            curvefodler = outfolder + '/' + maturity + '/avg_curves/'      + str(NNN)
-            vensfolder  = outfolder + '/' + maturity + '/clusters_venues/' + str(NNN)
+            figfolder   = outfolder + '/' + maturity + '/figs_clusters_'   + smoothing +  '/'  + str(NNN)
+            curvefodler = outfolder + '/' + maturity + '/avg_curves_'      + smoothing +  '/'  + str(NNN)
+            vensfolder  = outfolder + '/' + maturity + '/clusters_venues_' + smoothing +  '/'  + str(NNN)
 
             if not os.path.exists(figfolder):    os.makedirs(figfolder)
             if not os.path.exists(curvefodler):  os.makedirs(curvefodler)
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     for ijk in [4,5,6,7,8]:
 
 
-        infile     = outfolder + 'senior_timeseries_' + str(ijk) + '_' + smoothing + '_13.dat'
+        infile     = outfolder + 'senior_timeseries_' + str(ijk) + '_13.dat'
         #infile     = outfolder + 'mid_timeseries_4_9.dat'
         
         print (infile) 
