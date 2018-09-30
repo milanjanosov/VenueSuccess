@@ -1,7 +1,7 @@
 from dtaidistance import dtw
 from dtaidistance import clustering
 import numpy as np
-
+import sys
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -40,7 +40,7 @@ def getBinnedDistribution(x, y, nbins):
 
 
 
-def cluster_the_ts_curves(infile, outfolder, maturity):
+def cluster_the_ts_curves(infile, outfolder, maturity, smoothing):
 
     series   = {}
     venues   = []
@@ -52,7 +52,13 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
         ts     = fields[1:]
         venues.append(venue)
         #if ind == 500: break
-        series[venue] = savgol_filter(np.asarray([float(fff) for fff in ts  ] ), 5, 3)   
+
+        if smoothing == 'smooth':
+            series[venue] = savgol_filter(np.asarray([float(fff) for fff in ts  ] ), 5, 3)  
+        elif smooting == 'notsmooth':
+             series[venue] = np.asarray([float(fff) for fff in ts  ] )
+        else
+            print 'FUCK OFF'
 
 
 
@@ -201,20 +207,21 @@ def cluster_the_ts_curves(infile, outfolder, maturity):
 if __name__ == "__main__":
 
 
-    city       = 'newyork'
+    city       = sys.argv[1]
+    smoothing  = sys.argv[2]
     outfolder  = '../ProcessedData/' + city + '/timeseries/'
 
 
     for ijk in [4,5,6,7,8]:
 
 
-        infile     = outfolder + 'senior_timeseries_' + str(ijk) + '_13.dat'
+        infile     = outfolder + 'senior_timeseries_' + str(ijk) + '_' + smoothing + '_13.dat'
         #infile     = outfolder + 'mid_timeseries_4_9.dat'
         
         print (infile) 
 
 
-        cluster_the_ts_curves(infile, outfolder, 'senior_' + str(ijk) + '_13')
+        cluster_the_ts_curves(infile, outfolder, 'senior_' + str(ijk) + '_13', smoothing)
 
 
 

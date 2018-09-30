@@ -4,7 +4,7 @@ matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 import datetime
-
+import sys
 import pandas as pd
 from scipy.stats import spearmanr
 from collections import Counter
@@ -195,7 +195,7 @@ def get_stretched_filtered_ts(longest_1m_12, limit_low, limit_up):
 if __name__ == "__main__":
 
 
-    city    = 'newyork'
+    city       = sys.argv[1]
     infile  = '../ProcessedData/' + city + '/venues_info/venues_time_series.dat'
     ofolder =  '../ProcessedData/' + city + '/timeseries'
 
