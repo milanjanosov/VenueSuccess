@@ -207,9 +207,8 @@ if __name__ == "__main__":
     
 
     #relevant_venues = set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/venues_ward_full.dat') if 'venue' not in line])
-    #relevant_venues =[line.strip().split('\t')[0] for line in open(infile)]
-    relevant_venues = list(set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/' + city + '_venues_locations.dat')]))
-
+    #relevant_venues = list(set([line.strip().split('\t')[0] for line in open('../ProcessedData/' + city + '/venues_info/' + city + '_venues_locations.dat')]))
+    relevant_venues =[line.strip().split('\t')[0] for line in open(infile)]
 
 
 
