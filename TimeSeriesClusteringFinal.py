@@ -58,7 +58,7 @@ def cluster_the_ts_curves(infile, outfolder, maturity, smoothing):
         elif smooting == 'notsmooth':
              series[venue] = np.asarray([float(fff) for fff in ts  ] )
         else:
-            print 'FUCK OFF'
+            print ('FUCK OFF')
 
 
 
