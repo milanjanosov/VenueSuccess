@@ -165,7 +165,7 @@ def cluster_the_ts_curves(infile, outfolder, maturity, smoothing):
 
 
 
-                        ffout = open(vensfolder + '/venues_in_' + str(ind) + '_' + str(biggest) + '.dat', 'w')
+                        ffout = open(vensfolder + '/venues_in_' + str(ind) + '_' + str(biggest) + '_venuesnum=' +  str(len(subseries)) + '.dat', 'w')
                         ffout.write( '\n'.join(cluster_vens))
                         ffout.close()
             
