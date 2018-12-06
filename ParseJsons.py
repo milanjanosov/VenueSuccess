@@ -57,7 +57,7 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
         user  = jsono['list']['user']['id']
 
 
-        print (jsono)
+
 
         if str(user) in set(unknown_users + local_users):
     
@@ -70,6 +70,9 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
 
                 venueid  = venue['id']
 
+
+                print (venue, '\t', venueid, len(venues_stats))
+        
 
                 if venueid not in venues_stats:
                     venues_stats[venueid] = str(venue['stats'])   # {'usersCount': 4, 'checkinsCount': 718, 'tipCount': 1}
