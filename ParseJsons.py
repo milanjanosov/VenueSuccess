@@ -533,6 +533,9 @@ def get_local_users(city, infolder, outfolder):
 
         qres.write(user + '\n')
 
+
+        print jsono
+
         if 'homeCity' in jsono:
 
             print (jsono)
