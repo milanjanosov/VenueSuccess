@@ -537,7 +537,7 @@ def get_local_users(city, infolder, outfolder):
 
         if 'homeCity' in jsono:
 
-            print (ind, line)
+            print (jsono)
 
             hcity = jsono['homeCity']
 
