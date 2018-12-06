@@ -56,6 +56,9 @@ def get_users_like_location(unknown_users, local_users, city, boundingbox, infol
         jsono = json.loads(line)
         user  = jsono['list']['user']['id']
 
+
+        print (jsono)
+
         if str(user) in set(unknown_users + local_users):
     
 
@@ -167,7 +170,7 @@ def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox
         count = jsono['totalCount']
         user  = jsono['id']
 
-        print (jsono)
+
 
 
         if str(user) in set(unknown_users + local_users) and count > 0:
