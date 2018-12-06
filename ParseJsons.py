@@ -167,6 +167,8 @@ def get_photos_locations_and_users(unknown_users, local_users, city, boundingbox
         count = jsono['totalCount']
         user  = jsono['id']
 
+        print jsono
+
 
         if str(user) in set(unknown_users + local_users) and count > 0:
 
