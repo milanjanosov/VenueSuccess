@@ -527,6 +527,9 @@ def get_local_users(city, infolder, outfolder):
 
     for ind, line in enumerate(open(infolder + city + '_users.json', 'r')):
 
+
+        print (ind, line)
+
         jsono = json.loads(line)
         user  = jsono['id']
 
