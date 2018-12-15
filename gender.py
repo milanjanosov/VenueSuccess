@@ -4,7 +4,7 @@ import sys
 
 city = sys.argv[1]
 
-fout = open('../ProcessedData/london/user_info/users_gender.dat', 'w')
+fout = open('../ProcessedData/'+city+'/user_info/users_gender.dat', 'w')
 
 for ind, line in enumerate(open('../Data/fsqdb/'+city+'/'+city+'_users.json')):
 
