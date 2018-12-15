@@ -12,7 +12,7 @@ for ind, line in enumerate(open('../Data/fsqdb/'+city+'/'+city+'_users.json')):
 
     data = json.loads(line)
 
-
+    print ind
 
     fout.write( data['id'] + '\t' + data['gender'] + '\n')
 
