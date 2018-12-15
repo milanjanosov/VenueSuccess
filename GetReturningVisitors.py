@@ -1,8 +1,9 @@
 from collections import Counter
+import sys
 
 
 ### the relevant guys
-city = 'london'
+city = sys.argv[1]
 outroot   = '../ProcessedData/' + city + '/venues_info/'
 
 #relevant_venues = list(set([line.strip().split('\t')[0] for line in open(outroot + '/venues_ward_full.dat') if 'venue' not in line]))
