@@ -72,7 +72,7 @@ folder = '../ProcessedData/' + city + '/venues_info/'
 #venues = list([line.strip().split('\t')[0] for line in open(folder + city + '_venues_success_measures.csv') if 'tipC' not in line])
 #venues = [line.strip() for line in open('indicies.dat')]
 
-venues = [line.strip().split('\t')[0] for line in open('../ProcessedData/barcelona/timeseries/senior_timeseries_4_13.dat')]
+venues = [line.strip().split('\t')[0] for line in open('../ProcessedData/'+city+'/timeseries/senior_timeseries_4_13.dat')]
 
 
 outfolder = 'html/' + city
