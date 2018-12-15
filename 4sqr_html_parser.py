@@ -3,6 +3,7 @@ import gzip
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
+import sys
 import scipy.stats as stat
 
 
@@ -11,7 +12,7 @@ import scipy.stats as stat
 def get_venues_money(city, outfolder):
 
   
-    files = ['html/' + fn for fn in os.listdir('html')]
+    files = ['html/' + city + '/' + fn for fn in os.listdir('html/' + city)]
 
     venues_money= {}
     nnn = len(files)
@@ -71,7 +72,7 @@ def get_users_venues_money(outfolder, city):
 
     users_moneys = {}
 
-    for ind, line in enumerate(open(outfolder + 'user_info/london_user_venues_full_locals_filtered.dat')):
+    for ind, line in enumerate(open(outfolder + 'user_info/'+city+'_user_venues_full_locals_filtered.dat')):
 
 
         print 'aggregating users money profile    ', ind
@@ -249,13 +250,13 @@ def get_venues_users_moneys(outfolder, city):
 
    
 
-city        = 'london'
+city        = sys.argv[1]
 outfolder   = '../ProcessedData/' + city + '/'
 
 
-#get_venues_money(city, outfolder)
-#get_users_venues_money(outfolder, city)
-get_venues_users_moneys(outfolder, city)
+get_venues_money(city, outfolder)
+get_users_venues_money(outfolder, city)
+#get_venues_users_moneys(outfolder, city)
 
 
 
