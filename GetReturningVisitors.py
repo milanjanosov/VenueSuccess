@@ -63,7 +63,7 @@ for v, u in venues_regulars_l.items():
 
 
 ''' writing out the result '''
-fout = open(outroot + 'venues_REGULARS.dat', 'w')
+fout = open('FINAL/venues_REGULARS_'+city+'.dat', 'w')
 
 for venue, usercn in venues_users.items():
 
