@@ -45,7 +45,7 @@ def scrape_and_save_url(url, filename, v, sleeptime, city):
                 f.write(html)
             
             print "Successfully scraped\t{0} ".format(url)
-            sleep_a_bit(4, city)
+            sleep_a_bit(0, city)
             
         else:
             print 'Already got it'    
@@ -53,7 +53,7 @@ def scrape_and_save_url(url, filename, v, sleeptime, city):
     
     except:
         print 'Error sleeping'
-        sleep_a_bit(5, city)    
+        sleep_a_bit(0, city)    
 
 
     #    print "Could not connect to\t {0} ".format(url)
